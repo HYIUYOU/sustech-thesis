@@ -2,113 +2,422 @@
 
 % 第1章 绪论
 \chapter{绪论}
+\section{研究背景}
 
-\section{研究背景与意义}
+近年来，以GPT-4\cite{achiam2023gpt4}、LLaMA\cite{touvron2023llama}、Claude\cite{anthropic2025claude}等为代表的大语言模型（Large Language Models, LLMs）在自然语言处理、代码生成、知识检索和内容创作等领域展现出卓越的性能，推动了人工智能技术的跨越式发展。这些模型通过数百亿乃至万亿级参数的规模化效应，涌现出强大的上下文学习与推理能力，已成为智能时代的关键基础设施。然而，随着模型参数规模的指数级增长，其训练和推理过程对计算资源提出了极高的要求，由此产生的资源密集型特征与高效部署需求之间的矛盾日益尖锐。
 
-\subsection{研究背景}
+在机器学习即服务（MLaaS）的范式下，大模型的生命周期呈现出"训练集中，推理分散"的显著特征。据统计，云平台中约90\%的人工智能计算资源被用于模型推理服务而非训练\cite{wu2022sustainable}，且推理成本随着模型规模呈超线性增长。以OpenAI的ChatGPT为例，为维持其日均7000万次访问的服务规模，需要部署超过6万张NVIDIA A100 GPU，初始投资成本高达16亿美元，每日电费支出约10万美元\cite{he2024uellm}。这些数字清晰地揭示了大模型推理阶段对计算资源的巨额消耗及其带来的沉重经济负担。
 
-近年来，以GPT-4\cite{achiam2023gpt4}、LLaMA\cite{touvron2023llama}、Claude\cite{anthropic2025claude}等为代表的大语言模型（Large Language Models, LLMs）在自然语言处理、代码生成、知识检索和内容创作等领域展现出卓越的性能，推动了人工智能技术的跨越式发展。然而，随着模型参数规模从数十亿增长至数千亿甚至万亿级别，其训练和推理过程对计算资源提出了极高的要求。据统计，云平台中约90\%的人工智能计算资源被用于模型推理服务而非训练\cite{wu2022sustainable}，且推理成本随着模型规模呈指数级增长。例如，为维持ChatGPT日均7000万次访问的服务规模，需要部署超过6万张NVIDIA A100 GPU，初始投资成本高达16亿美元，每日电费支出约10万美元\cite{he2024uellm}。
+大模型推理过程具有独特的两阶段执行特性：预填充（Prefill）阶段与解码（Decode）阶段，这种内在的计算模式差异构成了资源优化的核心挑战。Prefill阶段计算密集，需并行处理整个输入序列以计算注意力键值（KV Cache）并生成首个令牌（Time to First Token, TTFT），其延迟直接影响用户感知的响应速度；Decode阶段则受限于自回归生成机制，需逐令牌迭代输出，呈现显著的内存密集型特征，其关键指标为每输出令牌时间（Time Per Output Token, TPOT）。两个阶段在计算强度、内存访问模式和延迟敏感度上的固有不对称性，使得传统单一架构难以同时优化，往往导致严重的资源利用率低下和负载不均衡问题。
 
-在典型的机器学习即服务（MLaaS）架构中，开发者首先利用大规模数据集离线训练LLMs，随后将训练好的模型部署到分布式云环境中提供在线推理服务。由于单张GPU的显存容量有限（通常为40GB或80GB），而千亿级模型的参数和激活值往往超出单机显存容量，因此必须采用分布式部署策略。然而，随着部署GPU数量的增加，设备间的通信开销和同步延迟显著上升；反之，若GPU数量不足，则会导致显存溢出（Out-of-Memory, OOM）错误或极长的推理延迟。此外，大模型推理具有独特的两阶段执行特性：预填充（Prefill）阶段和解码（Decode）阶段。Prefill阶段计算密集，需并行处理整个输入序列以生成第一令牌（Time to First Token, TTFT）；Decode阶段则受限于自回归特性，逐令牌生成输出，呈现内存密集型特征，其关键指标为每输出令牌时间（Time Per Output Token, TPOT）。这种计算-内存需求的固有不对称性，使得传统单一架构难以同时优化两个阶段，导致严重的资源利用率低下和负载不均衡问题。
+此外，大模型推理面临着严峻的显存墙（Memory Wall）挑战。以千亿级参数模型为例，其参数本身需占用数百GB显存，而KV Cache的动态增长进一步加剧了显存压力。由于单张GPU显存容量有限（通常为40GB或80GB），必须采用张量并行（Tensor Parallelism）或流水线并行（Pipeline Parallelism）等分布式部署策略。然而，随着部署GPU数量的增加，节点间通信开销和同步延迟显著上升；反之，若GPU资源配置不足，则会导致显存溢出（Out-of-Memory, OOM）错误或极长的推理延迟。这种资源配置的刚性约束与服务质量（Quality of Service, QoS）要求之间的张力，构成了大模型部署的核心难点。
 
-另一方面，生产环境的推理负载具有高度动态性和不可预测性。请求到达率（Requests Per Second, RPS）随时间剧烈波动，输入/输出序列长度分布呈现重尾特性（Heavy-tailed）。传统静态资源配置策略在负载低谷期造成严重的资源浪费（GPU利用率仅20\%-40\%），而在突发流量（Bursty Traffic）下又因扩容滞后导致服务等级目标（Service Level Objective, SLO）违约甚至服务中断。现有系统如vLLM\cite{kwon2023efficient}通过PagedAttention优化显存管理，DistServe\cite{zhong2024distserve}采用PD分离架构消除阶段间干扰，但这些方案仍受限于粗粒度的资源配置（实例级或GPU池级）和缓存感知的静态路由策略，无法适应快速变化的负载模式。因此，如何在保障严格SLO的前提下，实现计算与内存资源的细粒度弹性调度，成为大模型推理服务面临的核心挑战。
+更为复杂的是，生产环境的推理负载具有高度动态性和不可预测性。请求到达率（Requests Per Second, RPS）随时间呈现剧烈波动，输入/输出序列长度分布呈现显著的重尾特性（Heavy-tailed），即少数长序列请求占据了大量资源。传统静态资源配置策略在负载低谷期造成严重的资源浪费（GPU利用率常仅20\%-40\%），而在突发流量（Bursty Traffic）下又因扩容滞后导致服务等级目标（Service Level Objective, SLO）违约甚至服务中断。现有系统如vLLM\cite{kwon2023efficient}通过PagedAttention优化显存管理，DistServe\cite{zhong2024distserve}采用PD分离架构消除阶段间干扰，但这些方案仍受限于粗粒度的资源配置（实例级或GPU池级）和缺乏前瞻性的静态调度策略，无法适应快速变化的负载模式。因此，如何在保障严格SLO的前提下，实现计算与内存资源的细粒度弹性调度，成为大模型推理服务从实验室走向规模化产业应用必须攻克的关键瓶颈。
 
-\subsection{研究意义}
+\section{研究意义}
 
-本研究围绕大模型推理服务的批式调度与弹性伸缩展开，具有以下重要的理论价值和实践意义：
+本研究围绕大模型推理服务的批式调度与弹性伸缩展开，针对静态资源配置与动态负载需求之间的结构性矛盾，具有以下重要的理论价值和实践意义：
 
-从科学价值角度，本研究针对LLM推理中计算-内存协同优化这一基础科学问题，揭示了静态资源配置与动态负载需求之间的结构性矛盾，提出了从请求级批处理到模块级弹性伸缩的分层优化理论框架。通过建立考虑KV Cache动态增长、网络拓扑异构性和SLO约束的数学模型，探索了在离散配置空间中寻找最优部署策略的算法边界，为大规模分布式推理系统的资源管理提供了新的理论依据。
+\textbf{（1）理论价值：构建分层优化的资源管理理论框架}
 
-从工程实践角度，研究成果可直接应用于云原生AI基础设施，具有显著的经济效益和社会价值。首先，通过精确的输出长度预测和SLO感知的批处理算法，可减少无效填充（Padding）和冗余计算，预计可降低推理成本30\%以上；其次，模块级细粒度迁移技术打破了传统副本级扩缩容的粒度限制，将资源响应时间从分钟级降至秒级，显著提升系统对突发流量的鲁棒性；再者，跨实例的KV Cache共享机制消除了缓存局部性对调度策略的约束，解决了前缀缓存感知路由导致的热点倾斜问题，提高了集群整体资源利用率。这些技术对推动大模型在智能客服、自动驾驶、金融风控等延迟敏感场景的普及应用具有重要意义，同时通过提升资源利用效率减少了能源消耗，符合绿色计算和可持续发展的战略目标。
+从科学价值角度，本研究针对LLM推理中计算-内存协同优化这一基础科学问题，提出了从请求级批处理到模块级弹性伸缩的分层优化理论框架。通过建立考虑KV Cache动态增长、网络拓扑异构性和SLO约束的数学模型，深入探索了在离散配置空间中寻找最优部署策略的算法边界与计算复杂度。研究揭示了在Prefill与Decode阶段分离场景下，资源分配与延迟约束之间的权衡机理，为大规模分布式推理系统的资源管理提供了新的理论依据和分析工具，丰富了云计算与人工智能交叉领域的理论体系。
 
-此外，本研究提出的统一优化框架兼顾算法效率与系统可实现性，已在真实GPU集群和Azure生产环境traces中验证了其有效性，为学术界和工业界提供了可复现、可部署的技术路径，有助于填补当前LLM推理服务在细粒度资源管理方面的研究空白。
+\textbf{（2）经济效益：显著降低推理成本与提升资源利用率}
+
+从工程实践角度，研究成果可直接应用于云原生AI基础设施，产生显著的经济效益。首先，通过精确的输出长度预测和SLO感知的动态批处理算法，可有效减少无效填充（Padding）和冗余计算，预计可降低推理成本30\%以上，缓解企业运营压力；其次，模块级细粒度迁移技术打破了传统副本级扩缩容的粒度限制，将资源响应时间从分钟级降至秒级，显著提升系统对突发流量的鲁棒性，避免因过度预配置导致的资源闲置浪费；再者，跨实例的KV Cache共享机制消除了缓存局部性对调度策略的约束，解决了前缀缓存感知路由导致的热点倾斜问题，可将集群整体GPU利用率从当前的20\%-40\%提升至70\%以上。这些技术对推动大模型在智能客服、自动驾驶、金融风控等延迟敏感场景的普及应用具有重要意义。
+
+\textbf{（3）绿色计算：促进环境可持续性与社会责任}
+
+提高资源利用率对于全球环境可持续性具有重要的战略意义。当前大模型服务需要消耗巨量电力，不仅增加了企业的运营成本，也产生了显著的碳足迹。通过优化计算资源的调度与使用，减少闲置GPU的能源浪费，可有效降低数据中心整体功耗，符合全球倡导的绿色计算和可持续发展目标\cite{wu2022sustainable}。据估算，若全球云AI基础设施采用本研究提出的资源优化方法，每年可减少数亿千瓦时的能源消耗，为推动人工智能技术的绿色发展提供可行的技术路径。
+
+\textbf{（4）技术生态：推动边缘计算与异构计算发展}
+
+此外，本研究提出的统一优化框架不仅适用于云端数据中心，其核心理念还可延伸至边缘计算场景。通过高效的资源调度机制，使大模型能够在资源受限的边缘设备和嵌入式系统中高效运行，拓展了LLM的应用边界。研究还将促进GPU、TPU、CPU等异构计算资源的协同调度技术发展，为构建更加灵活、高效、经济的AI计算基础设施提供技术支撑，进一步推动人工智能技术在医疗、教育、制造等各行各业的深度落地与普惠应用。
+
+综上所述，面向大模型推理任务的优化研究不仅是对现有系统性能的改进，更是推动大模型技术从理论走向规模化实践的关键一步。随着大模型的不断扩展及其推理需求的持续增长，本研究成果将在提升模型应用效率、节约计算资源及提高系统稳定性方面发挥愈加重要的作用，为人工智能产业的健康可持续发展奠定坚实基础。
 
 \section{国内外研究现状及分析}
 
-本节从大模型推理优化的技术路径出发，系统梳理了批处理调度、资源配置优化和PD分离架构三个维度的研究现状，分析现有方案的局限性，并引出本文的研究切入点。
+大语言模型推理优化的研究呈现出从算法创新到系统架构、从静态配置到动态调度、从单机优化到分布式协同的演进趋势。本节系统梳理了算法层面的解码优化、系统层面的内存管理与批处理技术、架构层面的资源配置与弹性伸缩策略，并对比分析国内外研究特点，最后指出现有研究的局限性与本文切入点。
 
-\subsection{批处理与请求调度优化}
+\subsection{算法层面的推理优化}
 
-批处理（Batching）是提升LLM推理吞吐量的关键技术。近期的vLLM\cite{kwon2023efficient}提出了PagedAttention机制，通过块级KV Cache管理减少显存碎片，支持动态批处理（Continuous Batching）。SGLang\cite{zheng2024sglang}通过前缀缓存（Prefix Caching）和缓存感知路由减少预填充阶段的冗余计算。然而，这些系统的批处理策略主要依据请求到达顺序（FIFO）或简单启发式规则，缺乏对请求输出长度的先验知识，导致批内请求长度差异过大时产生严重的填充浪费（Padding Waste）。
+\textbf{1. 解码策略创新}
 
-针对此问题，S$^3$\cite{jin2023s3}将批处理建模为装箱问题，通过预测输出长度优化请求组合，但仅考虑内存优化而未考虑SLO约束。BATCH\cite{ali2020batch}提出了针对无服务器平台的自适应批处理框架，但采用穷举搜索配置，时间复杂度高。Tabi\cite{wang2023tabi}针对判别式模型优化，难以应用于生成式LLMs。现有方案普遍存在三个缺陷：一是缺乏对请求SLO的显式建模，导致高优先级请求可能被延迟；二是未考虑KV Cache随生成过程动态增长的特性；三是静态批处理策略无法适应负载变化。
+为突破自回归生成的序列依赖瓶颈，学术界提出了多种非传统的解码范式。\textbf{推测性解码}（Speculative Decoding）通过小规模草稿模型（Draft Model）快速生成候选序列，再由目标模型并行验证并修正，在保持输出质量不变的前提下实现2-3倍的加速比\cite{leviathan2022fast,chen2023accelerating}。\textbf{非自回归解码}（Non-autoregressive Decoding）则彻底打破逐token生成的限制，通过迭代精化（Iterative Refinement）或掩码预测（Masked Prediction）机制并行输出生成序列，虽然牺牲部分质量，但在实时性要求极高的场景（如实时翻译）展现潜力。
 
-\subsection{模型部署与资源配置优化}
+针对生成过程的不确定动态性，\textbf{早退出机制}（Early Exiting）和\textbf{级联推理}（Cascade Inference）根据中间层置信度自适应决定计算深度。例如，CALM\cite{schuster2022confident}通过动态层级退出减少简单查询的计算量；CascadeBERT\cite{li2020cascade}采用模型级联策略，对简单样本使用轻量级模型，仅将困难样本路由至大模型。这类方法通过计算量与任务难度的自适应匹配，显著提升了平均推理效率。
 
-在资源配置方面，MArk\cite{zhang2019mark}提出了面向SLA的推理服务系统，集成IaaS和无服务器计算以降低成本，但主要针对小型传统模型。Morphling\cite{wang2021morphling}采用元学习（Meta-learning）快速搜索最优配置，但需要对每个候选配置进行压力测试，在LLM场景下引入显著延迟。Splitwise\cite{patel2024splitwise}和DistServe\cite{zhong2024distserve}探索了PD分离架构，将Prefill和Decode阶段分配到不同GPU实例以消除阶段间干扰，但采用静态的资源配比，无法适应动态负载。
+\textbf{2. 模型压缩与量化}
 
-现有PD分离方案存在固有资源失衡问题：Prefill实例通常计算利用率超过95\%但显存利用率仅35\%，而Decode实例则相反。Mooncake\cite{qin2024mooncake}和MemServe\cite{hu2024memserve}尝试通过分布式KV Cache池解决内存瓶颈，但引入跨节点查找开销和一致性协调复杂性。总体而言，当前系统缺乏细粒度的在线资源重平衡机制，难以在请求级动态调整资源配置。
+为缓解显存墙（Memory Wall）问题，模型压缩技术成为研究热点。\textbf{低比特量化}（Low-bit Quantization）将FP16/FP32权重压缩至INT8甚至INT4，配合权重量化（Weight-only Quantization）和激活量化（Activation Quantization）策略，使千亿级模型可在单卡消费级GPU上部署\cite{dettmers2022llm,frantar2022gptq}。近期研究还探索了1-bit量化（如BitNet\cite{wang2023bitnet}）和混合精度量化，通过细粒度分组量化（Group-wise Quantization）减少精度损失。
 
-\subsection{弹性伸缩与负载均衡}
+\textbf{知识蒸馏}（Knowledge Distillation）通过将大模型（教师）的知识迁移至小模型（学生），在保持性能的同时显著降低推理成本。MiniLLM\cite{gu2023knowledge}和LaMini-GPT\cite{wu2023laminigpt}等工作表明，经过针对性蒸馏的7B参数模型在特定任务上可逼近70B模型的性能。国内研究机构在此领域成果显著，清华大学的QLoRA\cite{dettmers2023qlora}和Knowledge Fusion方法在低资源场景下的压缩效率达到国际领先水平。
 
-弹性伸缩（Auto-scaling）是应对动态负载的关键技术。传统方法如Kubernetes的Horizontal Pod Autoscaler（HPA）采用副本级（Replica-level）扩缩容，粒度粗糙，启动延迟长达1-30分钟，无法应对LLM推理的突发流量。Llumnix\cite{sun2024llumnix}提出了动态负载均衡策略，但未针对PD分离架构中的计算-内存异构性进行优化。SpotServe\cite{miao2024spotserve}利用可抢占实例降低成本，但缺乏对LLM特定访存模式的优化。
+\subsection{系统架构与内存管理优化}
 
-在细粒度资源管理方面，Choi等\cite{choi2022serving}提出了GPU时空共享的gpulet抽象，但仅适用于小型传统模型。现有研究尚未解决PD分离架构中模块级（Layer-level）的动态迁移问题，无法在Prefill和Decode实例之间实时转移计算负载或显存压力，导致资源碎片化严重。
+\textbf{1. 注意力机制与显存优化}
 
-\subsection{现有研究的不足与分析}
+Transformer的注意力机制计算复杂度高，显存占用随序列长度平方增长。PagedAttention\cite{kwon2023efficient}借鉴操作系统虚拟内存管理思想，将KV Cache划分为非连续的物理块（Block），通过块表（Block Table）映射实现动态分配，消除了传统连续存储导致的显存碎片，使GPU显存利用率从40-50\%提升至90\%以上。在此基础上，vLLM实现了\textbf{连续批处理}（Continuous Batching），通过动态合并新到达请求并移除已完成请求，最大化吞吐率。
 
-综合上述分析，现有LLM推理系统在以下三个方面存在显著局限：
+针对长上下文（Long Context）场景，\textbf{滑动窗口注意力}（Sliding Window Attention）和\textbf{稀疏注意力}（Sparse Attention）通过限制注意力范围降低计算复杂度。StreamingLLM\cite{xiao2023streamingllm}发现注意力汇点（Attention Sinks）现象，仅需保留初始token的KV Cache即可维持长序列生成稳定性，将显存消耗从序列长度的二次方降至线性。
 
-\textbf{（1）调度策略与资源状态紧耦合}：现有系统（如SGLang、Mooncake）的调度决策严重依赖KV Cache的物理位置，前缀缓存感知路由导致负载热点倾斜。路由器被迫在计算负载均衡与缓存命中率之间做困难权衡，无法基于实时负载做出最优调度。
+\textbf{2. 内核优化与硬件协同}
 
-\textbf{（2）资源配置静态化与粗粒度}：现有PD分离系统（DistServe、Splitwise）在部署时固定Prefill与Decode实例比例，无法在运行期间根据实际负载动态调整。副本级扩缩容响应滞后，难以处理突发流量，且模型加载开销巨大。
+为充分发挥GPU Tensor Core的计算能力，\textbf{算子融合}（Operator Fusion）和\textbf{自动编译}（Automatic Compilation）技术被广泛采用。FlashAttention\cite{dao2022flashattention}系列算法通过IO感知的精确计算调度和分块策略（Tiling），将注意力计算中的HBM访问次数从$O(N)$降至$O(N^2/\text{block\_size})$，在A100 GPU上实现2-4倍的加速。TVM\cite{chen2018tvm}和MLIR等编译器框架通过自动生成针对特定硬件的微内核（Micro-kernel），进一步优化了矩阵乘法和内存访问模式。
 
-\textbf{（3）缺乏跨阶段的细粒度资源协同}：Prefill与Decode阶段的资源需求（计算vs内存）互补，但现有系统缺乏在两个阶段之间动态迁移工作负载或显存数据的机制，导致严重的资源利用率失衡。
+\subsection{批处理与请求调度策略}
 
-针对上述问题，本文拟从请求级批处理优化和模块级弹性伸缩两个层面，研究大模型推理服务的统一资源管理框架。
+批处理（Batching）是提升LLM推理吞吐量的核心手段，但静态批处理（Static Batching）的填充浪费（Padding Waste）问题严重。近期研究聚焦于\textbf{输出长度感知调度}和\textbf{SLO约束优化}。
+
+\textbf{输出长度预测}是优化批处理的关键。S$^3$\cite{jin2023s3}将请求调度建模为多维装箱问题，利用轻量级预测器估计输出长度，将相似长度的请求归入同一批次，减少填充开销。现有方案多基于历史数据静态预测，难以适应输出长度分布的实时变化。
+
+\textbf{前缀缓存与数据局部性}是另一优化维度。SGLang\cite{zheng2024sglang}和RadixAttention通过前缀树（Trie）结构缓存共享系统提示（System Prompt）的KV Cache，对多轮对话场景实现显著加速。然而，缓存感知路由（Cache-aware Routing）引入的负载不均衡问题尚未得到有效解决，热点前缀可能导致特定GPU过载。
+
+\textbf{SLO感知调度}方面，ClockWork\cite{gujarati2020serving}针对传统模型提出基于完成时间预测的早期退出策略，但难以适应LLM自回归生成的动态延迟特性。Splitwise\cite{patel2024splitwise}尝试在保证延迟SLO的前提下优化吞吐量，但缺乏对Prefill与Decode阶段差异性的细粒度建模。
+
+\subsection{资源配置与弹性伸缩机制}
+
+\textbf{1. PD分离架构的演进}
+
+大模型推理的Prefill阶段（计算密集）与Decode阶段（内存密集）具有截然不同的资源需求特征，催生了\textbf{预填充-解码分离}（Prefill-Decode Disaggregation）架构。DistServe\cite{zhong2024distserve}和Splitwise\cite{patel2024splitwise}将两个阶段部署在不同GPU实例上，消除阶段间干扰，使各自可独立优化。然而，现有方案多采用\textbf{静态配比}（如1:1或固定比例），无法适应动态负载中Prefill与Decode需求的实时变化。
+
+\textbf{分布式KV Cache管理}是支撑PD分离的关键。Mooncake\cite{qin2024mooncake}提出全局KV Cache池，通过RDMA网络实现跨节点缓存迁移；MemServe\cite{hu2024memserve}探索了缓存预取（Prefetching）和冗余消除技术。但这些方案引入了显著的跨节点通信开销，且缺乏对网络拓扑异构性的感知。
+
+\begin{figure}[htbp]
+    \centering
+    \begin{tikzpicture}[
+      node distance=2cm,
+      box/.style={draw, rounded corners, minimum width=3.5cm, minimum height=1.8cm, align=center, thick},
+      arrow/.style={->, thick},  % 简化为标准箭头
+      label/.style={font=\small\bfseries, text=red}
+    ]
+    
+    % 左侧：传统耦合架构
+    \node[box, fill=gray!15] (trad) at (0,0) {
+      \textbf{传统耦合架构} \\[3pt]
+      \small 单实例部署 \\[2pt]
+      $\bullet$ Prefill阶段 \\ $\bullet$ Decode阶段 \\[2pt]
+      \textcolor{red}{$\times$ 资源竞争严重}
+    };
+    
+    % 中间的演进箭头
+    \draw[arrow, dashed, color=green!50!black] (2.2,0) -- (4.2,0) 
+      node[midway, above, font=\small\bfseries] {演进} 
+      node[midway, below, font=\small] {PD分离};
+    
+    % 右侧：Prefill节点（计算密集）
+    \node[box, fill=red!10, draw=red!50!black] (prefill) at (6,1.2) {
+      \textbf{Prefill节点} \\[2pt]
+      \small 计算密集型 \\[2pt]
+      \textcolor{red!70!black}{GPU利用率 > 95\%} \\[1pt]
+      \textcolor{blue!70!black}{显存利用率 $\approx$ 35\%}
+    };
+    
+    % 右侧：Decode节点（内存密集）
+    \node[box, fill=blue!10, draw=blue!50!black] (decode) at (6,-1.2) {
+      \textbf{Decode节点} \\[2pt]
+      \small 内存密集型 \\[2pt]
+      \textcolor{red!70!black}{GPU利用率 $\approx$ 40\%} \\[1pt]
+      \textcolor{blue!70!black}{显存利用率 > 90\%}
+    };
+    
+    % 从传统到分离的虚线箭头
+    \draw[arrow, dashed] (trad.east) -- ++(0.5,0) |- (prefill.west);
+    \draw[arrow, dashed] (trad.east) -- ++(0.5,0) |- (decode.west);
+    
+    % KV Cache传输（用紫色线）
+    \draw[->, thick, dashed, color=purple] (prefill.east) -- ++(0.5,0) |- (decode.east) 
+      node[pos=0.25, right, font=\small, text=purple] { KV Cache};
+    
+    % 底部引用
+    % \node[below] at (3,-2.8) {\small DistServe/Splitwise~\cite{zhong2024distserve,patel2024splitwise}};
+    
+    \end{tikzpicture}
+    \caption{传统耦合架构与PD分离架构对比}
+    \label{fig:pd-architecture}
+  \end{figure}
+
+
+\textbf{2. 弹性伸缩与细粒度资源管理}
+
+传统云原生弹性伸缩（如Kubernetes HPA）采用\textbf{副本级}（Replica-level）扩缩容，粒度粗糙（需加载完整模型副本），启动延迟长达分钟级，无法应对LLM推理的突发流量（Bursty Traffic）。ServerlessLLM\cite{chu2024serverlessllm}提出基于分层的快速启动技术，但仍未能解决扩缩容的粒度问题。
+
+在细粒度资源管理方面，\textbf{GPU虚拟化}和\textbf{时空共享}技术取得进展。NVIDIA MPS和MIG（Multi-Instance GPU）支持硬件级的GPU切分，但配置刚性且缺乏软件层面的灵活性。AntMan\cite{xiao2022antman}和Allox\cite{qin2022allox}提出针对深度学习任务的GPU时间片调度，但主要针对训练场景，未考虑LLM推理中KV Cache的状态保持需求。
+
+\subsection{国内外研究现状对比}
+
+\textbf{1. 国外研究：系统架构与硬件协同领先}
+
+以OpenAI、Google、Meta、Stanford等为代表的国外研究机构在\textbf{系统架构创新}和\textbf{硬件-软件协同设计}方面处于领先地位。OpenAI的GPT系列和Google的Gemini推动了超大规模模型的工程化实践，其内部推理系统（如Triton、Pathways）虽未完全开源，但通过vLLM、TensorRT-LLM等开源工具影响了行业标准。学术机构如Stanford的FlexGen\cite{sheng2023flexgen}和Berkeley的SkyPilot\cite{yang2023skypilot}在资源受限场景下的推理优化提出系统性解决方案。
+
+在\textbf{新兴硬件适配}方面，国外研究积极探索TPU、AWS Inferentia、Groq LPU等专用芯片的优化策略，以及FPGA/ASIC的定制化推理加速。PagedAttention、FlashAttention等底层优化多源自国外顶尖实验室。
+
+\textbf{2. 国内研究：场景驱动与算法创新并重}
+
+国内以百度、阿里、华为、清华、中科院等为代表的研究力量在\textbf{垂直场景优化}和\textbf{算法效率提升}方面表现突出。百度的ERNIE系列、阿里的通义千问（Qwen）、华为的盘古（Pangu）模型在中文语境和多模态推理方面具有特色；清华的FastTransformer希望实验室在稀疏化、量化方面贡献显著。
+
+国内研究更注重\textbf{产业落地}与\textbf{边缘部署}。针对国内云计算和边缘计算的特定需求，研究重点集中在移动端部署（如小米、OPPO的端侧大模型）、多模态推理优化（文生图、文生视频的高效推理）以及国产AI芯片（昇腾、寒武纪、海光）的适配优化。此外，国内在\textbf{长文本处理}（如月之暗面的Kimi模型）和\textbf{智能体}（Agent）推理调度方面形成了特色研究方向。
+
+然而，在\textbf{开源基础设施}和\textbf{底层系统软件}方面，国内仍以跟进和适配为主，原创性的系统架构（如vLLM级别的创新）相对不足，这反映了在系统软件栈积累上的差距。
+
+
+\begin{table}[htbp]
+    \caption{国内外大模型推理优化研究特点对比}
+    \label{tab:comparison}
+    \centering
+    \begin{tabular}{p{3cm}p{5cm}p{5cm}}
+      \toprule
+      \textbf{维度} & \textbf{国外研究} & \textbf{国内研究} \\
+      \midrule
+      核心优势 & 系统架构、硬件协同 & 场景驱动、算法创新 \\
+      代表工作 & vLLM\cite{kwon2023efficient}, DistServe\cite{zhong2024distserve} & QLoRA\cite{dettmers2023qlora}, Mooncake\cite{qin2024mooncake} \\
+      技术重点 & 底层系统、内存管理 & 模型压缩、端侧部署 \\
+      产业落地 & 云基础设施 & 端侧AI、国产芯片适配 \\
+      \bottomrule
+    \end{tabular}
+\end{table}
+
+
+\subsection{现有研究的局限性与启示}
+
+综合上述分析，当前LLM推理优化研究在以下维度存在显著局限：
+
+\textbf{（1）调度粒度与资源状态的紧耦合}：现有系统（如SGLang、Mooncake）的调度决策严重依赖KV Cache的物理位置，前缀缓存感知路由导致负载热点倾斜。路由器被迫在计算负载均衡与缓存命中率之间做困难权衡（Cache-Load Balancing Trade-off），缺乏\textbf{计算-缓存联合优化}的全局视角。
+
+\textbf{（2）资源配置的静态化与刚性约束}：现有PD分离系统（DistServe、Splitwise）在部署时固定Prefill与Decode实例比例，无法在运行期间根据实际负载动态调整。副本级扩缩容响应滞后，且模型加载开销巨大，难以处理突发流量下的资源重分配需求。
+
+\textbf{（3）缺乏跨阶段的细粒度资源协同机制}：Prefill与Decode阶段的资源需求（计算vs内存）在时域和空域上互补，但现有系统缺乏在两个阶段之间实时迁移计算负载或显存数据的\textbf{细粒度机制}（如层级别的动态迁移），导致严重的资源利用率失衡（Prefill实例计算饱和但显存闲置，Decode实例反之）。
+
+\textbf{（4）对异构性和动态性的适应性不足}：现有方案多假设同构的GPU集群和稳态负载，对混合型号GPU、网络拓扑差异以及重尾分布（Heavy-tailed）的动态负载缺乏有效建模，导致实际部署中资源碎片化严重。
+
+针对上述局限，本文拟从\textbf{请求级批处理优化}和\textbf{模块级弹性伸缩}两个层面，构建大模型推理服务的统一资源管理框架，突破静态配置与动态需求间的结构性矛盾，实现计算-内存资源的细粒度协同优化。
 
 \section{论文主要工作}
+\label{sec:contributions}
 
-针对大模型推理服务中资源利用率低、SLO保障困难、动态适应性差等挑战，本文围绕批式调度与弹性伸缩两个核心问题，系统性地提出了资源画像、动态批处理、智能部署与细粒度迁移/复制的优化方法，主要贡献包括以下两个方面：
+针对大语言模型（LLM）推理服务中\textbf{资源需求难以预测}、\textbf{静态配置效率低下}、\textbf{动态负载适应性差}等关键挑战，本文围绕\textbf{大模型推理服务的资源画像与弹性资源管理}这一核心主题，构建``\textit{先验感知-静态优化-动态调控}''的完整技术体系。如图~\ref{fig:overview}所示，研究工作由底层至上层递进展开：首先建立细粒度的任务资源画像能力（第~\ref{sec:profiling}节），基于此设计静态场景下的批处理与部署优化方法（第~\ref{sec:uellm}节），最终突破动态场景下的细粒度弹性伸缩技术（第~\ref{sec:banaserve}节），形成从任务接入到资源释放的全生命周期管理闭环。
+
+\begin{figure*}[t]
+    \centering
+    \begin{tikzpicture}[
+        font=\small,
+        >=stealth,
+        thick,
+        layer1/.style={draw=blue!60!black, fill=blue!10, rounded corners, 
+                       minimum width=3.2cm, minimum height=1cm, align=center},
+        layer2/.style={draw=green!50!black, fill=green!10, rounded corners, 
+                       minimum width=3.2cm, minimum height=1cm, align=center},
+        layer3/.style={draw=orange!70!black, fill=orange!10, rounded corners, 
+                       minimum width=3.2cm, minimum height=1cm, align=center},
+        box/.style={draw=#1!70!black, fill=#1!15, rounded corners, thick,
+                    minimum width=2.2cm, minimum height=0.8cm, align=center, font=\footnotesize},
+        descbox/.style={draw=#1!40, fill=#1!5, rounded corners, 
+                       text width=3.2cm, align=left, inner sep=4pt, font=\small}
+    ]
+    
+    %============= 第一层：资源画像（底层，中心点(0,0)）=============
+    \node[layer1] (profiling) at (0,0) {\textbf{资源画像与预测}\\(Resource Profiling)};
+    
+    % 第一层子模块（下方）
+    \node[box=blue] (cluster) at (-2.5,-1.5) {K-Prototypes\\聚类分析};
+    \node[box=blue] (predict) at (0,-1.5) {集成学习预测\\RF/GBM/LightGBM};
+    \node[box=blue] (features) at (2.5,-1.5) {多维度特征建模\\任务类型/长度/语言};
+    
+    % 连接到第一层
+    \draw[->, thick, blue!60!black] (cluster.north) -- ([xshift=-2.5cm, yshift=-0.1cm]profiling.south);
+    \draw[->, thick, blue!60!black] (predict.north) -- ([yshift=-0.1cm]profiling.south);
+    \draw[->, thick, blue!60!black] (features.north) -- ([xshift=2.5cm, yshift=-0.1cm]profiling.south);
+    
+    % 输入数据
+    \node[draw=gray, dashed, fill=gray!5, rounded corners, 
+          minimum width=2cm, minimum height=0.5cm, font=\footnotesize] 
+          (input) at (0,-2.8) {LLM推理任务负载};
+    \draw[->, thick, gray] (input.north) -- (predict.south);
+    
+    %============= 第二层：UELLM（中层，中心点(0,3.5)）=============
+    \node[layer2] (uellm) at (0,3.5) {\textbf{统一高效批式调度与部署}\\(UELLM Framework)};
+    
+    % 第二层子模块（上方）
+    \node[box=green] (profiler) at (-2.5,5) {资源画像\\(Resource Profiler)};
+    \node[box=green] (scheduler) at (0,5) {SLO-ODBS\\动态批处理};
+    \node[box=green] (deployer) at (2.5,5) {HELR\\高效部署};
+    
+    % 连接到第二层
+    \draw[->, thick, green!60!black] (profiler.south) -- ([xshift=-2.5cm, yshift=0.1cm]uellm.north);
+    \draw[->, thick, green!60!black] (scheduler.south) -- ([yshift=0.1cm]uellm.north);
+    \draw[->, thick, green!60!black] (deployer.south) -- ([xshift=2.5cm, yshift=0.1cm]uellm.north);
+    
+    % UELLM内部连接
+    \draw[<->, thick, green!60!black] (profiler.east) -- (scheduler.west);
+    \draw[<->, thick, green!60!black] (scheduler.east) -- (deployer.west);
+    
+    %============= 第三层：BanaServe（顶层，中心点(0,7)）=============
+    \node[layer3] (banaserve) at (0,7) {\textbf{细粒度弹性伸缩}\\(BanaServe Framework)};
+    
+    % 第三层子模块（上方）
+    \node[box=orange] (kvstore) at (-2.5,8.5) {全局KV Cache\\存储层};
+    \node[box=orange] (migration) at (0,8.5) {模块级动态迁移\\(Layer/Attention级)};
+    \node[box=orange] (loadsched) at (2.5,8.5) {负载感知\\调度器};
+    
+    % 连接到第三层
+    \draw[->, thick, orange!70!black] (kvstore.south) -- ([xshift=-2.5cm, yshift=0.1cm]banaserve.north);
+    \draw[->, thick, orange!70!black] (migration.south) -- ([yshift=0.1cm]banaserve.north);
+    \draw[->, thick, orange!70!black] (loadsched.south) -- ([xshift=2.5cm, yshift=0.1cm]banaserve.north);
+    
+    % BanaServe内部连接
+    \draw[<->, thick, orange!70!black] (kvstore.east) -- (migration.west);
+    \draw[<->, thick, orange!70!black] (migration.east) -- (loadsched.west);
+    \draw[<->, thick, orange!70!black, dashed] (kvstore.north east) to[bend left=15] (loadsched.north west);
+    
+    %============= 层间垂直连接（主数据流）=============
+    \draw[->, very thick, blue!50!green] (profiling.north) -- 
+        node[right, fill=white, inner sep=1pt, font=\bfseries\small] {预测资源需求} 
+        (uellm.south);
+        
+    \draw[->, very thick, green!50!orange] (uellm.north) -- 
+        node[right, fill=white, inner sep=1pt, font=\bfseries\small] {部署基础} 
+        (banaserve.south);
+    
+    % 反馈回路
+    \draw[->, very thick, orange!80!black, dashed] (banaserve.west) 
+        to[bend right=35] 
+        node[left, fill=white, inner sep=1pt, font=\bfseries\small] {运行时优化} 
+        (uellm.west);
+    
+    % 直接旁路：Profilling到Scheduler
+    \draw[->, thick, blue!60!green, dashed] (profiling.north east) 
+        to[bend left=18] 
+        node[above right, pos=0.3, fill=white, inner sep=1pt, font=\small] {输出长度预测} 
+        (scheduler.south west);
+    
+    %============= 右侧阶段标注（使用xshift定位）=============
+    \node[descbox=blue] (desc1) at (5,0) {
+        \textbf{阶段一：先验感知}\\[2pt]
+        任务特征提取\\
+        负载模式聚类\\
+        资源需求预测
+    };
+    
+    \node[descbox=green] (desc2) at (5,3.5) {
+        \textbf{阶段二：静态优化}\\[2pt]
+        SLO约束批处理\\
+        异构拓扑部署\\
+        请求-资源匹配
+    };
+    
+    \node[descbox=orange] (desc3) at (5,7) {
+        \textbf{阶段三：动态调控}\\[2pt]
+        细粒度在线迁移\\
+        全局状态共享\\
+        弹性负载均衡
+    };
+    
+    % 右侧标注连接到主框
+    \draw[->, thick, blue!50] (profiling.east) -- (desc1.west);
+    \draw[->, thick, green!50] (uellm.east) -- (desc2.west);
+    \draw[->, thick, orange!50] (banaserve.east) -- (desc3.west);
+    
+    %============= 底部阶段标签 =============
+    \node[font=\footnotesize\itshape, text=blue!60!black] at ([yshift=-0.6cm]profiling.south) 
+    {第一研究阶段：资源画像};
+\node[font=\footnotesize\itshape, text=green!50!black] at ([yshift=-0.6cm]uellm.south) 
+    {第二研究阶段：静态优化};
+\node[font=\footnotesize\itshape, text=orange!70!black] at ([yshift=-0.6cm]banaserve.south) 
+    {第三研究阶段：动态伸缩};
+    
+    \end{tikzpicture}
+    \caption{论文整体技术框架：从资源画像感知（底层）、静态优化（中层）到动态弹性伸缩（顶层）的递进式研究体系。底层通过K-Prototypes聚类和集成学习建立任务资源画像；中层基于UELLM框架实现SLO感知的批处理与异构部署；顶层通过BanaServe实现模块级细粒度迁移与全局KV Cache共享，形成``\textit{感知-优化-调控}''的闭环。}
+    \label{fig:overview}
+\end{figure*}
+
+\subsection{面向LLM推理的任务资源画像与预测方法}
+\label{sec:profiling}
+
+LLM推理任务的资源需求具有高度不确定性，传统基于峰值预留的资源分配策略导致严重的资源浪费。针对该问题，本文从\textit{任务特征工程}、\textit{负载模式聚类}和\textit{资源需求预测}三个层面建立细粒度资源画像体系。
+
+\textbf{（1）多维度任务特征建模与打标数据集构建}。
+
+深入分析LLM推理任务的异构性，从任务类型（文本生成、摘要、翻译、代码等）、输入长度、语言类型等维度构建任务特征空间。设计并采集了182个覆盖不同复杂度、长度（5-431 tokens）和语言（中英双语）的测试样本，建立高质量的推理任务基准数据集。
+
+\textbf{（2）基于K-Prototypes的混合特征聚类分析}。
+
+针对任务属性中同时存在数值型（输入长度、历史GPU利用率）和分类型（任务类型、语言）特征的混合数据特点，提出基于K-Prototypes算法的负载聚类方法。算法定义混合距离函数：
+\begin{equation}
+d(x_i, q_j) = \sum_{l=1}^{p}(x_{il} - q_{jl})^2 + \mu \sum_{l=p+1}^{m}s(x_{il}, q_{jl})
+\end{equation}
+其中前$p$项为数值属性的欧氏距离，后$m-p$项为分类属性的简单匹配距离（$s$为指示函数，取值0/1），$\mu$为类别权重系数。
+
+通过肘部法则确定最优聚类数$K=6$，将182个测试样本划分为具有显著差异的资源消费模式：Cluster~0（短输入/高波动）、Cluster~3（长输入/稳定高占用）等。聚类内样本在GPU利用率方差上比全局分布降低67\%，验证了聚类有效性。
+
+
+\textbf{（3）基于集成学习的多维资源预测模型}。
+
+在每个聚类内部，分别训练Random Forest、Gradient Boosting和LightGBM三种机器学习模型，对最大GPU利用率、平均GPU利用率、最大显存占用、平均显存占用和总推理时延等五维资源指标进行预测。实验表明，该预测方法在80\%测试样本上相对误差小于10\%，显著优于单一全局模型，为后续资源调度提供了可靠的决策依据。
 
 \subsection{统一高效的批式调度与部署框架UELLM}
+\label{sec:uellm}
 
-针对传统推理系统批处理策略粗放、部署配置静态化、缺乏SLO感知等问题，本文提出了UELLM（Unified and Efficient LLM Inference Serving）框架，实现了请求级资源画像、动态批处理与高效部署的协同优化。
+基于前述资源画像获取的任务先验知识，本文进一步研究静态场景下的\textbf{请求调度}与\textbf{模型部署}联合优化问题。针对传统系统批处理策略粗放（FIFO）、部署配置静态化、缺乏服务质量（SLO）感知等缺陷，提出UELLM（Unified and Efficient LLM Inference Serving）框架，实现从资源画像到调度决策的端到端优化。
 
-\textbf{（1）基于微调的推理任务资源画像方法}：针对LLM推理中输出长度不确定导致的资源需求难以预测问题，本文采用基于微调大模型（ChatGLM3-6B）的方法对请求输出长度进行预测。通过在Alpaca、Natural Questions等指令遵循数据集上微调，模型对长度分桶的预测准确率达到99.51\%，为后续调度提供先验知识。
+\textbf{（1）基于微调大模型的输出长度预测}。
 
-\textbf{（2）SLO与输出长度驱动的动态批处理算法（SLO-ODBS）}：突破了传统FIFO批处理的局限，建立了综合考虑请求SLO约束和输出长度差异的批处理优化模型。算法通过权重化目标函数平衡总延迟与总输出长度，采用贪心策略将请求组合成批，显著减少KV Cache冗余和填充浪费。实验表明，SLO-ODBS在保持低延迟的同时，将SLO违约率降低至接近0\%。
+突破传统静态分析方法的局限，认识到\textit{输出长度}是决定KV Cache大小和计算量的关键变量。采用ChatGLM3-6B作为基础模型，在Alpaca和Natural Questions数据集上进行LoRA微调，将输出长度预测建模为分类任务（分桶策略：8/16/32/64/128/.../2048 tokens）。微调后模型在测试集上达到\textbf{99.51\%}的分桶准确率，相比第一篇工作的基于规则的方法，显著提升了预测精度。
 
-\textbf{（3）高效低延迟资源分配算法（HELR）}：针对LLM分布式部署中设备映射（Device Map）搜索空间巨大、静态配置性能次优的问题，提出了基于动态规划的高效资源分配算法。算法综合考虑集群网络拓扑（NVLink、PCIe带宽异构）、GPU计算能力差异和模型层间依赖关系，自动求解最优的层到设备映射策略。通过调整权重系数，可同时优化GPU利用率（HE模式）或推理延迟（LR模式）。
+\textbf{（2）SLO与输出长度驱动的动态批处理算法（SLO-ODBS）}。
 
-UELLM框架在真实4-GPU集群上的验证表明，相比Morphling和S$^3$等先进方案，系统降低推理延迟72.3\%至90.3\%，提升GPU利用率1.2倍至4.1倍，吞吐量提高1.92倍至4.98倍，且实现了零SLO违约的推理服务。
+针对传统FIFO批处理策略导致的KV Cache冗余填充和SLO违约问题，建立了综合考虑请求SLO约束和输出长度差异的批处理优化模型。算法通过权重化目标函数平衡总延迟与总输出长度，采用贪心策略将长度相近的请求组合成批，避免为短输出请求不必要的填充计算。实验表明，SLO-ODBS在保持低延迟的同时，将SLO违约率降低至接近0\%。
+
+
+\textbf{（3）面向异构拓扑的高效资源分配算法（HELR）}。
+
+针对LLM分布式部署中设备映射（Device Map）搜索空间巨大、静态配置性能次优的问题，提出了基于动态规划的高效资源分配算法。算法综合考虑集群网络拓扑（NVLink、PCIe带宽异构）、GPU计算能力差异和模型层间依赖关系，自动求解最优的层到设备映射策略。通过调整权重系数$\alpha_1$和$\alpha_2$，可在高利用率模式（HE）和低延迟模式（LR）间灵活切换，适应不同服务等级需求。
+
+UELLM框架在真实4-GPU集群上的验证表明，相比Morphling和S$^3$等先进方案，系统降低推理延迟72.3\%至90.3\%，提升GPU利用率1.2倍至4.1倍，吞吐量提高1.92倍至4.98倍，实现了零SLO违约的高质量推理服务。
 
 \subsection{面向PD分离架构的细粒度弹性伸缩框架BanaServe}
+\label{sec:banaserve}
 
-针对PD（Prefill-Decode）分离架构中固有的计算-内存负载失衡、静态资源配置适应性差、前缀缓存导致路由倾斜等问题，本文提出了BanaServe动态编排框架，实现了模块级细粒度迁移与全局KV Cache共享。
+当面临\textbf{动态变化}的负载时，静态配置的系统难以维持高效运行。特别是PD（Prefill-Decode）分离架构中，Prefill阶段\textit{计算密集}而Decode阶段\textit{内存密集}的固有特性导致资源利用率失衡。针对该问题，本文提出BanaServe动态编排框架，突破传统\textit{实例级}扩缩容的粒度限制，实现\textbf{模块级细粒度迁移}与\textbf{全局状态共享}。
 
-\textbf{（1）模块级细粒度动态迁移机制}：突破传统副本级扩缩容的粒度限制，提出了层级（Layer-level）权重迁移与注意力级（Attention-level）KV Cache迁移两种机制。层级迁移支持将连续的Transformer层动态迁移至负载较轻的GPU，实现粗粒度负载重平衡；注意力级迁移将KV Cache按注意力头维度切分，将部分头的计算卸载至辅助GPU（Cold GPU），主GPU（Hot GPU）与辅助GPU并行计算，在不迁移模型权重的情况下实现细粒度负载分担。数学上证明了注意力分解的正确性，确保分布式计算与单卡计算数值等价。
+\textbf{（1）模块级细粒度动态迁移机制}。
 
-\textbf{（2）全局KV Cache存储与层间流水线传输}：为消除前缀缓存对路由决策的约束，设计了跨Prefill实例的全局KV Cache存储层，结合CPU/SSD作为持久化后端。针对全局存储引入的访问延迟，提出了层间流水线重叠传输机制，利用Transformer逐层计算特性，将第$i$层计算与第$i+1$层KV Cache预取重叠，隐藏通信开销。理论分析与实验验证表明，当KV Cache传输时间（约0.082ms）远小于层计算时间（约4.22ms）时，可实现近透明的缓存访问。
+针对PD分离架构中Prefill阶段计算密集与Decode阶段内存密集的资源需求差异，提出了层级（Layer-level）权重迁移与注意力级（Attention-level）KV Cache迁移两种机制。层级迁移支持将连续的Transformer层动态迁移至负载较轻的GPU，实现粗粒度负载重平衡；注意力级迁移将KV Cache按注意力头维度切分，将部分头的计算卸载至辅助GPU（Cold GPU），主GPU（Hot GPU）与辅助GPU并行计算，在不迁移模型权重的情况下实现细粒度负载分担。数学上证明了注意力分解的正确性，确保分布式计算与单卡计算数值等价。
 
-\textbf{（3）负载感知请求调度算法}：基于全局KV Cache存储，实现了完全基于实时负载的调度策略，无需考虑缓存局部性。算法周期性地测量各Prefill实例的综合负载（计算+内存），将新请求分发至负载最轻的实例，并配合动态迁移机制实现快速负载均衡。
+\textbf{（2）全局KV Cache存储与层间流水线传输}。
 
-BanaServe在13B参数模型（LLaMA-13B、OPT-13B）和公开基准（Alpaca、LongBench、Azure生产环境traces）上的评估表明，相比vLLM，系统吞吐量提升1.2倍至3.9倍，延迟降低3.9\%至78.4\%；相比DistServe，吞吐量提升1.1倍至2.8倍，延迟降低1.4\%至70.1\%，并在突发流量下展现出卓越的鲁棒性。
+针对传统前缀缓存感知路由导致的负载倾斜问题，设计了跨Prefill实例的全局KV Cache存储层，解耦缓存状态与计算位置，使调度决策无需受限于缓存局部性。针对全局存储引入的访问延迟，提出了层间流水线重叠传输机制，利用Transformer逐层计算特性，将第$i$层计算与第$i+1$层KV Cache预取重叠。理论分析与实验验证表明，当KV Cache传输时间（约0.082ms）远小于层计算时间（约4.22ms）时，可实现近透明的缓存访问。
+
+
+\textbf{（3）自适应迁移与负载感知调度算法}。
+基于全局KV Cache存储，实现了完全基于实时负载的调度策略。算法周期性地测量各Prefill实例的综合负载（计算+内存利用率），将新请求分发至负载最轻的实例；同时结合动态迁移机制，当实例间负载差异超过阈值$\delta$时，自动触发层级或注意力级迁移，实现快速负载均衡。
+
+BanaServe在13B参数模型（LLaMA-13B、OPT-13B）和公开基准（Alpaca、LongBench）上的评估表明，相比vLLM，系统吞吐量提升1.2倍至3.9倍，总处理时间降低3.9\%至78.4\%；相比DistServe，吞吐量提升1.1倍至2.8倍，延迟降低1.4\%至70.1\%，并在突发流量下展现出卓越的鲁棒性。
 
 \subsection{主要创新点}
 
-本文的主要创新点可总结为：
+本文围绕大模型推理服务的资源管理问题，从资源画像、静态优化到动态伸缩开展了系统性研究，主要创新点可总结为：
 
-\textbf{（1）提出了SLO感知的动态批处理理论框架}：首次将输出长度预测与SLO约束联合建模，突破了传统批处理仅优化吞吐量的局限，实现了延迟违约率与资源利用率的联合优化。
+\textbf{（1）提出了面向异构LLM任务的细粒度资源画像与预测方法}：首次将K-Prototypes聚类与集成学习相结合，针对LLM推理任务的类型、长度、语言等多维属性建立资源需求预测模型，解决了传统方法对LLM推理资源需求预测不准确的问题，为资源管理提供了可靠的数据基础。
 
-\textbf{（2）提出了基于网络拓扑感知的LLM部署优化方法}：将模型层分配问题形式化为带约束的动态规划问题，综合考虑异构互联拓扑和计算能力差异，解决了传统方法部署配置次优或搜索开销过高的问题。
+\textbf{（2）提出了SLO感知的动态批处理与异构部署联合优化框架}：首次将输出长度预测与SLO约束联合建模，设计了SLO-ODBS批处理算法与HELR部署优化算法，突破了传统批处理仅优化吞吐量、传统部署忽视网络拓扑异构性的局限，实现了延迟、利用率与违约率的联合优化。
 
-\textbf{（3）提出了模块级细粒度弹性伸缩新范式}：将扩缩容粒度从实例级下沉至Transformer层/注意力头级，实现了PD分离架构中计算与内存资源的在线重平衡，填补了细粒度在线资源迁移研究空白。
+\textbf{（3）提出了模块级细粒度弹性伸缩新范式}：针对PD分离架构，将资源重配置粒度从实例级下沉至Transformer层/注意力头级，提出了层级权重迁移与注意力级KV Cache迁移机制，实现了计算与内存资源的在线重平衡，填补了细粒度在线资源迁移研究空白。
 
-\textbf{（4）提出了全局KV Cache存储与计算-通信重叠机制}：通过解耦缓存状态与计算位置，消除了前缀缓存对调度的约束，结合流水线传输解决了全局存储的延迟瓶颈。
+\textbf{（4）提出了全局状态共享与计算-通信重叠机制}：通过全局KV Cache存储解耦缓存状态与计算位置，消除了前缀缓存对调度的约束；结合层间流水线传输技术，解决了全局存储的延迟瓶颈，实现了PD分离架构下的高效负载均衡。
 
 \section{论文组织架构}
 
 本文共分为六章，各章内容安排如下：
 
-\textbf{第一章 绪论}：介绍大模型推理服务的研究背景与意义，分析批式调度和弹性伸缩领域的国内外研究现状，阐述本文的主要工作与创新点。
+\textbf{第一章 绪论}：介绍大语言模型推理服务的研究背景与意义，系统梳理国内外在算法优化、系统架构、批处理调度、弹性伸缩等方面的研究现状，深入分析现有研究的局限性；阐述本文"资源画像--静态优化--动态调控"的递进式技术路线与创新点。
 
-\textbf{第二章 相关技术与理论基础}：介绍大语言模型Transformer架构、KV Cache机制、PD分离架构等背景知识；阐述资源管理中的关键metrics（TTFT、TPOT、SLO等）；分析现有系统架构（vLLM、DistServe等）的技术细节与局限性。
+\textbf{第二章 大模型推理资源管理基础与挑战分析}：阐述Transformer架构的自回归生成机制与KV Cache原理，分析Prefill/Decode阶段的计算特征差异；介绍评估指标（TTFT、TPOT、SLO等）与硬件环境（GPU拓扑、NVLink/PCIe异构带宽）；深入剖析现有系统（vLLM、DistServe等）的技术细节与局限性，重点阐述\textbf{资源需求不确定性}、\textbf{静态配置次优性}、\textbf{动态负载失衡}三大核心挑战，为后续三章的技术方案奠定理论基础。
 
-\textbf{第三章 UELLM：统一高效的批式调度与部署}：详细介绍UELLM系统架构，包括资源画像模块的设计与实现、SLO-ODBS批处理算法的数学建模与算法流程、HELR部署优化算法的动态规划求解过程，以及系统集成与实现细节。
+\textbf{第三章 面向LLM推理的任务资源画像与预测方法}：\textit{（对应第一章1.4.1节，第一篇工作）}。针对LLM推理任务资源需求难以预测的问题，构建多维度任务特征建模体系（任务类型、输入长度、语言属性），建立包含182个样本的推理任务基准数据集；提出基于K-Prototypes算法的混合特征聚类方法，通过定义混合距离函数（欧氏距离+简单匹配距离）将任务划分为6个资源消费模式；在各聚类内采用Random Forest、Gradient Boosting、LightGBM集成学习方法，建立GPU利用率、显存占用、推理时延等五维资源指标的预测模型；通过实验验证资源画像方法的预测精度（80\%样本相对误差<10\%），为后续章节的调度优化提供先验知识。
 
-\textbf{第四章 BanaServe：面向PD分离架构的细粒度弹性伸缩}：阐述BanaServe的整体架构设计，详细论述层级迁移与注意力级迁移的数学原理与实现机制，介绍全局KV Cache存储的设计与层间流水线传输优化，以及负载感知调度算法与动态决策流程。
+\textbf{第四章 统一高效的批式调度与部署框架UELLM}：\textit{（对应第一章1.4.2节，第二篇工作）}。基于第三章获取的资源画像先验知识，研究静态场景下的批处理与部署联合优化。介绍基于微调大模型（ChatGLM3-6B）的输出长度预测方法（99.51\%分桶准确率）；详细阐述SLO与输出长度驱动的动态批处理算法SLO-ODBS的数学模型（填充浪费建模）与双阶段贪心策略；论述面向异构拓扑的高效资源分配算法HELR，包括基于动态规划的层到GPU映射优化、HE/LR双模式切换机制；介绍UELLM系统实现与4-GPU集群实验验证，展示相比Morphling/S$^3$在延迟、利用率、吞吐量方面的性能提升。
 
-\textbf{第五章 实验验证与性能评估}：介绍实验环境搭建（硬件配置、测试模型、数据集），设计对比实验验证UELLM在批处理、部署优化方面的性能提升，验证BanaServe在不同负载模式、上下文长度、生产环境traces下的吞吐量和延迟表现，并进行消融实验分析各组件的贡献。
+\textbf{第五章 面向PD分离架构的细粒度弹性伸缩及全文总结}：\textit{（对应第一章1.4.3节，第三篇工作 + 全文总结）}。针对动态负载场景，研究PD分离架构下的弹性伸缩机制。阐述模块级细粒度迁移机制，包括层级（Layer-level）权重迁移的粗粒度重平衡策略与注意力级（Attention-level）KV Cache迁移的细粒度卸载策略，给出注意力分解的数学正确性证明；介绍全局KV Cache存储架构设计与层间流水线重叠传输机制，分析通信-计算重叠的条件与收益；论述负载感知请求调度算法与自适应迁移决策机制；通过LLaMA-13B/OPT-13B模型在Alpaca/LongBench基准及Azure生产traces上的实验，验证BanaServe相比vLLM/DistServe的性能优势；最后总结全文主要研究成果，讨论异构硬件感知、预测性伸缩、跨区域部署等未来研究方向。
 
 \textbf{第六章 总结与展望}：总结本文的主要研究成果，讨论存在的问题与局限性，展望未来研究方向，包括异构硬件感知调度、预测性弹性伸缩、跨地域分布式推理等。
