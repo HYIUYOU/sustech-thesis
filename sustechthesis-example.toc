@@ -1,0 +1,52 @@
+\contentsline {chapter}{摘\hskip 1em\relax 要}{I}{section*.9}%
+\contentsline {chapter}{\textbf {Abstract}}{II}{section*.11}%
+\contentsline {chapter}{符号和缩略语说明}{VI}{section*.15}%
+\contentsline {chapter}{\numberline {第1章}绪论}{1}{chapter.1}%
+\contentsline {section}{\numberline {1.1}研究背景与意义}{1}{section.1.1}%
+\contentsline {subsection}{\numberline {1.1.1}研究背景}{1}{subsection.1.1.1}%
+\contentsline {subsection}{\numberline {1.1.2}研究意义}{2}{subsection.1.1.2}%
+\contentsline {section}{\numberline {1.2}国内外研究现状及分析}{2}{section.1.2}%
+\contentsline {subsection}{\numberline {1.2.1}批处理与请求调度优化}{2}{subsection.1.2.1}%
+\contentsline {subsection}{\numberline {1.2.2}模型部署与资源配置优化}{3}{subsection.1.2.2}%
+\contentsline {subsection}{\numberline {1.2.3}弹性伸缩与负载均衡}{3}{subsection.1.2.3}%
+\contentsline {subsection}{\numberline {1.2.4}现有研究的不足与分析}{4}{subsection.1.2.4}%
+\contentsline {section}{\numberline {1.3}论文主要工作}{4}{section.1.3}%
+\contentsline {subsection}{\numberline {1.3.1}统一高效的批式调度与部署框架UELLM}{4}{subsection.1.3.1}%
+\contentsline {subsection}{\numberline {1.3.2}面向PD分离架构的细粒度弹性伸缩框架BanaServe}{5}{subsection.1.3.2}%
+\contentsline {subsection}{\numberline {1.3.3}主要创新点}{6}{subsection.1.3.3}%
+\contentsline {section}{\numberline {1.4}论文组织架构}{6}{section.1.4}%
+\contentsline {chapter}{\numberline {第2章}图、表及条目示例}{8}{chapter.2}%
+\contentsline {section}{\numberline {2.1}插图}{8}{section.2.1}%
+\contentsline {section}{\numberline {2.2}表格}{8}{section.2.2}%
+\contentsline {section}{\numberline {2.3}源代码}{12}{section.2.3}%
+\contentsline {section}{\numberline {2.4}伪代码}{12}{section.2.4}%
+\contentsline {section}{\numberline {2.5}图表格式测试}{15}{section.2.5}%
+\contentsline {section}{\numberline {2.6}条目编写}{15}{section.2.6}%
+\contentsline {subsection}{\numberline {2.6.1}支持三级目录显示}{15}{subsection.2.6.1}%
+\contentsline {subsection}{\numberline {2.6.2}条目要求}{15}{subsection.2.6.2}%
+\contentsline {subsubsection}{\numberline {2.6.2.1}条目测试}{16}{subsubsection.2.6.2.1}%
+\contentsline {chapter}{\numberline {第3章}数学符号和公式}{17}{chapter.3}%
+\contentsline {section}{\numberline {3.1}数学符号}{17}{section.3.1}%
+\contentsline {section}{\numberline {3.2}数学公式}{18}{section.3.2}%
+\contentsline {section}{\numberline {3.3}数学定理}{19}{section.3.3}%
+\contentsline {section}{\numberline {3.4}数学字体}{19}{section.3.4}%
+\contentsline {chapter}{\numberline {第4章}引用文献的标注}{21}{chapter.4}%
+\contentsline {section}{\numberline {4.1}顺序编码制}{21}{section.4.1}%
+\contentsline {section}{\numberline {4.2}著者-出版年制}{21}{section.4.2}%
+\contentsline {subsection}{\numberline {4.2.1}其他引用注意事项}{21}{subsection.4.2.1}%
+\contentsline {chapter}{\numberline {第5章}English and $\text {lower-case}$ Example}{22}{chapter.5}%
+\contentsline {section}{\numberline {5.1}Reference guide}{22}{section.5.1}%
+\setcounter {tocdepth}{0}
+\contentsline {chapter}{结\hskip 1em\relax 论}{23}{section*.31}%
+\contentsline {chapter}{参考文献}{24}{section*.33}%
+\setcounter {tocdepth}{0}
+\contentsline {chapter}{\numberline {附录 A}补充内容}{27}{appendix.A}%
+\contentsline {section}{\numberline {A.1}图表示例}{27}{section.A.1}%
+\contentsline {subsection}{\numberline {A.1.1}图}{27}{subsection.A.1.1}%
+\contentsline {subsection}{\numberline {A.1.2}表格}{27}{subsection.A.1.2}%
+\contentsline {section}{\numberline {A.2}数学公式}{27}{section.A.2}%
+\contentsline {section}{\numberline {A.3}源代码}{28}{section.A.3}%
+\contentsline {section}{\numberline {A.4}伪代码}{28}{section.A.4}%
+\contentsline {chapter}{致\hskip 1em\relax 谢}{30}{section*.38}%
+\contentsline {chapter}{个人简历、在学期间完成的相关学术成果}{31}{section*.40}%
+\contentsfinish 

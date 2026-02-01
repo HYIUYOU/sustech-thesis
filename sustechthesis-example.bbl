@@ -1,0 +1,318 @@
+\begin{thebibliography}{54}
+\providecommand{\natexlab}[1]{#1}
+\providecommand{\url}[1]{#1}
+\expandafter\ifx\csname urlstyle\endcsname\relax\else
+  \urlstyle{same}\fi
+\expandafter\ifx\csname href\endcsname\relax
+  \DeclareUrlCommand\doi{\urlstyle{rm}}
+  \def\eprint#1#2{#2}
+\else
+  \def\doi#1{\href{https://doi.org/#1}{\nolinkurl{#1}}}
+  \let\eprint\href
+\fi
+
+\bibitem[Achiam et~al.(2023)Achiam, Adler, Agarwal, et~al.]{achiam2023gpt4}
+ACHIAM J, ADLER S, AGARWAL S, et~al.
+\newblock {GPT-4} Technical Report\allowbreak[A].
+\newblock 2023.
+
+\bibitem[Touvron et~al.(2023)Touvron, Lavril, Izacard, et~al.]{touvron2023llama}
+TOUVRON H, LAVRIL T, IZACARD G, et~al.
+\newblock {LLaMA}: Open and Efficient Foundation Language Models\allowbreak[A].
+\newblock 2023.
+
+\bibitem[{Anthropic}(2025)]{anthropic2025claude}
+{Anthropic}.
+\newblock Claude\allowbreak[EB/OL].
+\newblock 2025.
+\newblock \url{https://claude.ai}.
+
+\bibitem[Wu et~al.(2022)Wu, Raghavendra, Gupta, et~al.]{wu2022sustainable}
+WU C~J, RAGHAVENDRA R, GUPTA U, et~al.
+\newblock Sustainable {AI}: Environmental Implications, Challenges and Opportunities\allowbreak[J].
+\newblock Proceedings of Machine Learning and Systems (MLSys), 2022, 4: 795-813.
+
+\bibitem[He et~al.(2024)He, Xu, Wu, Zheng, Ye, and Xu]{he2024uellm}
+HE Y, XU M, WU J, et~al.
+\newblock {UELLM}: A Unified and Efficient Approach for Large Language Model Inference Serving\allowbreak[C/OL]//\allowbreak
+Proceedings of the 22nd International Conference on Service-Oriented Computing (ICSOC 2024).
+\newblock Berlin, Heidelberg: Springer-Verlag, 2024: 218-235.
+\newblock DOI: \doi{10.1007/978-3-031-72312-0_14}.
+
+\bibitem[Kwon et~al.(2023)Kwon, Li, Zhuang, et~al.]{kwon2023efficient}
+KWON W, LI Z, ZHUANG S, et~al.
+\newblock Efficient Memory Management for Large Language Model Serving with PagedAttention\allowbreak[C]//\allowbreak
+Proceedings of the 29th Symposium on Operating Systems Principles (SOSP).
+\newblock ACM, 2023: 611-626.
+
+\bibitem[Zhong et~al.(2024)Zhong, Liu, Chen, et~al.]{zhong2024distserve}
+ZHONG Y, LIU S, CHEN J, et~al.
+\newblock {DistServe}: Disaggregating Prefill and Decoding for Goodput-optimized Large Language Model Serving\allowbreak[C]//\allowbreak
+Proceedings of the 18th USENIX Symposium on Operating Systems Design and Implementation (OSDI).
+\newblock 2024: 193-210.
+
+\bibitem[Zheng et~al.(2024)Zheng, Yin, Xie, et~al.]{zheng2024sglang}
+ZHENG L, YIN L, XIE Z, et~al.
+\newblock {SGLang}: Efficient Execution of Structured Language Model Programs\allowbreak[C]//\allowbreak
+Advances in Neural Information Processing Systems (NeurIPS): Vol.~37.
+\newblock 2024: 62557-62583.
+
+\bibitem[Jin et~al.(2023)Jin, Wu, Brooks, et~al.]{jin2023s3}
+JIN Y, WU C~F, BROOKS D, et~al.
+\newblock {S$^3$}: Increasing {GPU} Utilization during Generative Inference for Higher Throughput\allowbreak[C]//\allowbreak
+Advances in Neural Information Processing Systems (NeurIPS): Vol.~36.
+\newblock 2023: 18015-18027.
+
+\bibitem[Ali et~al.(2020)Ali, Pinciroli, Yan, et~al.]{ali2020batch}
+ALI A, PINCIROLI R, YAN F, et~al.
+\newblock {BATCH}: Machine Learning Inference Serving on Serverless Platforms with Adaptive Batching\allowbreak[C]//\allowbreak
+Proceedings of the International Conference for High Performance Computing, Networking, Storage and Analysis (SC).
+\newblock IEEE, 2020: 1-15.
+
+\bibitem[Wang et~al.(2023)Wang, Chen, Tan, et~al.]{wang2023tabi}
+WANG Y, CHEN K, TAN H, et~al.
+\newblock {Tabi}: An Efficient Multi-Level Inference System for Large Language Models\allowbreak[C]//\allowbreak
+Proceedings of the Eighteenth European Conference on Computer Systems (EuroSys).
+\newblock 2023: 233-248.
+
+\bibitem[Zhang et~al.(2019)Zhang, Yu, Wang, et~al.]{zhang2019mark}
+ZHANG C, YU M, WANG W, et~al.
+\newblock {MArk}: Exploiting Cloud Services for Cost-Effective, {SLO}-Aware Machine Learning Inference Serving\allowbreak[C]//\allowbreak
+Proceedings of the USENIX Annual Technical Conference (ATC).
+\newblock 2019: 1049-1062.
+
+\bibitem[Wang et~al.(2021)Wang, Yang, Yu, et~al.]{wang2021morphling}
+WANG L, YANG L, YU Y, et~al.
+\newblock {Morphling}: Fast, Near-Optimal Auto-Configuration for Cloud-Native Model Serving\allowbreak[C]//\allowbreak
+Proceedings of the ACM Symposium on Cloud Computing (SoCC).
+\newblock 2021: 639-653.
+
+\bibitem[Patel et~al.(2024)Patel, Choukse, Zhang, et~al.]{patel2024splitwise}
+PATEL P, CHOUKSE E, ZHANG C, et~al.
+\newblock {Splitwise}: Efficient Generative {LLM} Inference Using Phase Splitting\allowbreak[C]//\allowbreak
+Proceedings of the 51st Annual International Symposium on Computer Architecture (ISCA).
+\newblock ACM, 2024: 118-132.
+
+\bibitem[Qin et~al.(2024)Qin, Li, He, et~al.]{qin2024mooncake}
+QIN R, LI Z, HE W, et~al.
+\newblock {Mooncake}: A {KVCache}-centric Disaggregated Architecture for {LLM} Serving\allowbreak[C]//\allowbreak
+2024.
+
+\bibitem[Hu et~al.(2024)Hu, Huang, Hu, et~al.]{hu2024memserve}
+HU C, HUANG H, HU J, et~al.
+\newblock {MemServe}: Context Caching for Disaggregated {LLM} Serving with Elastic Memory Pool\allowbreak[A].
+\newblock 2024.
+
+\bibitem[Sun et~al.(2024)Sun, Huang, Zhao, et~al.]{sun2024llumnix}
+SUN B, HUANG Z, ZHAO H, et~al.
+\newblock {Llumnix}: Dynamic Scheduling for Large Language Model Serving\allowbreak[C]//\allowbreak
+Proceedings of the 18th USENIX Symposium on Operating Systems Design and Implementation (OSDI).
+\newblock 2024: 173-191.
+
+\bibitem[Miao et~al.(2024)Miao, Shi, Duan, et~al.]{miao2024spotserve}
+MIAO X, SHI C, DUAN J, et~al.
+\newblock {SpotServe}: Serving Generative Large Language Models on Preemptible Instances\allowbreak[C]//\allowbreak
+Proceedings of the 29th ACM International Conference on Architectural Support for Programming Languages and Operating Systems (ASPLOS).
+\newblock 2024: 1112-1127.
+
+\bibitem[Choi et~al.(2022)Choi, Lee, Kim, et~al.]{choi2022serving}
+CHOI S, LEE S, KIM Y, et~al.
+\newblock Serving Heterogeneous Machine Learning Models on Multi-{GPU} Servers with Spatio-Temporal Sharing\allowbreak[C]//\allowbreak
+Proceedings of the USENIX Annual Technical Conference (ATC).
+\newblock 2022: 199-216.
+
+\bibitem[张昆\ 等(1994)张昆, 冯立群, 余昌钰, et~al.]{zhangkun1994}
+张昆, 冯立群, 余昌钰, 等.
+\newblock 机器人柔性手腕的球面齿轮设计研究\allowbreak[J].
+\newblock 清华大学学报: 自然科学版, 1994, 34\allowbreak (2): 1-7.
+
+\bibitem[竺可桢(1973)]{zhukezhen1973}
+竺可桢.
+\newblock 物理学论\allowbreak[M].
+\newblock 北京: 科学出版社, 1973: 56-60.
+
+\bibitem[Dupont(1974)]{dupont1974bone}
+DUPONT B.
+\newblock Bone marrow transplantation in severe combined immunodeficiency with an unrelated MLC compatible donor\allowbreak[C]//\allowbreak
+WHITE H~J, SMITH R.
+\newblock Proceedings of the third annual meeting of the International Society for Experimental Hematology.
+\newblock Houston: International Society for Experimental Hematology, 1974: 44-46.
+
+\bibitem[郑开青(1987)]{zhengkaiqing1987}
+郑开青.
+\newblock 通讯系统模拟及软件\allowbreak[D].
+\newblock 北京: 清华大学无线电系, 1987.
+
+\bibitem[姜锡洲(1980)]{jiangxizhou1980}
+姜锡洲.
+\newblock 一种温热外敷药制备方案: 中国, 88105607.3\allowbreak[P].
+\newblock 1980-07-26.
+
+\bibitem[中华人民共和国国家技术监督局(1994)]{jianduju1994}
+中华人民共和国国家技术监督局.
+\newblock GB3100-3102. 中华人民共和国国家标准-量与单位\allowbreak[S].
+\newblock 北京: 中国标准出版社, 1994.
+
+\bibitem[Merkt et~al.(1995)Merkt, Mackenzie, and Softley]{merkt1995rotational}
+MERKT F, MACKENZIE S~R, SOFTLEY T~P.
+\newblock Rotational Autoionization Dynamics in High Rydberg States of Nitrogen\allowbreak[J].
+\newblock J Chem Phys, 1995, 103: 4509-4518.
+
+\bibitem[Mellinger et~al.(1996)Mellinger, Vidal, and Jungen]{mellinger1996laser}
+MELLINGER A, VIDAL C~R, JUNGEN C.
+\newblock Laser reduced fluorescence study of the carbon monoxide nd triplet Rydberg series - Experimental results and multichannel quantum defect analysis\allowbreak[J].
+\newblock J Chem Phys, 1996, 104: 8913-8921.
+
+\bibitem[Bixon et~al.(1996)Bixon and Jortner]{bixon1996dynamics}
+BIXON M, JORTNER J.
+\newblock The dynamics of predissociating high {Rydberg} states of {NO}\allowbreak[J].
+\newblock J Chem Phys, 1996, 105: 1363-1382.
+
+\bibitem[马辉\ 等(1995)马辉, 李俭, 刘耀明, et~al.]{mahui1995}
+马辉, 李俭, 刘耀明, 等.
+\newblock 利用 {REMPI} 方法测量 {BaF} 高里德堡系列光谱\allowbreak[J].
+\newblock 化学物理学报, 1995, 8: 308-311.
+
+\bibitem[Carlson et~al.(1981)Carlson, Taylor, Jones, and Schawlow]{carlson1981two}
+CARLSON N~W, TAYLOR A~J, JONES K~M, et~al.
+\newblock Two-step polarization-labeling spectroscopy of excited states of {Na2}\allowbreak[J].
+\newblock Phys Rev A, 1981, 24: 822-834.
+
+\bibitem[Taylor et~al.(1983)Taylor, Jones, and Schawlow]{taylor1983scanning}
+TAYLOR A~J, JONES K~M, SCHAWLOW A~L.
+\newblock Scanning pulsed-polarization spectrometer applied to {Na2}\allowbreak[J].
+\newblock J Opt Soc Am, 1983, 73: 994-998.
+
+\bibitem[Taylor et~al.(1981)Taylor, Jones, and Schawlow]{taylor1981study}
+TAYLOR A~J, JONES K~M, SCHAWLOW A~L.
+\newblock A study of the excited {1$\Sigma$g+} states in {Na2}\allowbreak[J].
+\newblock Opt Commun, 1981, 39: 47-50.
+
+\bibitem[Shimizu et~al.(1983)Shimizu and Shimizu]{shimizu1983laser}
+SHIMIZU K, SHIMIZU F.
+\newblock Laser induced fluorescence spectra of the a {3$\Pi$u--X 1$\Sigma$g+} band of {Na2} by molecular beam\allowbreak[J].
+\newblock J Chem Phys, 1983, 78: 1126-1131.
+
+\bibitem[Atkinson et~al.(1982)Atkinson, Becker, and Demtr{\"o}der]{atkinson1982experimental}
+ATKINSON J~B, BECKER J, DEMTR{\"O}DER W.
+\newblock Experimental observation of the a {3$\Pi$u} state of {Na2}\allowbreak[J].
+\newblock Chem Phys Lett, 1982, 87: 92-97.
+
+\bibitem[Kusch et~al.(1975)Kusch and Hessel]{kusch1975perturbations}
+KUSCH P, HESSEL M~M.
+\newblock Perturbations in the A {1$\Sigma$u+} state of {Na2}\allowbreak[J].
+\newblock J Chem Phys, 1975, 63: 4087-4088.
+
+\bibitem[广西壮族自治区林业厅(1993)]{guangxi1993}
+广西壮族自治区林业厅.
+\newblock 广西自然保护区\allowbreak[M].
+\newblock 北京: 中国林业出版社, 1993.
+
+\bibitem[霍斯尼(1989)]{huosini1989guwu}
+霍斯尼.
+\newblock 谷物科学与工艺学原理\allowbreak[M].
+\newblock 李庆龙, 译. 2 版.
+\newblock 北京: 中国食品出版社, 1989: 15-20.
+
+\bibitem[王夫之(1865（清同治四年）)]{wangfuzhi1865songlun}
+王夫之.
+\newblock 宋论\allowbreak[M].
+\newblock 刻本.
+\newblock 金陵: 曾氏, 1865（清同治四年）.
+
+\bibitem[赵耀东(1998)]{zhaoyaodong1998xinshidai}
+赵耀东.
+\newblock 新时代的工业工程师\allowbreak[M/OL].
+\newblock 台北: 天下文化出版社, 1998\allowbreak[1998-09-26].
+\newblock \url{http://www.ie.nthu.edu.tw/info/ie.newie.htm}.
+
+\bibitem[全国信息与文献工作标准化技术委员会出版物格式分委员会(2002)]{biaozhunhua2002tushu}
+全国信息与文献工作标准化技术委员会出版物格式分委员会.
+\newblock GB/T 12450-2001 图书书名页\allowbreak[S].
+\newblock 北京: 中国标准出版社, 2002.
+
+\bibitem[全国出版专业职业资格考试办公室(2004)]{chubanzhuanye2004}
+全国出版专业职业资格考试办公室.
+\newblock 全国出版专业职业资格考试辅导教材: 出版专业理论与实务•中级\allowbreak[M].
+\newblock 2014 版.
+\newblock 上海: 上海辞书出版社, 2004: 299-307.
+
+\bibitem[{World Health Organization}(1970)]{who1970factors}
+{World Health Organization}.
+\newblock Factors Regulating the Immune Response: Report of {WHO Scientific Group}\allowbreak[R].
+\newblock Geneva: WHO, 1970.
+
+\bibitem[Peebles(2001)]{peebles2001probability}
+PEEBLES P~Z, Jr.
+\newblock Probability, Random Variables, and Random Signal Principles\allowbreak[M].
+\newblock 4th ed.
+\newblock New York: McGraw Hill, 2001.
+
+\bibitem[白书农(1998)]{baishunong1998zhiwu}
+白书农.
+\newblock 植物开花研究\allowbreak[M]//\allowbreak
+李承森.
+\newblock 植物科学进展.
+\newblock 北京: 高等教育出版社, 1998: 146-163.
+
+\bibitem[Weinstein et~al.(1974)Weinstein and Swertz]{weinstein1974pathogenic}
+WEINSTEIN L, SWERTZ M~N.
+\newblock Pathogenic Properties of Invading Microorganism\allowbreak[M]//\allowbreak
+SODEMAN W~A, Jr, SODEMAN W~A.
+\newblock Pathologic physiology: mechanisms of disease.
+\newblock Philadelphia: Saunders, 1974: 745-772.
+
+\bibitem[韩吉人(1985)]{hanjiren1985lun}
+韩吉人.
+\newblock 论职工教育的特点\allowbreak[C]//\allowbreak
+中国职工教育研究会.
+\newblock 职工教育研究论文集.
+\newblock 北京: 人民教育出版社, 1985: 90-99.
+
+\bibitem[中国地质学会(1936)]{dizhi1936dizhi}
+中国地质学会.
+\newblock 地质评论\allowbreak[J].
+\newblock 1936, 1\allowbreak (1)--.
+\newblock 北京: 地质出版社, 1936--.
+
+\bibitem[中国图书馆学会(1957)]{tushuguan1957tushuguanxue}
+中国图书馆学会.
+\newblock 图书馆学通讯\allowbreak[J].
+\newblock 1957\allowbreak (1)--1990\allowbreak (4).
+\newblock 北京: 北京图书馆, 1957--1990.
+
+\bibitem[{American Association for the Advancement of Science}(1883)]{aaas1883science}
+{American Association for the Advancement of Science}.
+\newblock Science\allowbreak[J].
+\newblock 1883, 1\allowbreak (1)--.
+\newblock Washington, D.C.: American Association for the Advancement of Science, 1883--.
+
+\bibitem[傅刚\ 等(2000)傅刚, 赵承, and 李佳路]{fugang2000fengsha}
+傅刚, 赵承, 李佳路.
+\newblock 大风沙过后的思考\allowbreak[N/OL].
+\newblock 北京青年报, 2000-04-12\allowbreak (14)\allowbreak[2002-03-06].
+\newblock \url{http://www.bjyouth.com.cn/Bqb/20000412/B/4216%5ED0412B1401.htm}.
+
+\bibitem[萧钰(2001)]{xiaoyu2001chubanye}
+萧钰.
+\newblock 出版业信息化迈入快车道\allowbreak[EB/OL].
+\newblock \allowbreak(2001-12-19)\allowbreak[2002-04-15].
+\newblock \url{http://www.creader.com/news/20011219/200112190019.htm}.
+
+\bibitem[{Online Computer Library Center, Inc}(2000)]{oclc2000about}
+{Online Computer Library Center, Inc}.
+\newblock About {OCLC}: History of Cooperation\allowbreak[EB/OL].
+\newblock 2000\allowbreak[2000-01-08].
+\newblock \url{http://www.oclc.org/about/cooperation.en.htm}.
+
+\bibitem[{Scitor Corporation}(1983)]{scitor2000project}
+{Scitor Corporation}.
+\newblock Project scheduler\allowbreak[CP/DK].
+\newblock Sunnyvale, Calif.: Scitor Corporation, 1983.
+
+\bibitem[Kamiya et~al.(2018)Kamiya, Ge, Hong, Qiu, Quintero-Castro, Lu, Cao, Matsuda, Choi, Batista, et~al.]{kamiya2018nature}
+KAMIYA Y, GE L, HONG T, et~al.
+\newblock The nature of spin excitations in the one-third magnetization plateau phase of $\mathrm{Ba}_{3}\mathrm{CoSb}_{2}\mathrm{O}_{9}$\allowbreak[J].
+\newblock Nature communications, 2018, 9\allowbreak (1): 1-11.
+
+\end{thebibliography}

@@ -3,45 +3,29 @@
 % 中英文摘要和关键字
 
 \begin{abstract}
-  论文的摘要是对论文研究内容和成果的高度概括。
-  摘要应对论文所研究的问题及其研究目的进行描述，对研究方法和过程进行简单介绍，对研究成果和所得结论进行概括。
-  摘要应具有独立性和自明性，其内容应包含与论文全文同等量的主要信息。
-  使读者即使不阅读全文，通过摘要就能了解论文的总体内容和主要成果。
+  随着大语言模型（LLMs）在云计算环境中的广泛部署，其推理服务面临着资源消耗巨大、服务等级目标（SLO）要求严格、以及预填充与解码阶段资源需求异构等多重挑战。本文围绕“面向大模型的推理任务批式调度和弹性伸缩研究”这一主题，提出了系统化的资源管理与调度优化方案，显著提升了推理服务的吞吐量、资源利用率与服务质量。
 
-  论文摘要的书写应力求精确、简明。
-  切忌写成对论文书写内容进行提要的形式，尤其要避免“第 1 章……；第 2 章……；……”这种或类似的陈述方式。
+  首先，针对传统推理系统中批处理策略粗放、请求组合不合理、以及部署配置静态化等问题，本文提出了UELLM统一高效推理框架。该框架通过基于微调大模型的资源画像方法，精确预测请求输出长度；设计了SLO与输出长度驱动的动态批处理算法（SLO-ODBS），在满足服务等级目标的前提下优化请求组合，减少KV Cache冗余；同时提出了基于动态规划的高效低延迟资源分配算法（HELR），根据集群硬件拓扑自动优化模型层到GPU的映射策略。实验结果表明，UELLM相比现有方法可降低推理延迟72.3\%至90.3\%，提升GPU利用率1.2倍至4.1倍，吞吐量提高1.92倍至4.98倍。
 
-  以\textbf{中文}为正文撰写的论文中，博士论文摘要约 800～1000 字，硕士论文摘要的字数一般为 500 字左右，且篇幅限制在一页内书写。
-  以\textbf{英文}为正文撰写的论文中，中文摘要字数要求为800～1000字（不分博硕）。
+  其次，面向PD分离架构中固有的计算--内存负载不均衡、静态资源配置适应性差、以及前缀缓存感知路由导致的热点倾斜等问题，本文提出了BanaServe动态编排框架。该框架创新性地引入了模块级细粒度迁移机制，包括层级权重迁移与注意力级KV Cache迁移，实现了计算与内存资源的在线动态重平衡；设计了全局KV Cache存储与层间流水线重叠传输机制，消除了前缀缓存对调度策略的约束；并提出了基于实时负载感知的请求调度算法。实验表明，BanaServe相比vLLM吞吐量提升1.2倍至3.9倍、延迟降低3.9\%至78.4\%；相比DistServe吞吐量提升1.1倍至2.8倍、延迟降低1.4\%至70.1\%，并在Azure生产环境traces下展现出优异的鲁棒性。
 
-  关键词是为了文献标引工作、用以表示全文主要内容信息的单词或术语。
-  关键词不超过 5 个，每个关键词中间用分号分隔。
+  本文所提出的方法在真实GPU集群和公开基准数据集上得到了充分验证，为大模型推理服务的高效部署与资源管理提供了新的理论依据和技术路径。
 
-  % 关键词用“英文逗号”分隔，输出时会自动处理为正确的分隔符
   \thusetup{
-    keywords = {关键词 1, 关键词 2, 关键词 3, 关键词 4, 长长长长长长长长长长长长长长长长长长长长长长长长长关键词 5},
+    keywords = {大语言模型推理, 批式调度, 弹性伸缩, 资源管理, 动态迁移},
   }
 \end{abstract}
 
 \begin{abstract*}
-  An abstract of a dissertation is a summary and extraction of research work and contributions.
-  Included in an abstract should be description of research topic and research objective, brief introduction to methodology and research process, and summarization of conclusion and contributions of the research.
-  An abstract should be characterized by independence and clarity and carry identical information with the dissertation.
-  It should be such that the general idea and major contributions of the dissertation are conveyed without reading the dissertation.
+  With the widespread deployment of Large Language Models (LLMs) in cloud computing environments, inference services face critical challenges including massive resource consumption, strict Service Level Objective (SLO) requirements, and heterogeneous resource demands between the prefill and decode phases. This thesis focuses on ``Batch Scheduling and Elastic Scaling for Large Language Model Inference,'' proposing systematic resource management and scheduling optimization schemes that significantly improve inference throughput, resource utilization, and service quality.
 
-  An abstract should be concise and to the point.
-  It is a misunderstanding to make an abstract an outline of the dissertation and words “the first chapter”, “the second chapter” and the like should be avoided in the abstract.
+  Firstly, to address the issues of coarse-grained batching strategies, inefficient request combinations, and static deployment configurations in existing systems, this thesis proposes UELLM (Unified and Efficient LLM Inference Serving), a comprehensive inference framework. UELLM employs a fine-tuned LLM-based resource profiler to accurately predict request output lengths. It introduces the SLO and Output-Driven Dynamic Batch Scheduler (SLO-ODBS), which optimizes request combinations while meeting SLO constraints and reducing KV Cache redundancy. Additionally, the High-Efficiency Low-Latency Resource Allocation (HELR) algorithm based on dynamic programming is proposed to automatically optimize layer-to-GPU mapping strategies according to cluster hardware topology. Experimental results demonstrate that UELLM reduces inference latency by 72.3\% to 90.3\%, improves GPU utilization by 1.2$\times$ to 4.1$\times$, and increases throughput by 1.92$\times$ to 4.98$\times$ compared to state-of-the-art methods.
 
-  For thesis written in \textbf{Chinese} as the main text, the abstract of doctoral thesis is about 800 to 1000 words; and the abstract of the master's thesis is generally about 500 words; the length is limited to one page.
-  For thesis written in \textbf{English} as the main text, the word count of Chinese abstracts is required to be 800 to 1000 words (regardless doctoral thesis or master's thesis).
+  Secondly, targeting the inherent compute-memory load imbalance, poor adaptability of static resource configurations, and hotspot skews caused by prefix cache-aware routing in PD (Prefill-Decode) disaggregated architectures, this thesis presents BanaServe, a dynamic orchestration framework. BanaServe introduces novel fine-grained module-level migration mechanisms, including layer-level weight migration and attention-level KV Cache migration, enabling online dynamic rebalancing of computational and memory resources. It designs a Global KV Cache Store with layer-wise pipelined transmission to eliminate constraints imposed by prefix caching on scheduling decisions, and proposes a real-time load-aware request scheduling algorithm. Experiments show that BanaServe achieves 1.2$\times$--3.9$\times$ higher throughput with 3.9\%--78.4\% lower latency compared to vLLM, and 1.1$\times$--2.8$\times$ throughput improvement with 1.4\%--70.1\% latency reduction compared to DistServe, demonstrating superior robustness under Azure production traces.
 
-  The abstract of the doctoral thesis is about 800 to 1000 words; the abstract of the master's thesis is generally about 500 words; the length is limited to one page.
+  The proposed methods have been extensively validated on real GPU clusters and public benchmarks, providing novel theoretical foundations and technical pathways for efficient deployment and resource management of LLM inference services.
 
-  Keywords are terms used in a dissertation for indexing, reflecting core information of the dissertation.
-  An abstract may contain a maximum of 5 keywords, with semi-colons used in between to separate one another.
-
-  % Use comma as seperator when inputting
   \thusetup{
-    keywords* = {keyword 1, keyword 2, keyword 3, keyword 4, looooooooooooooooooooong keyword 5},
+    keywords* = {Large Language Model Inference, Batch Scheduling, Elastic Scaling, Resource Management, Dynamic Migration},
   }
 \end{abstract*}
