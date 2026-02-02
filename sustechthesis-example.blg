@@ -1,0 +1,62 @@
+This is BibTeX, Version 0.99d (TeX Live 2025)
+Capacity: max_strings=200000, hash_size=200000, hash_prime=170003
+The top-level auxiliary file: sustechthesis-example.aux
+The style file: sustechthesis-numeric.bst
+A level-1 auxiliary file: bu.aux
+Reallocated singl_function (elt_size=4) to 100 items from 50.
+Reallocated singl_function (elt_size=4) to 150 items from 100.
+Reallocated wiz_functions (elt_size=4) to 6000 items from 3000.
+Reallocated singl_function (elt_size=4) to 100 items from 50.
+Reallocated singl_function (elt_size=4) to 100 items from 50.
+Reallocated singl_function (elt_size=4) to 100 items from 50.
+Reallocated singl_function (elt_size=4) to 100 items from 50.
+Reallocated singl_function (elt_size=4) to 100 items from 50.
+Reallocated glb_str_ptr (elt_size=4) to 20 items from 10.
+Reallocated global_strs (elt_size=200001) to 20 items from 10.
+Reallocated glb_str_end (elt_size=4) to 20 items from 10.
+Reallocated singl_function (elt_size=4) to 100 items from 50.
+Database file #1: ref/refs.bib
+Warning--I didn't find a database entry for "yu2022orca"
+Warning--I didn't find a database entry for "lin2023awq"
+You've used 70 entries,
+            5374 wiz_defined-function locations,
+            1459 strings with 21826 characters,
+and the built_in function-call counts, 554856 in all, are:
+= -- 11502
+> -- 63186
+< -- 80718
++ -- 23574
+- -- 4761
+* -- 3176
+:= -- 77753
+add.period$ -- 230
+call.type$ -- 70
+change.case$ -- 417
+chr.to.int$ -- 20440
+cite$ -- 70
+duplicate$ -- 1743
+empty$ -- 4707
+format.name$ -- 2209
+if$ -- 143700
+int.to.chr$ -- 1
+int.to.str$ -- 71
+missing$ -- 0
+newline$ -- 401
+num.names$ -- 216
+pop$ -- 26342
+preamble$ -- 1
+purify$ -- 70
+quote$ -- 0
+skip$ -- 57762
+stack$ -- 0
+substring$ -- 26602
+swap$ -- 72
+text.length$ -- 1628
+text.prefix$ -- 0
+top$ -- 0
+type$ -- 746
+warning$ -- 0
+while$ -- 1742
+width$ -- 0
+write$ -- 946
+(There were 2 warnings)
