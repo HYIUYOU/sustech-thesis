@@ -1,172 +1,464 @@
 % !TeX root = ../sustechthesis-example.tex
 
-\chapter{数学符号和公式}
+\chapter{面向LLM推理任务的高效批式调度和部署方法：UELLM}
 
-\section{数学符号}
+\section{引言}
 
-模板中使用 \pkg{unicode-math} 宏包来配置数学符号，
+在机器学习即服务（MLaaS）云平台中，大语言模型推理服务面临三类核心挑战：其一，GPU数量的配置存在双向风险，GPU数量过多会因通信开销增大而降低推理速度，GPU数量不足则会因显存溢出（Out-of-Memory, OOM）导致服务中断；其二，静态部署策略无法保证最优的资源利用率和最低的推理延迟；其三，粗放的请求编排策略极易导致大量SLO违约。
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=\textwidth]{figures/uellm_framework.pdf}
+  \caption{UELLM系统整体架构图。系统由资源画像器、批处理调度器和LLM部署器三个核心组件构成，通过在线监控反馈机制实现端到端的推理服务优化\cite{he2024uellm}。}
+  \label{fig:uellm_framework}
+\end{figure}
+针对上述挑战，本章提出UELLM（Unified and Efficient LLM Inference Serving）框架。UELLM将请求批处理优化与模型部署优化有机整合，通过三个协同工作的核心组件：\textbf{资源画像器}（Resource Profiler）、\textbf{批处理调度器}（Batch Scheduler）和\textbf{LLM部署器}（LLM Deployer），实现推理服务的端到端优化。系统整体架构如图~\ref{fig:uellm_framework}所示。
 
-研究生《写作指南》要求量及其单位所使用的符号应符合国家标准《国际单位制及其应用》（GB 3100—1993）、《有关量、单位和符号的一般原则》（GB/T 3101—1993）的规定，但是与 \TeX{} 默认的美国数学学会（AMS）的符号习惯有所区别。
+本章其余部分组织如下：第~\ref{sec:uellm_motivation}节分析推理性能瓶颈与设计动机；第~\ref{sec:uellm_profiler}节介绍资源画像器的设计；第~\ref{sec:uellm_scheduler}节详述SLO-ODBS批处理调度算法；第~\ref{sec:uellm_deployer}节阐述HELR部署优化算法；第~\ref{sec:uellm_eval}节给出实验评估结果；第~\ref{sec:uellm_summary}节总结本章工作。
 
-英文论文的数学符号使用 \TeX{} 默认的样式。论文以中文为主要撰写语言按照国标建议的配置数学字体格式：
+\section{问题分析与设计动机}
+\label{sec:uellm_motivation}
 
+\subsection{部署配置对推理性能的影响}
+
+\textbf{观察一：部署配置的微小变化会对LLM推理性能产生显著影响。}
+
+LLM的分布式部署涉及两个关键决策：\textbf{GPU数量的选择}和\textbf{层到设备的映射关系}（Device Map）。这两个决策的组合空间巨大，且对推理性能的影响极为显著。
+
+\begin{figure}[htbp]
+  \centering
+  \subcaptionbox{归一化延迟\label{fig:image1}}
+    {\includegraphics[width=0.346\textwidth]{figures/Latency_3d.pdf}}
+  \hfill
+  \subcaptionbox{归一化显存占用\label{fig:image2}}
+    {\includegraphics[width=0.32\textwidth]{figures/Memory.pdf}}
+  \hfill
+  \subcaptionbox{归一化GPU利用率\label{fig:image3}}
+    {\includegraphics[width=0.32\textwidth]{figures/GPU.pdf}}
+  \caption{不同GPU数量和批大小配置下归一化延迟、显存占用和GPU利用率的变化（各指标均归一化至其最小值）。合理的部署配置可将GPU利用率提升4倍，延迟降低20倍。}
+  \label{fig:deployment_sensitivity}
+\end{figure}
+图~\ref{fig:deployment_sensitivity}展示了在不同GPU数量和批大小配置下，归一化延迟、显存占用和GPU利用率的变化规律。实验结果表明，合理的GPU数量配置可将GPU利用率提升4倍，并将推理延迟降低20倍（最坏情况涉及显存卸载时）。这一结果揭示了以下规律：
+\begin{itemize}
+    \item \textbf{GPU数量并非越多越好}：随着GPU数量增加，节点间通信延迟和同步开销显著上升，过多的GPU反而会拖慢推理速度；
+    \item \textbf{设备映射影响巨大}：即使在确定了最优GPU数量后，不合理的层分配仍会造成严重的性能退化。如第二章表~\ref{tab:devicemap_impact}所示，通过调整ChatGLM2-6B在两张异构GPU上的层分配比例，平均吞吐量可从11.19 token/s提升至22.55 token/s，提升幅度超过100\%\cite{he2024uellm}。
+\end{itemize}
+
+\subsection{批处理策略对推理性能的影响}
+
+\textbf{观察二：批处理多个请求可在大量推理请求场景下显著降低SLO违约率。}
+
+批处理通过权重共享机制，允许在单次迭代中并行生成多个token，从而提升token生成速率。然而，LLM批处理面临两个关键挑战：
 \begin{enumerate}
-  \item 大写希腊字母默认为斜体，如
-    \begin{equation*}
-      \Gamma \Delta \Theta \Lambda \Xi \Pi \Sigma \Upsilon \Phi \Psi \Omega.
-    \end{equation*}
-    注意有限增量符号 $\increment$ 固定使用正体，模板提供了 \cs{increment} 命令。
-  \item 小于等于号和大于等于号使用倾斜的字形 $\le$、$\ge$。
-  \item 积分号使用正体，比如 $\int$、$\oint$。
-  \item 行间公式积分号的上下限位于积分号的上下两端，比如
-    \begin{equation*}
-      \int_a^b f(x) \dif x.
-    \end{equation*}
-    行内公式为了版面的美观，统一居右侧，如 $\int_a^b f(x) \dif x$ 。
-  \item
-    偏微分符号 $\partial$ 使用正体。
-  \item
-    省略号 \cs{dots} 按照中文的习惯固定居中，比如
-    \begin{equation*}
-      1, 2, \dots, n \quad 1 + 2 + \dots + n.
-    \end{equation*}
-  \item
-    实部 $\Re$ 和虚部 $\Im$ 的字体使用罗马体。
+    \item \textbf{请求到达时间不同步}：简单的批处理策略要么让先到的请求等待后续请求，要么让后到的请求等待前序请求处理完毕，导致显著的排队延迟；
+    \item \textbf{输入输出长度差异巨大}：现有批处理技术通过填充（Padding）使批内请求长度一致，但这一策略在请求长度差异大时会造成严重的GPU计算和显存浪费。
 \end{enumerate}
+以图~\ref{fig:batching_comparison}所示场景为例：默认FIFO策略将三个请求合并为单一批次，共需处理174个token，其中包含大量冗余填充；而UELLM的输出长度感知策略将请求分组为两个批次，仅需处理74个token，减少冗余约57.5\%\cite{he2024uellm}。由于token数量与计算和显存开销近似线性相关，减少冗余token可直接降低推理延迟和显存使用。
 
-以上数学符号样式的差异可以在模板中统一设置。
-另外国标还有一些与 AMS 不同的符号使用习惯，需要用户在写作时进行处理：
-\begin{enumerate}
-  \item 数学常数和特殊函数名用正体，如
-    \begin{equation*}
-      \uppi = 3.14\dots; \quad
-      \symup{i}^2 = -1; \quad
-      \symup{e} = \lim_{n \to \infty} \left( 1 + \frac{1}{n} \right)^n.
-    \end{equation*}
-  \item 微分号使用正体，比如 $\dif y / \dif x$。
-  \item 向量、矩阵和张量用粗斜体（\cs{mathbfit}），如 $\mathbfit{x}$、$\mathbfit{\Sigma}$、$\mathbfit{T}$。
-  \item 自然对数用 $\ln x$ 不用 $\log x$。
-\end{enumerate}
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=\textwidth]{figures/batch2.pdf}
+  \caption{UELLM与默认批处理算法的对比示意图。该对比展示了三个查询请求在批处理阶段和推理阶段的KV缓存利用情况。UELLM专注于优化token使用效率，与默认方法相比，显著减少了推理过程中处理的token总数\cite{he2024uellm}。}
+  \label{fig:batching_comparison}
+\end{figure}
 
+\section{资源画像器}
+\label{sec:uellm_profiler}
 
+资源画像器（Resource Profiler）是UELLM的数据入口模块，负责在请求进入调度队列之前，预测其输出长度并获取SLO约束，为后续批处理调度和部署优化提供决策依据。资源画像器由三个子模块构成：\textbf{数据采集}、\textbf{输出长度预测}和\textbf{资源画像}。
 
-关于数学符号更多的用法，参考
-\href{http://mirrors.ctan.org/macros/latex/contrib/unicode-math/unicode-math.pdf}{\pkg{unicode-math}}
-宏包的使用说明，
-全部数学符号命的令参考
-\href{http://mirrors.ctan.org/macros/latex/contrib/unicode-math/unimath-symbols.pdf}{\pkg{unimath-symbols}}，也可以参考 Stack Overflow 上的答案 \href{https://tex.stackexchange.com/questions/58098/what-are-all-the-font-styles-i-can-use-in-math-mode}{What are all the font styles I can use in math mode?}。
+\subsection{基于微调大模型的输出长度预测}
 
-关于量和单位推荐使用
-\href{http://mirrors.ctan.org/macros/latex/contrib/siunitx/siunitx.pdf}{\pkg{siunitx}}
-宏包，
-可以方便地处理希腊字母以及数字与单位之间的空白，
-比如：
-\SI{6.4e6}{m}，
-\SI{9}{\micro\meter}，
-\si{kg.m.s^{-1}}，
-\SIrange{10}{20}{\degreeCelsius}。
+\textbf{1. 预测模型选择与微调策略}
 
+UELLM采用ChatGLM3-6B\cite{du2022glm}作为输出长度预测的基础模型，通过LoRA（Low-Rank Adaptation）\cite{dettmers2023qlora}高效微调策略，在Alpaca\cite{alpaca}问答数据集上进行任务适配。微调时，以用户问题文本作为输入，以对应答案的token数量所属桶编号作为分类标签。
 
-
-\section{数学公式}
-
-数学公式可以使用 \env{equation} 和 \env{equation*} 环境。
-注意数学公式的引用应前后带括号，建议使用 \cs{eqref} 命令，比如式\eqref{eq:example}。
+具体而言，输出长度被离散化为$K$个桶（Bucket）：
 \begin{equation}
-  \frac{1}{2 \uppi \symup{i}} \int_\gamma f = \sum_{k=1}^m n(\gamma; a_k) \mathscr{R}(f; a_k)
-  \label{eq:example}
+    \mathcal{B} = \{[0,8),\ [8,16),\ [16,32),\ [32,64),\ \ldots,\ [1024,2048)\}
+    \label{eq:bucket_definition}
 \end{equation}
-注意公式编号的引用应含有圆括号，可以使用 \cs{eqref} 命令。
+每个桶对应一个类别标签，将连续的长度回归问题转化为$K$类分类问题，显著降低了预测复杂度，同时保证调度决策的快速响应。
 
-晶体衍射基础的著名公式──布拉格方程：
+\textbf{2. 预测精度评估}
+
+微调后的预测模型在测试集上达到了\textbf{99.51\%}的分桶准确率。为验证模型的泛化能力，进一步在Google Natural Questions数据集和Alpaca GPT-4数据集上进行评估，准确率均超过80\%，表明模型对不同问答分布具有良好的泛化性能\cite{he2024uellm}。
+
+相比S$^3$\cite{jin2023s3}采用的轻量级BERT分类器，UELLM选择微调同类大模型（ChatGLM3-6B）作为预测器，具有以下优势：
+\begin{itemize}
+    \item \textbf{语义理解深度}：大模型对问题语义的理解更为深入，能够捕捉影响答案长度的细粒度语言特征（如问题类型、领域、复杂度等）；
+    \item \textbf{预测精度显著更高}：99.51\%的分桶准确率远高于基于规则或轻量级分类器的方案；
+    \item \textbf{在线学习能力}：支持基于实时反馈的增量更新，适应输出长度分布的动态变化。
+\end{itemize}
+
+\subsection{SLO获取与资源画像}
+
+资源画像器在预测输出长度的同时，从请求元数据中提取SLO约束（即请求必须在该时间内完成推理的截止时间）。对于每个请求$q_i$，资源画像器输出一个三元组：
 \begin{equation}
-  2d\sin\theta=k\lambda, \quad k=1,2,3\ldots
+    \text{Profile}(q_i) = (\text{Input}_i,\ \widehat{\text{Output}}_i,\ \text{SLO}_i)
+    \label{eq:profile}
+\end{equation}
+其中$\text{Input}_i$为实际输入长度，$\widehat{\text{Output}}_i$为预测输出长度桶的代表值，$\text{SLO}_i$为请求的延迟截止时间。该三元组作为批处理调度器的输入，支持后续的SLO感知批次构建决策。
+
+\subsection{在线监控与自适应校正}
+
+UELLM在后台运行实时监控程序，持续追踪GPU利用率、显存占用和推理执行时间等指标。当监控程序检测到预测输出长度与实际输出长度存在显著偏差时，触发自适应校正机制：
+\begin{itemize}
+    \item \textbf{显存动态调整}：根据实际KV Cache增长速率调整已分配显存大小，防止OOM错误；
+    \item \textbf{预测器在线更新}：将预测错误的样本加入在线学习队列，周期性地对预测模型进行增量微调，提升对动态负载分布的适应能力。
+\end{itemize}
+
+\section{批处理调度器：SLO-ODBS算法}
+\label{sec:uellm_scheduler}
+
+批处理调度器（Batch Scheduler）接收资源画像器输出的请求画像序列，将请求组合为最优批次，目标是在满足SLO约束的前提下最小化推理延迟和显存浪费。
+
+\subsection{问题建模}
+
+设批次$\text{batch}_c=\{q_1, q_2, \ldots, q_b\}$包含$b$个请求，由于批处理要求批内所有输入等长，每个请求需被填充至批内最大输入长度$\max_{i=1}^{b}(\text{Input}_i)$。在推理阶段，模型需将批内所有输出生成至最大输出长度$O = \max_{i=1}^{b}(\text{Output}_i)$，因此批次内实际生成的token总数为$b \times O$。
+
+批处理的核心优化目标是通过合理分组，减少批内最大输出长度$O$，从而降低冗余token数量。具体地，UELLM的优化目标综合考虑\textbf{总延迟}$T_l$和\textbf{总输出长度}$T_o$两个维度。
+
+总延迟$T_l$定义为：
+\begin{equation}
+    T_l = \sum_{i=1}^{N} \left[ (\text{SLO}_i + L_{CM}) \times (|\text{batch}_c| + 1) \times L_1 \right]
+    \label{eq:total_latency}
+\end{equation}
+总输出长度$T_o$定义为：
+\begin{equation}
+    T_o = \sum_{i=1}^{N} \left[ (\text{Length}_i + O_{CM}) \times (|\text{batch}_c| + 1) \times L_2 \right]
+    \label{eq:total_output}
+\end{equation}
+其中，$N$为当前批次$\text{batch}_c$中的请求数量，$L_{CM}$为当前批次的最大延迟，$O_{CM}$为当前批次的最大输出长度，$L_1$和$L_2$分别为并行计算引入的额外延迟系数。通过权重系数$w_1$和$w_2$平衡两个优化目标的重要性，综合优化目标为：
+\begin{equation}
+    \max_{w_1, w_2}\ (w_1 \times T_l + w_2 \times T_o) \leq \text{Threshold}
+    \label{eq:optimization_objective}
+\end{equation}
+系统通过确保每次加入新请求后批次的综合指标$\text{Total} \leq T$（阈值），将请求序列重新组合为$\text{batch}_1, \text{batch}_2, \ldots, \text{batch}_n$。
+
+\subsection{SLO-ODBS算法设计}
+
+基于上述问题建模，本文提出\textbf{SLO感知与输出长度驱动的动态批处理调度算法}（SLO and Output-Driven Dynamic Batch Scheduler, SLO-ODBS），如算法~\ref{algo:slo_odbs}所示。
+
+\begin{algorithm}[htbp]
+  \caption{SLO感知与输出长度驱动的动态批处理调度算法（SLO-ODBS）}
+  \label{algo:slo_odbs}
+  \KwIn{requests：经资源画像器处理后的请求列表}
+  \KwOut{batches：批次列表}
+  \BlankLine
+  $\text{sorted\_requests} \leftarrow \text{sort}(\text{requests})$
+      \tcp*{按SLO升序排列}
+  $\text{batches},\ \text{batch}_c \leftarrow \emptyset$\;
+  $L_{CM},\ O_{CM},\ CM \leftarrow 0$\;
+  \BlankLine
+  \ForEach{$q \in \text{sorted\_requests}$}{
+      $T_l \leftarrow (q.\text{SLO} + L_{CM}) \times (\text{len}(\text{batch}_c) + 1) \times L_1$\;
+      $T_o \leftarrow (q.\text{length} - O_{CM}) \times (\text{len}(\text{batch}_c) + 1) \times L_2$\;
+      $\text{Total} \leftarrow w_1 \times T_l + w_2 \times T_o$\;
+      \uIf{$\text{batch}_c = \emptyset$ \textbf{or} $\text{Total} \leq \text{Threshold}$}{
+          $\text{batch}_c.\text{append}(q.\text{index})$\;
+          $L_{CM} \leftarrow \max(L_{CM},\ q.\text{SLO})$\;
+          $O_{CM} \leftarrow \max(O_{CM},\ q.\text{length})$\;
+          $CM \leftarrow \max(CM,\ w_1 \times q.\text{length} + w_2 \times q.\text{SLO})$\;
+      }\Else{
+          $\text{batches}.\text{append}(\text{batch}_c)$\;
+          $\text{batch}_c \leftarrow \{q.\text{index}\}$\;
+          $L_{CM} \leftarrow q.\text{SLO}$\;
+          $O_{CM} \leftarrow q.\text{length}$\;
+          $CM \leftarrow w_1 \times q.\text{length} + w_2 \times q.\text{SLO}$\;
+      }
+      根据$CM$的值动态调整批大小\;
+  }
+  \If{$\text{batch}_c \neq \emptyset$}{
+      $\text{batches}.\text{append}(\text{batch}_c)$\;
+  }
+  \Return{batches}\;
+\end{algorithm}
+
+\textbf{算法执行分三个阶段：}
+
+\textbf{阶段一：初始化（第1--3行）}
+
+所有请求按SLO升序排列，优先处理SLO最紧迫的请求，同时初始化当前批次$\text{batch}_c$及其属性（当前最大延迟$L_{CM}$、当前最大输出长度$O_{CM}$、当前综合指标$CM$）。按SLO排序的设计使得SLO接近的请求更容易被组合入同一批次，天然降低批内的SLO异构性。
+
+\textbf{阶段二：基于输出长度的单批次构建（第4--19行）}
+
+对每个请求$q$，计算将其加入当前批次后的综合指标$\text{Total}$。若$\text{Total} \leq \text{Threshold}$，则将请求加入当前批次并更新批次属性；否则，将当前批次提交至批次列表，并以当前请求初始化新批次。批大小根据综合指标$CM$动态调整，避免批次过大或过小导致的效率损失。
+
+\textbf{阶段三：合并排序所有批次（第20--23行）}
+
+将阶段二构建的所有批次整合至就绪列表，供后续LLM推理引擎处理。
+
+\subsection{算法变体：灵活适配不同调度目标}
+
+SLO-ODBS通过调整权重系数$w_1$和$w_2$，可灵活适配不同的调度优化目标：
+\begin{itemize}
+    \item \textbf{当$w_1 = 0$时}（SLO-DBS模式）：算法退化为纯SLO感知调度，仅以$T_o$为批次构建依据，优先降低SLO违约率，适合对服务质量保障要求严格的场景；
+    \item \textbf{当$w_2 = 0$时}（ODBS模式）：算法退化为纯输出长度驱动调度，仅以$T_l$为依据，优先最小化推理延迟，适合对吞吐量要求高但对SLO公平性要求相对宽松的场景；
+    \item \textbf{当$w_1, w_2 > 0$时}（完整SLO-ODBS模式）：算法同时兼顾SLO约束与输出长度差异，在低延迟和低违约率之间寻求最优平衡，适合生产环境的通用部署。
+\end{itemize}
+
+\section{LLM部署器：HELR算法}
+\label{sec:uellm_deployer}
+
+LLM部署器（LLM Deployer）在模型部署阶段运行，根据当前集群的硬件网络拓扑和LLM的计算特性，自动求解最优的层到设备映射（Device Map），以最大化资源利用率并最小化推理延迟。
+
+\subsection{问题形式化建模}
+
+将集群硬件网络抽象为图$G = (D, E)$，其中$D = \{d_1, d_2, \ldots, d_n\}$为硬件设备节点集合，$E$为节点间的连接边集合。对于待部署的大模型$\text{llm}_i$，其显存需求为$M(\text{llm}_i)$，模型层数为$\text{Layer}(\text{llm}_i)$。每个节点$d_i$具有以下属性：
+\begin{itemize}
+    \item $\text{Memory}(d_i)$：节点$d_i$的可用显存容量；
+    \item $\text{Performance}(d_i)$：节点$d_i$的计算处理能力；
+    \item $\text{Latency}(E[i][j])$：节点$d_i$与$d_j$之间的通信延迟。
+\end{itemize}
+目标是寻找设备分配方案$S \subseteq D$，在满足显存约束的前提下最小化推理延迟：
+\begin{equation}
+    \sum_{i=1}^{|S|} \text{Memory}(d_i) \geq M
+    \label{eq:memory_constraint}
 \end{equation}
 
-\noindent%
-\begin{minipage}{\textwidth}
-  \begin{tabularx}{\textwidth}{@{}l@{~}l@{~——~}X@{}}
-    式中 & $d$ & 晶面间距（nm）；\\
-    & $\theta$ & 入射线与晶面的夹角（rad）；\\
-    & $\lambda$ & X射线波长（nm）。\\
-    & $k$ & 公式中第一次出现的物理量代号应给予注释，注释的转行应与破折号“——”后第一个字对齐。
+\subsection{HELR算法设计}
+
+该问题可建模为一个动态规划（Dynamic Programming）问题。本文提出\textbf{高效低延迟资源分配算法}（High-Efficiency Low-Latency Resource Allocation, HELR），如算法~\ref{algo:helr}所示。
+
+\begin{algorithm}[htbp]
+  \caption{高效低延迟资源分配算法（HELR）}
+  \label{algo:helr}
+  \KwIn{$M$：LLM显存需求；$\text{Layer}(M)$：模型层数；
+        $G(D,E)$：硬件平台图；$\text{Latency}(E[i][j])$：节点间通信延迟；
+        $\text{Performance}(d)$：设备计算性能；$\text{Memory}(d)$：设备可用显存}
+  \KwOut{Device\_map：层到设备的映射方案}
+  \BlankLine
+  初始化 $\text{best\_state} \leftarrow \infty$，$\text{Device\_map} \leftarrow \emptyset$\;
+  \BlankLine
+  \ForEach{$n$ from $1$ to $|D|$}{
+      $S_n \leftarrow$ 从$D$中选取大小为$n$的子集\;
+      \If{$S_n$中节点的总显存 $< M$}{
+          跳过，继续下一个子集\;
+      }
+      初始化 $dp[\text{mark}][i] \leftarrow \infty$\;
+      \ForEach{$\text{mark}$ from $1$ to $2^n - 1$}{
+          按性能和显存降序排列$S_n$中的节点\;
+          计算每层所需显存 $m \leftarrow M / \text{Layer}(M)$\;
+          \ForEach{$i$ from $1$ to $|S_n|$}{
+              \ForEach{$j$ from $1$ to $|S_n|$，$j \neq i$}{
+                  \tcp{$T$为KV Cache预留显存}
+                  计算节点$i$可分配的最大层数：
+                  $\text{layers}[i] \leftarrow \min\!\left(\text{Layer}(M),\ \dfrac{\text{Memory}(i) - T}{m}\right)$\;
+                  计算延迟：
+                  $l \leftarrow dp[i][j] + \text{Latency}(E[i][j]) + p \times \dfrac{\text{layers}[i] \times m}{\text{Performance}(i)}$\;
+                  更新 $dp[\text{mark}][i] \leftarrow \min(dp[\text{mark}][i],\ l)$\;
+              }
+          }
+      }
+      $\text{current\_state} \leftarrow \min_{i}\!\left(dp[2^n-1][i]
+          + \sum_{j=1}^{|S_n|}\!\left(\text{Latency}(E[i][j])
+          + p \times \dfrac{\text{layers}[i] \times m}{\text{Performance}(i)}\right)\!\right)$\;
+      \If{$\text{current\_state} < \text{best\_state}$}{
+          $\text{best\_state} \leftarrow \text{current\_state}$\;
+          根据$\text{layers}$和$S_n$中的节点更新$\text{Device\_map}$\;
+      }
+  }
+  \Return{Device\_map}\;
+\end{algorithm}
+
+\textbf{算法执行分三个阶段：}
+
+\textbf{阶段一：初始化（第1--2行）}
+
+设置最优状态$\text{best\_state}$为正无穷，初始化空的设备映射方案$\text{Device\_map}$。
+
+\textbf{阶段二：动态规划求解（第3--16行）}
+
+维护二维数组$dp$，其中$dp[\text{mark}][i]$表示从初始状态到设备节点$d_i$的最小延迟，$\text{mark}$为状态压缩的位掩码。动态规划的状态转移方程为：
+\begin{equation}
+    dp[\text{mark}][i] = \min_{1 \leq j \leq |S|}
+    \left( dp[\text{mark}][i],\  dp[i][j] + \text{Latency}(E[i][j])
+    + p \times \frac{\text{layers}[i] \times m}{\text{Performance}(i)} \right)
+    \label{eq:dp_recurrence}
+\end{equation}
+最终的优化目标为最小化总延迟：
+\begin{equation}
+    \min_{1 \leq i \leq |S|} dp[2^k - 1][i]
+    + \sum_{j=1}^{|S|} \left( \text{Latency}(E[i][j])
+    + p \times \frac{\text{layers}[i] \times m}{\text{Performance}(i)} \right)
+    \label{eq:helr_objective}
+\end{equation}
+其中$\text{layers}[i]$为分配给节点$d_i$的层数，$p$为处理性能-时间关系的调节系数。
+
+\textbf{阶段三：设备映射更新（第17--19行）}
+
+记录最优分配状态$\text{best\_state}$，并根据$\text{layers}$数组和节点集合$S_n$更新最终的$\text{Device\_map}$，确保部署配置反映最优资源分配方案。
+
+\subsection{HELR的算法变体}
+
+类似于SLO-ODBS，HELR同样通过调整权重参数$a_1$实现不同部署目标的灵活适配：
+\begin{itemize}
+    \item \textbf{高效模式（HE，High-Efficiency）}：设$a_1 = 0$，动态规划仅最小化GPU数量，优先在尽可能少的GPU上完成部署，充分利用每个GPU的计算能力，适合资源受限的环境；由于LLM推理的顺序执行特性，在最少GPU上部署可有效提升GPU利用率；
+    \item \textbf{低延迟模式（LR，Low-Latency）}：设$a_1 \gg a_2$（如10:1），动态规划赋予延迟最高权重，在不考虑资源消耗的前提下追求最低推理延迟，适合对响应时间极为敏感的场景；
+    \item \textbf{均衡模式（HELR）}：同时考虑GPU利用率和推理延迟，在资源效率与服务质量之间寻求最优权衡，适合生产环境的通用部署场景。
+\end{itemize}
+
+\section{实验评估}
+\label{sec:uellm_eval}
+
+\subsection{实验设置}
+
+\textbf{测试平台。}实验在由4块NVIDIA RTX 3090 GPU组成的本地集群上进行。为模拟异构集群环境，对各GPU设置不同的性能限制。集群网络拓扑如表~\ref{tab:cluster_topology}所示，节点间连接类型分为三种：自身连接（X）、单PCIe桥连接（PIX）和NUMA节点内PCIe互联（NODE）。
+
+\begin{table}[htbp]
+  \centering
+  \caption{实验集群网络拓扑及GPU最大功耗配置}
+  \label{tab:cluster_topology}
+  \begin{tabularx}{\textwidth}{AAAAAA}
+    \toprule
+    & \textbf{GPU\#0} & \textbf{GPU\#1} &
+      \textbf{GPU\#2} & \textbf{GPU\#3} & \textbf{最大功耗} \\
+    \midrule
+    \textbf{GPU\#0} & X    & PIX  & NODE & NODE & 350 W \\
+    \textbf{GPU\#1} & PIX  & X    & NODE & NODE & 300 W \\
+    \textbf{GPU\#2} & NODE & NODE & X    & PIX  & 250 W \\
+    \textbf{GPU\#3} & NODE & NODE & PIX  & X    & 150 W \\
+    \bottomrule
+    \multicolumn{6}{l}{\scriptsize
+        X = 自身；\quad PIX = 单PCIe桥连接；\quad NODE = PCIe + NUMA节点内互联}
   \end{tabularx}
-\end{minipage}
+\end{table}
 
-多行公式尽可能在“=”处对齐，推荐使用 \env{align} 环境。
-\begin{align}
-  a & = b + c + d + e \\
-    & = f + g
-\end{align}
+\textbf{推理模型。}选用ChatGLM2-6B\cite{du2022glm}作为推理目标模型。由于该模型在实验时尚不支持批推理，UELLM对其推理代码进行适配以支持批处理。
 
-此外需要注意：公式需紧挨段前文字，不可空行，不然会导致公式独立成段，如下\textcolor{red}{\textbf{错误}}效果。公式前文字公式前文字公式前文字公式前文字公式前文字。
+\textbf{SLO设置。}为贴近真实场景，为不同推理请求设计随机SLO，范围从1秒到350秒，确保每个请求的SLO完全随机。
 
-\begin{equation}
-  \frac{1}{2 \uppi \symup{i}} \int_\gamma f = \sum_{k=1}^m n(\gamma; a_k) \mathscr{R}(f; a_k)
-\end{equation}
+\textbf{对比基线。}构建三个UELLM原型版本：
+\begin{itemize}
+    \item \textbf{UELLM-deploy（UD）}：仅使用HELR模型部署算法；
+    \item \textbf{UELLM-batch（UB）}：仅使用SLO-ODBS批处理调度算法；
+    \item \textbf{UELLM-all（UA）}：同时采用HELR和SLO-ODBS两种算法。
+\end{itemize}
+选取Morphling\cite{wang2021morphling}和S$^3$\cite{jin2023s3}作为SOTA基线进行对比。
 
-公式后文字公式后文字公式后文字公式后文字公式后文字公式后文字公式后文字公式后文字公式后文字公式后文字公式后文字。\textbf{正确}效果，如下：
-% <- 如需代码上空行需要在前面加上百分号·%
-\begin{equation}
-  \frac{1}{2 \uppi \symup{i}} \int_\gamma f = \sum_{k=1}^m n(\gamma; a_k) \mathscr{R}(f; a_k)
-\end{equation}
-公式后文字公式后文字公式后文字公式后文字公式后文字公式后文字公式后。
+\textbf{评估指标。}采用四项核心指标：推理延迟（Latency）、吞吐量（Throughput，token/s）、GPU利用率（GPU Utilization）和SLO违约率（SLO Violation Rate）。每组实验重复5次，取平均值以消除随机性影响。
 
-\section{数学定理}
+\subsection{批处理算法与部署算法的消融分析}
 
-定理环境的格式可以使用 \pkg{amsthm} 或者 \pkg{ntheorem} 宏包配置。
-用户在导言区载入这两者之一后，模板会自动配置 \env{thoerem}、\env{proof} 等环境。
+图~\ref{fig:ablation}展示了不同批处理算法和部署算法的性能对比。
 
-\begin{theorem}[Lindeberg--Lévy 中心极限定理]
-  设随机变量 $X_1, X_2, \dots, X_n$ 独立同分布， 且具有期望 $\mu$ 和有限的方差 $\sigma^2 \ne 0$，
-  记 $\bar{X}_n = \frac{1}{n} \sum_{i+1}^n X_i$，则
-  \begin{equation}
-    \lim_{n \to \infty} P \left(\frac{\sqrt{n} \left( \bar{X}_n - \mu \right)}{\sigma} \le z \right) = \Phi(z),
-  \end{equation}
-  其中 $\Phi(z)$ 是标准正态分布的分布函数。
-\end{theorem}
-\begin{proof}
-  Trivial.
-\end{proof}
+\begin{figure}[htbp]
+  \centering
+  \subcaptionbox{推理延迟\label{fig:arlatency}}
+    {\includegraphics[width=0.24\textwidth]{figures/Latency1.pdf}}
+  \hfill
+  \subcaptionbox{SLO违约率\label{fig:arslo}}
+    {\includegraphics[width=0.23\textwidth]{figures/SLO1.pdf}}
+  \hfill
+  \subcaptionbox{吞吐量\label{fig:hethroughput}}
+    {\includegraphics[width=0.24\textwidth]{figures/throughput.pdf}}
+  \hfill
+  \subcaptionbox{GPU利用率\label{fig:hegpu}}
+    {\includegraphics[width=0.24\textwidth]{figures/GPU_Utili.pdf}}
+  \caption{不同批处理算法与部署算法的性能对比。在高负载下，SLO-ODBS通过合理组合请求，维持与ODBS相近的低延迟，同时实现接近SLO-DBS的低SLO违约率，兼顾了两个优化目标；HELR在维持较高GPU利用率的同时实现了较高吞吐量。}
+  \label{fig:ablation}
+\end{figure}
 
-同时模板还提供了 \env{assumption}、\env{definition}、\env{proposition}、
-\env{lemma}、\env{theorem}、\env{axiom}、\env{corollary}、\env{exercise}、
-\env{example}、\env{remar}、\env{problem}、\env{conjecture} 这些相关的环境。
+\textbf{批处理算法对比分析：}实验结果（图~\ref{fig:ablation}(a)(b)）表明，在高负载场景下，SLO-ODBS通过合理组合请求减少迭代次数和显存开销，维持与ODBS相近的低延迟；同时按SLO调度请求，实现接近SLO-DBS的低违约率。SLO-ODBS成功地在低延迟和低SLO违约率两个目标之间取得了最佳平衡。
 
-\section{数学字体}
+\textbf{部署算法对比分析：}HELR由于选择了更合理的资源分配和部署方案，在维持与HE相近的GPU利用率的同时，实现了与LR相近的吞吐量，验证了均衡模式的有效性。
 
-按照《撰写规范》表达式字体可以采用 Times New Roman、Xits Math 或 Cambria Math（MS Word默认字体）。Cambria Math 缺少部分样式，例如：积分符号设定为 upright 也看起来没有变化。
+\subsection{与SOTA方法的综合对比}
 
-TeX Gyre Termes Math 字体（Times New Roman的TeX克隆版）样例：
-\makeatletter
-\thu@load@math@font@times
-\begin{equation}
-  \frac{1}{2 \uppi \symup{i}} \int_\gamma f = \sum_{k=1}^m n(\gamma; a_k) \mathscr{R}(f; a_k)
-\end{equation}
-\makeatother
+图~\ref{fig:sota_comparison}对比了UELLM与当前最优算法S$^3$和Morphling在各项指标上的性能差异，呈现了各算法在五个不同时间段内的平均表现。
 
-Cambria Math 字体样例：
-\makeatletter
-\thu@load@math@font@cambria
-\begin{equation}
-  \frac{1}{2 \uppi \symup{i}} \int_\gamma f = \sum_{k=1}^m n(\gamma; a_k) \mathscr{R}(f; a_k)
-\end{equation}
-\makeatother
+\begin{figure}[htbp]
+  \centering
+  \subcaptionbox{GPU利用率\label{fig:7GPU Utilization}}
+    {\includegraphics[width=0.24\textwidth]{figures/experiment7/GPU_Utili.pdf}}
+  \hfill
+  \subcaptionbox{SLO不违约率\label{fig:7slo}}
+    {\includegraphics[width=0.24\textwidth]{figures/experiment7/SLO1.pdf}}
+  \hfill
+  \subcaptionbox{推理延迟\label{fig:7latency}}
+    {\includegraphics[width=0.24\textwidth]{figures/experiment7/latency.pdf}}
+  \hfill
+  \subcaptionbox{吞吐量\label{fig:7throughput}}
+    {\includegraphics[width=0.24\textwidth]{figures/experiment7/throughput.pdf}}
+  \caption{UELLM各版本与S$^3$、Morphling在四项核心指标上的综合对比。UA（UELLM-all）在所有指标上均取得最优性能：SLO不违约率达100\%，推理延迟最低，吞吐量最高。}
+  \label{fig:sota_comparison}
+\end{figure}
 
-Xits Math 字体样例：
-\makeatletter
-\thu@load@math@font@xits
-\begin{equation}
-  \frac{1}{2 \uppi \symup{i}} \int_\gamma f = \sum_{k=1}^m n(\gamma; a_k) \mathscr{R}(f; a_k)
-\end{equation}
-\thu@load@math@font@cambria
-\makeatother
+\textbf{GPU利用率分析（图~\ref{fig:sota_comparison}(a)）：}
+由于S$^3$和UB仅关注批处理调度而未优化部署策略，其GPU利用率显著低于其他方法，说明这两种方案存在资源利用效率不足的问题。Morphling通过元学习搜索最优配置并进行压力测试，而UA和UD则利用HELR算法根据当前节点拓扑结构和模型特性选择最佳资源配置方案，因此三者的GPU利用率结果非常接近。实验结果表明，UELLM以更低的计算代价实现了与Morphling相当的部署效果。
 
-STIX Math 字体样例：
-\makeatletter
-\thu@load@math@font@stix
-\begin{equation}
-  \frac{1}{2 \uppi \symup{i}} \int_\gamma f = \sum_{k=1}^m n(\gamma; a_k) \mathscr{R}(f; a_k)
-\end{equation}
-\makeatother
+\textbf{SLO不违约率分析（图~\ref{fig:sota_comparison}(b)）：}
+五种方案的SLO不违约率由低到高依次为：S$^3$（51.8\%）$<$ Morphling（70.4\%）$<$ UD（76.6\%）$<$ UB（87.4\%）$<$ UA（100.0\%）。
+\begin{itemize}
+    \item S$^3$仅考虑显存优化，不感知各请求的SLO差异，表现最差；
+    \item Morphling和UD均仅优化部署策略而不考虑SLO调度，虽然推理延迟较低，但SLO不违约率仍低于UB；
+    \item UB通过SLO-ODBS算法感知SLO，将87.4\%的请求控制在SLO内；
+    \item UA同时优化部署策略和批处理调度，实现了\textbf{零SLO违约}，所有请求均在截止时间内完成。
+\end{itemize}
+相比S$^3$和Morphling，UELLM（UA）将SLO不违约率分别提升了48.2\%和29.6\%。
+
+\textbf{推理延迟与吞吐量分析（图~\ref{fig:sota_comparison}(c)(d)）：}
+UA在推理延迟和吞吐量两个指标上均取得最优结果：
+\begin{itemize}
+    \item 相比Morphling，UD通过消除压力测试环节，直接降低了测试阶段的时间开销，从而减少整体推理延迟并提升吞吐量；
+    \item 相比S$^3$，UD通过HELR优化资源分配，改善GPU利用率和通信延迟，显著降低推理延迟；
+    \item UB通过SLO-ODBS优化批次组合，减少迭代次数，降低推理延迟并提升吞吐量；
+    \item UA综合HELR和SLO-ODBS的双重优化，在五次实验中均取得最优结果。
+\end{itemize}
+总体而言，相比S$^3$和Morphling，UELLM将推理延迟降低\textbf{72.3\%至90.3\%}，吞吐量提升\textbf{1.92倍至4.98倍}\cite{he2024uellm}。
+
+\subsection{实验结果综合分析}
+
+综合上述实验结果，表~\ref{tab:uellm_results_summary}对UELLM各版本与基线方法的性能进行了系统性汇总。
+
+\begin{table}[htbp]
+  \centering
+  \caption{UELLM与基线方法性能综合对比}
+  \label{tab:uellm_results_summary}
+  \begin{tabularx}{\textwidth}{p{2.2cm}AAAAA}
+    \toprule
+    \textbf{方法} &
+    \textbf{GPU利用率} &
+    \textbf{SLO不违约率} &
+    \textbf{推理延迟} &
+    \textbf{吞吐量} &
+    \textbf{综合评价} \\
+    \midrule
+    S$^3$\cite{jin2023s3}
+        & 低    & 51.8\%          & 高   & 低   & 基线（批处理） \\
+    Morphling\cite{wang2021morphling}
+        & 高    & 70.4\%          & 中   & 中   & 基线（部署） \\
+    \midrule
+    UD  & 高    & 76.6\%          & 中低 & 中高 & 仅部署优化 \\
+    UB  & 低    & 87.4\%          & 低   & 高   & 仅批处理优化 \\
+    \textbf{UA}
+        & \textbf{高} & \textbf{100.0\%} & \textbf{最低} & \textbf{最高}
+        & \textbf{最优（联合优化）} \\
+    \bottomrule
+  \end{tabularx}
+\end{table}
+
+实验结果验证了UELLM设计的三个核心判断：
+\begin{enumerate}
+    \item \textbf{批处理优化与部署优化缺一不可}：单独的批处理优化（UB）或单独的部署优化（UD）均无法在所有指标上同时取得最优结果，只有联合优化（UA）才能实现零SLO违约、最低延迟和最高吞吐量的同时满足；
+    \item \textbf{SLO感知是批处理调度的关键维度}：不具备SLO感知能力的S$^3$虽能优化延迟和显存，但SLO违约率高达48.2\%，难以保障实际生产场景的服务质量；
+    \item \textbf{拓扑感知的动态规划优于元学习配置搜索}：HELR通过一次动态规划直接求解最优设备映射，无需Morphling的压力测试环节，在降低配置开销的同时实现了相当甚至更优的部署效果。
+\end{enumerate}
+
+\section{本章小结}
+\label{sec:uellm_summary}
+
+本章提出了UELLM，一个面向LLM推理服务的统一高效资源调度框架。UELLM由三个协同工作的核心组件构成：
+
+\textbf{资源画像器}通过微调ChatGLM3-6B实现高精度输出长度预测（分桶准确率99.51\%），并提取请求的SLO约束，为调度决策提供精确的输入信息。相比S$^3$采用的轻量级分类器，基于大模型微调的预测方案在预测精度和在线适应性方面具有显著优势。
+
+\textbf{批处理调度器}提出SLO-ODBS算法，将SLO感知与输出长度驱动的批次构建相结合，通过三阶段动态调度（初始化$\to$批次构建$\to$批次排序）实现了低延迟与低SLO违约率的双重目标。SLO-ODBS通过调整权重参数$w_1$、$w_2$可灵活派生出SLO-DBS和ODBS两种变体，支持不同调度目标的定制化配置。
+
+\textbf{LLM部署器}提出HELR算法，将LLM部署建模为拓扑感知的动态规划问题，在满足显存约束的前提下自动求解最优设备映射。HELR通过调整参数$a_1$可派生出HE（高效利用率）和LR（低延迟优先）两种部署模式，适配不同的资源约束场景。
+
+在由4块NVIDIA RTX 3090 GPU构成的异构集群上的实验结果表明，相比S$^3$和Morphling等SOTA方法，UELLM（UA版本）将推理延迟降低72.3\%至90.3\%，GPU利用率提升1.2倍至4.1倍，吞吐量提高1.92倍至4.98倍，并实现零SLO违约。UELLM的成功验证了\textbf{批处理调度优化与部署配置优化的联合设计}是提升LLM推理服务性能的关键路径。
+
+然而，UELLM仍存在一定局限性：其设计聚焦于单实例或小规模集群的批处理与部署优化，未深入考虑大规模PD分离架构下跨实例的细粒度资源协同问题。具体而言，在Prefill与Decode实例分离部署的场景下，两阶段之间的资源互补性（Prefill计算密集但显存闲置，Decode显存密集但计算利用率低）未能通过动态机制加以利用，这一问题将在下一章BanaServe框架中重点解决。
+
+
 

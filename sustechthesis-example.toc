@@ -1,0 +1,98 @@
+\contentsline {chapter}{摘\hskip 1em\relax 要}{I}{section*.9}%
+\contentsline {chapter}{\textbf {Abstract}}{III}{section*.11}%
+\contentsline {chapter}{符号和缩略语说明}{X}{section*.15}%
+\contentsline {chapter}{\numberline {第1章}绪论}{1}{chapter.1}%
+\contentsline {section}{\numberline {1.1}研究背景}{1}{section.1.1}%
+\contentsline {section}{\numberline {1.2}研究意义}{2}{section.1.2}%
+\contentsline {section}{\numberline {1.3}国内外研究现状及分析}{3}{section.1.3}%
+\contentsline {subsection}{\numberline {1.3.1}算法层面的推理优化}{3}{subsection.1.3.1}%
+\contentsline {subsection}{\numberline {1.3.2}系统架构与内存管理优化}{4}{subsection.1.3.2}%
+\contentsline {subsection}{\numberline {1.3.3}批处理与请求调度策略}{5}{subsection.1.3.3}%
+\contentsline {subsection}{\numberline {1.3.4}资源配置策略}{5}{subsection.1.3.4}%
+\contentsline {subsection}{\numberline {1.3.5}国内外研究现状对比}{6}{subsection.1.3.5}%
+\contentsline {subsection}{\numberline {1.3.6}现有研究的局限性与启示}{7}{subsection.1.3.6}%
+\contentsline {section}{\numberline {1.4}论文主要工作}{8}{section.1.4}%
+\contentsline {subsection}{\numberline {1.4.1}面向LLM推理任务的高效批式调度和部署方法}{8}{subsection.1.4.1}%
+\contentsline {subsection}{\numberline {1.4.2}面向PD分离架构的资源管理和KV缓存优化方法}{9}{subsection.1.4.2}%
+\contentsline {subsection}{\numberline {1.4.3}主要创新点}{10}{subsection.1.4.3}%
+\contentsline {section}{\numberline {1.5}论文组织架构}{10}{section.1.5}%
+\contentsline {chapter}{\numberline {第2章}现有LLM推理任务的批式调度与KV缓存优化方法}{12}{chapter.2}%
+\contentsline {section}{\numberline {2.1}概述}{12}{section.2.1}%
+\contentsline {section}{\numberline {2.2}批式任务调度方法}{12}{section.2.2}%
+\contentsline {subsection}{\numberline {2.2.1}传统调度策略}{12}{subsection.2.2.1}%
+\contentsline {subsection}{\numberline {2.2.2}输出长度感知的S$^3$调度框架}{14}{subsection.2.2.2}%
+\contentsline {subsection}{\numberline {2.2.3}连续批处理机制（Continuous Batching）}{15}{subsection.2.2.3}%
+\contentsline {subsection}{\numberline {2.2.4}Orca中的In-flight Batching机制}{15}{subsection.2.2.4}%
+\contentsline {section}{\numberline {2.3}KV缓存优化方法}{16}{section.2.3}%
+\contentsline {subsection}{\numberline {2.3.1}PagedAttention与vLLM的显存管理}{16}{subsection.2.3.1}%
+\contentsline {subsection}{\numberline {2.3.2}Mooncake的全局KV Cache池架构}{17}{subsection.2.3.2}%
+\contentsline {subsection}{\numberline {2.3.3}MemServe的弹性内存管理}{18}{subsection.2.3.3}%
+\contentsline {subsection}{\numberline {2.3.4}模型量化与压缩技术}{18}{subsection.2.3.4}%
+\contentsline {section}{\numberline {2.4}部署配置与资源分配方法}{19}{section.2.4}%
+\contentsline {subsection}{\numberline {2.4.1}静态部署配置与设备映射}{19}{subsection.2.4.1}%
+\contentsline {subsection}{\numberline {2.4.2}基于元学习的配置搜索：Morphling}{20}{subsection.2.4.2}%
+\contentsline {subsection}{\numberline {2.4.3}PD分离架构下的资源分配}{20}{subsection.2.4.3}%
+\contentsline {section}{\numberline {2.5}现有方法的局限性总结与分析}{21}{section.2.5}%
+\contentsline {section}{\numberline {2.6}本章小结}{24}{section.2.6}%
+\contentsline {chapter}{\numberline {第3章}面向LLM推理任务的高效批式调度和部署方法：UELLM}{25}{chapter.3}%
+\contentsline {section}{\numberline {3.1}引言}{25}{section.3.1}%
+\contentsline {section}{\numberline {3.2}问题分析与设计动机}{26}{section.3.2}%
+\contentsline {subsection}{\numberline {3.2.1}部署配置对推理性能的影响}{26}{subsection.3.2.1}%
+\contentsline {subsection}{\numberline {3.2.2}批处理策略对推理性能的影响}{26}{subsection.3.2.2}%
+\contentsline {section}{\numberline {3.3}资源画像器}{27}{section.3.3}%
+\contentsline {subsection}{\numberline {3.3.1}基于微调大模型的输出长度预测}{27}{subsection.3.3.1}%
+\contentsline {subsection}{\numberline {3.3.2}SLO获取与资源画像}{28}{subsection.3.3.2}%
+\contentsline {subsection}{\numberline {3.3.3}在线监控与自适应校正}{28}{subsection.3.3.3}%
+\contentsline {section}{\numberline {3.4}批处理调度器：SLO-ODBS算法}{29}{section.3.4}%
+\contentsline {subsection}{\numberline {3.4.1}问题建模}{29}{subsection.3.4.1}%
+\contentsline {subsection}{\numberline {3.4.2}SLO-ODBS算法设计}{30}{subsection.3.4.2}%
+\contentsline {subsection}{\numberline {3.4.3}算法变体：灵活适配不同调度目标}{31}{subsection.3.4.3}%
+\contentsline {section}{\numberline {3.5}LLM部署器：HELR算法}{31}{section.3.5}%
+\contentsline {subsection}{\numberline {3.5.1}问题形式化建模}{31}{subsection.3.5.1}%
+\contentsline {subsection}{\numberline {3.5.2}HELR算法设计}{32}{subsection.3.5.2}%
+\contentsline {subsection}{\numberline {3.5.3}HELR的算法变体}{33}{subsection.3.5.3}%
+\contentsline {section}{\numberline {3.6}实验评估}{33}{section.3.6}%
+\contentsline {subsection}{\numberline {3.6.1}实验设置}{33}{subsection.3.6.1}%
+\contentsline {subsection}{\numberline {3.6.2}批处理算法与部署算法的消融分析}{34}{subsection.3.6.2}%
+\contentsline {subsection}{\numberline {3.6.3}与SOTA方法的综合对比}{35}{subsection.3.6.3}%
+\contentsline {subsection}{\numberline {3.6.4}实验结果综合分析}{36}{subsection.3.6.4}%
+\contentsline {section}{\numberline {3.7}本章小结}{37}{section.3.7}%
+\contentsline {chapter}{\numberline {第4章}面向PD分离架构的动态资源协同优化方法：BanaServe}{38}{chapter.4}%
+\contentsline {section}{\numberline {4.1}引言}{38}{section.4.1}%
+\contentsline {section}{\numberline {4.2}问题分析与设计动机}{39}{section.4.2}%
+\contentsline {subsection}{\numberline {4.2.1}静态配置导致的资源低效利用}{39}{subsection.4.2.1}%
+\contentsline {subsection}{\numberline {4.2.2}前缀缓存感知路由引发的负载倾斜}{40}{subsection.4.2.2}%
+\contentsline {subsection}{\numberline {4.2.3}PD分离架构的内生资源不均衡}{40}{subsection.4.2.3}%
+\contentsline {section}{\numberline {4.3}系统设计}{41}{section.4.3}%
+\contentsline {subsection}{\numberline {4.3.1}层级权重迁移}{41}{subsection.4.3.1}%
+\contentsline {subsection}{\numberline {4.3.2}注意力级KV Cache迁移}{42}{subsection.4.3.2}%
+\contentsline {subsection}{\numberline {4.3.3}全局KV Cache存储}{43}{subsection.4.3.3}%
+\contentsline {section}{\numberline {4.4}性能优化模型}{45}{section.4.4}%
+\contentsline {subsection}{\numberline {4.4.1}优化目标}{45}{subsection.4.4.1}%
+\contentsline {subsection}{\numberline {4.4.2}延迟模型}{45}{subsection.4.4.2}%
+\contentsline {subsection}{\numberline {4.4.3}资源利用率模型}{46}{subsection.4.4.3}%
+\contentsline {subsection}{\numberline {4.4.4}迁移开销模型}{46}{subsection.4.4.4}%
+\contentsline {subsection}{\numberline {4.4.5}系统吞吐量}{47}{subsection.4.4.5}%
+\contentsline {section}{\numberline {4.5}核心算法设计}{47}{section.4.5}%
+\contentsline {subsection}{\numberline {4.5.1}自适应模块迁移算法}{47}{subsection.4.5.1}%
+\contentsline {subsection}{\numberline {4.5.2}负载感知请求调度算法}{49}{subsection.4.5.2}%
+\contentsline {section}{\numberline {4.6}实验评估}{50}{section.4.6}%
+\contentsline {subsection}{\numberline {4.6.1}实验设置}{50}{subsection.4.6.1}%
+\contentsline {subsection}{\numberline {4.6.2}短文本场景性能评估}{51}{subsection.4.6.2}%
+\contentsline {subsection}{\numberline {4.6.3}长文本场景性能评估}{52}{subsection.4.6.3}%
+\contentsline {subsection}{\numberline {4.6.4}Azure生产负载追踪实验}{53}{subsection.4.6.4}%
+\contentsline {subsection}{\numberline {4.6.5}综合性能对比分析}{54}{subsection.4.6.5}%
+\contentsline {section}{\numberline {4.7}本章小结}{55}{section.4.7}%
+\contentsline {chapter}{\numberline {第5章}总结与展望}{57}{chapter.5}%
+\contentsline {section}{\numberline {5.1}研究总结}{57}{section.5.1}%
+\contentsline {section}{\numberline {5.2}未来研究方向}{58}{section.5.2}%
+\contentsline {subsection}{\numberline {5.2.1}异构硬件感知的自适应调度}{58}{subsection.5.2.1}%
+\contentsline {subsection}{\numberline {5.2.2}基于预测的主动式资源编排}{58}{subsection.5.2.2}%
+\contentsline {subsection}{\numberline {5.2.3}端到端延迟优化与SLO感知服务}{59}{subsection.5.2.3}%
+\contentsline {subsection}{\numberline {5.2.4}跨地域分布式推理}{59}{subsection.5.2.4}%
+\setcounter {tocdepth}{0}
+\contentsline {chapter}{结\hskip 1em\relax 论}{60}{section*.48}%
+\contentsline {chapter}{参考文献}{62}{section*.50}%
+\contentsline {chapter}{致\hskip 1em\relax 谢}{65}{section*.52}%
+\contentsline {chapter}{个人简历、在学期间完成的相关学术成果}{67}{section*.54}%
+\contentsfinish 

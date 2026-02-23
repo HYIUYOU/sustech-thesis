@@ -1,10 +1,88 @@
 % !TeX root = ../sustechthesis-example.tex
 
-\chapter{English and $\text{lower-case}$ Example}
+\chapter{总结与展望}
 
-If your supervisor is a foreign resident, or if your supervisor or defense committee specifically allows writing in English, the thesis may be written in English as the primary language. Please check with your supervisor or department secretary to confirm if you can write in English.
+\section{研究总结}
 
-\section{Reference guide}
+随着大语言模型在各行业的深度渗透，高效、低延迟、高吞吐量的LLM推理服务已成为AI基础设施建设的核心挑战。本文围绕LLM推理服务中资源管理的两类核心瓶颈展开研究：其一，在静态场景下，批处理策略的粗放性和部署配置的低效性共同导致了严重的SLO违约和资源浪费；其二，在动态场景下，PD分离架构中Prefill与Decode阶段之间的内生资源失衡，以及前缀缓存感知路由引发的持续性负载倾斜，使得现有系统难以在高动态工作负载下维持高效服务。
 
-Writing in English still requires the Chinese reference standard GB/T 7714-2015.
+针对上述两类挑战，本文分别提出了UELLM（第三章）和BanaServe（第四章）两个互补的优化框架，从批处理优化和层级资源协同两个层面构建了覆盖"静态优化-动态调度"全生命周期的LLM推理服务资源管理体系。两个系统的核心设计理念、适用场景和性能定位的对比如表~\ref{tab:contribution_summary}所示。
 
+\begin{table}[htbp]
+    \centering
+    \caption{本文主要研究成果定位对比}
+    \label{tab:contribution_summary}
+    \begin{tabularx}{\textwidth}{p{2.0cm}XX}
+        \toprule
+        \textbf{维度} &
+        \textbf{UELLM（第三章）} &
+        \textbf{BanaServe（第四章）} \\
+        \midrule
+        \textbf{核心问题} &
+            批处理策略粗放；部署配置搜索低效；SLO违约率高 &
+            PD资源失衡；缓存感知路由热点；静态配置无法适应动态负载 \\
+        \textbf{设计理念} &
+            批处理调度与部署配置联合优化 &
+            资源分配与状态管理解耦 \\
+        \textbf{关键创新} &
+            输出长度预测；SLO-ODBS算法；HELR拓扑感知部署 &
+            层级权重迁移；注意力级KV Cache迁移；全局KV Cache存储 \\
+        \textbf{适用场景} &
+            单实例或小规模异构集群；弱动态负载 &
+            大规模PD分离集群；高动态突发负载 \\
+        \textbf{验证平台} &
+            4块RTX 3090异构集群 &
+            LLaMA/OPT-13B；合成+Azure生产追踪 \\
+        \bottomrule
+    \end{tabularx}
+\end{table}
+
+UELLM的核心贡献在于验证了\textbf{批处理调度优化与部署配置优化的联合设计}是提升LLM推理服务性能的关键路径，两者缺一不可：单独的批处理优化（UB）无法改善GPU利用率，单独的部署优化（UD）无法消除SLO违约，只有联合优化（UA）才能同时实现零SLO违约、最低延迟和最高吞吐量。
+
+BanaServe的核心贡献在于验证了\textbf{细粒度动态资源迁移与全局缓存共享的协同设计}可以有效解耦PD分离系统中的资源分配与状态管理，从根本上消除前缀缓存感知路由引发的热点问题，并在真实生产负载（Azure追踪数据）下保持强健的性能优势。
+
+然而，两个系统仍存在若干值得正视的局限性：UELLM的输出长度预测泛化能力受限于微调数据集分布，HELR算法的状态空间复杂度限制了其在大规模集群上的适用性；BanaServe的迁移机制对异构硬件适配不足，被动响应式调度在极端突发场景下存在不可避免的响应延迟窗口，且系统设计局限于单区域集群，尚未支持跨地域分布式部署场景。
+
+\section{未来研究方向}
+
+基于上述局限性分析，结合LLM推理服务领域的技术发展趋势，本文展望以下四个具有重要研究价值的未来方向。
+
+\subsection{异构硬件感知的自适应调度}
+
+当前UELLM和BanaServe的调度决策均基于简化的硬件抽象模型，未能充分刻画异构硬件的细粒度特性。未来研究应构建\textbf{细粒度硬件感知调度框架}，具体包括以下三个子方向：
+
+\begin{itemize}
+    \item \textbf{设备画像数据库}：在线收集并维护各类GPU（A100、V100、RTX 3090、H100等）的计算吞吐量、显存带宽、NVLink/PCIe互联拓扑和混合精度支持能力等细粒度硬件参数，构建可动态更新的设备画像数据库；
+    \item \textbf{拓扑感知迁移路径规划}：在迁移决策时综合考虑源设备与目标设备之间的实际互联带宽和延迟，选择传输开销最小的迁移路径，将HELR的拓扑感知能力从部署阶段延伸至运行时动态迁移；
+    \item \textbf{混合精度自适应执行}：针对FP16、BF16、INT8和INT4等不同量化精度格式，设计自适应的层分配策略，将计算敏感层保留在高精度设备上，将存储密集层迁移至低精度但带宽更高的设备，在推理质量和资源效率之间寻求最优权衡。
+\end{itemize}
+
+\subsection{基于预测的主动式资源编排}
+
+现有BanaServe的被动响应式调度在极端突发场景下存在响应延迟窗口。未来研究应引入\textbf{预测性编排}（Predictive Orchestration）机制，将历史负载模式与实时监控相结合，实现资源的提前预分配：
+
+\begin{itemize}
+    \item \textbf{工作负载预测模型}：利用历史请求到达序列训练轻量级时序预测模型，预测未来时间窗口内的请求速率和计算需求，为迁移决策提供前瞻性依据；
+    \item \textbf{基于强化学习的迁移策略优化}：将迁移决策建模为马尔可夫决策过程（MDP），以系统吞吐量、SLO不违约率和GPU利用率的加权组合作为奖励函数，通过在线强化学习训练迁移策略；
+    \item \textbf{突发流量预警与弹性扩缩容}：结合容器编排平台（Kubernetes）的弹性扩缩容能力，在预测到流量突增时提前完成新实例的模型加载和KV Cache预热，实现对突发流量的零停机响应。
+\end{itemize}
+
+\subsection{端到端延迟优化与SLO感知服务}
+
+当前两个框架在端到端延迟优化方面均存在进一步提升空间。未来研究应构建\textbf{端到端SLO感知服务框架}：
+
+\begin{itemize}
+    \item \textbf{分层SLO分解}：将端到端SLO分解为各子阶段的局部SLO约束（$T^{\text{budget}}_{\text{TTFT}}$和$T^{\text{budget}}_{\text{TPOT}}$），并根据当前系统负载动态调整各阶段的预算分配；
+    \item \textbf{请求优先级感知调度}：为不同类型请求赋予不同的调度优先级和SLO约束，在高负载时通过抢占式调度动态调整批次构成，优先保障高优先级请求的SLO；
+    \item \textbf{尾延迟优化}：引入尾延迟感知的批次构建策略和推测执行（Speculative Execution）机制，将P99/P999尾延迟纳入优化目标体系。
+\end{itemize}
+
+\subsection{跨地域分布式推理}
+
+随着LLM服务全球化部署需求的增长，单数据中心架构已无法满足地理分散用户的低延迟访问需求。未来研究应探索\textbf{跨地域分布式LLM推理}系统的设计：
+
+\begin{itemize}
+    \item \textbf{广域网感知的KV Cache同步}：设计层次化KV Cache存储架构，数据中心内采用BanaServe的三阶段流水线实现低开销本地访问，跨数据中心采用选择性KV Cache同步（仅同步高频访问的热门前缀），结合增量差分压缩技术降低跨WAN传输量；
+    \item \textbf{地理感知请求路由}：综合考虑用户地理位置、各区域数据中心负载状态和WAN延迟，设计全局请求路由策略，在用户访问延迟和数据中心资源利用率之间寻求最优权衡；
+    \item \textbf{模型分片与流水线并行}：将模型的不同层组分布在不同地理区域的数据中心，设计WAN感知的流水线调度策略，合理安排各区域处理的层范围以最小化跨WAN激活传输量和流水线气泡。
+\end{itemize}

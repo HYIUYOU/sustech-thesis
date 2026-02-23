@@ -14,345 +14,434 @@
 %    4. 量化
 % 3. 现有方法的缺陷
 
-\chapter{现有LLM的推理任务批式任务调度和KV缓存优化的方法}
-\label{chap:related-work}
 
-大语言模型推理优化是一个快速发展的研究领域，学术界和工业界提出了众多技术方案。本章系统梳理现有LLM推理任务的批式调度方法与KV缓存优化技术，分析各类方案的设计思想、核心机制与适用场景，并总结现有方法的局限性，为后续章节提出UELLM和BanaServe两种优化方案提供技术背景与改进动机。
+\chapter{现有LLM推理任务的批式调度与KV缓存优化方法}
 
-\section{现有的LLM推理任务批式调度方法}
-\label{sec:batch-scheduling}
+\section{概述}
 
-批处理（Batching）是提升LLM推理吞吐量的核心手段。通过将多个请求合并处理，可以充分利用GPU的并行计算能力，提高硬件利用率。本节介绍从传统调度策略到面向LLM特性的先进批处理技术的演进过程。
+大语言模型推理优化是一个多维度的系统工程问题，涵盖从请求接入、批处理调度、内存管理到分布式部署的完整技术栈。本章系统梳理现有LLM推理优化方法，重点围绕\textbf{批式任务调度}与\textbf{KV缓存优化}两条主线展开分析。
 
-\subsection{S$^3$：输出长度感知调度}
-\label{subsec:s3}
+在批式任务调度方面，本章介绍传统调度策略（FIFO、短作业优先、长作业优先）、输出长度感知的S$^3$调度框架\cite{jin2023s3}、连续批处理（Continuous Batching）机制以及Orca\cite{Orca}中的In-flight Batching技术，分析各方法在吞吐量提升与延迟控制之间的权衡。在KV缓存优化方面，本章分析vLLM\cite{kwon2023efficient}的PagedAttention显存管理机制、Mooncake\cite{qin2024mooncake}的全局KV Cache池架构、MemServe\cite{hu2024memserve}的弹性内存管理技术，以及模型量化等压缩手段对显存占用的影响。
 
-S$^3$（SLO-aware, Size-based, Scheduling System）\cite{jin2023s3}是针对生成式LLM推理服务提出的批处理优化框架，其核心洞察是：\textbf{输出序列长度的差异}是导致批处理效率低下的关键因素。
+最后，本章从\textbf{调度粒度与资源状态紧耦合}、\textbf{资源配置静态化}、\textbf{缺乏跨阶段细粒度协同机制}、\textbf{对异构性和动态性适应性不足}四个维度总结现有方法的局限性，为后续章节提出UELLM和BanaServe优化方案提供技术背景与改进动机。
 
-传统批处理策略将不同输出长度的请求强制填充（Padding）到同一批次，导致大量无效计算。如图~\ref{fig:s3-illustration}所示，当短输出请求（如8 tokens）与长输出请求（如128 tokens）被批处理时，短请求必须等待长请求完成，造成严重的计算资源浪费。
+\section{批式任务调度方法}
 
-\begin{figure}[htbp]
-    \centering
-    \begin{tikzpicture}[
-        box/.style={draw, minimum width=2.5cm, minimum height=0.8cm, align=center, font=\small},
-        short/.style={fill=green!20},
-        long/.style={fill=red!20},
-        arrow/.style={->, thick}
-    ]
-        % 传统批处理
-        \node[box, short] (req1) at (0,2) {请求1\\8 tokens};
-        \node[box, long] (req2) at (3,2) {请求2\\128 tokens};
-        \node[box, long, minimum width=6cm] (batch1) at (1.5,0.5) {批处理结果：填充至128 tokens};
-        
-        \draw[arrow] (req1) -- (batch1);
-        \draw[arrow] (req2) -- (batch1);
-        
-        \node at (1.5, -0.8) {\textbf{传统方法：}大量填充，资源浪费};
-        
-        % S3批处理
-        \node[box, short] (req3) at (8,2) {请求1\\8 tokens};
-        \node[box, long] (req4) at (11,2) {请求2\\128 tokens};
-        \node[box, short] (batch2) at (8,0.5) {批次A：8 tokens};
-        \node[box, long] (batch3) at (11,0.5) {批次B：128 tokens};
-        
-        \draw[arrow] (req3) -- (batch2);
-        \draw[arrow] (req4) -- (batch3);
-        
-        \node at (9.5, -0.8) {\textbf{S3方法：}按长度分组，减少填充};
-    \end{tikzpicture}
-    \caption{S3与传统批处理策略对比}
-    \label{fig:s3-illustration}
-\end{figure}
-
-S3的核心创新包括：
-
-\textbf{(1) 输出长度预测模型}。S3采用轻量级预测器（基于输入文本特征）估计每个请求的输出行长度，将长度相近的请求归入同一批次。预测模型在多种工作负载上达到85\%以上的准确率。
-
-\textbf{(2) 多维装箱调度算法}。将请求调度建模为多维装箱问题，综合考虑输出长度、SLO约束和GPU显存容量，采用启发式算法优化批次组合。目标函数为：
-\begin{equation}
-    \min \sum_{i=1}^{N} \left( \text{Padding}_i + \lambda \cdot \text{SLO\_Violation}_i \right)
-\end{equation}
-其中$\text{Padding}_i$为第$i$个批次的填充开销，$\text{SLO\_Violation}_i$为SLO违约惩罚，$\lambda$为权衡系数。
-
-\textbf{(3) 动态批次重构}。在请求到达和完成时动态调整批次组成，最大化吞吐量同时保证延迟约束。
-
-S3的局限性在于：仅优化批处理组合，未考虑模型部署配置对性能的影响；缺乏对网络拓扑异构性的感知；预测模型针对特定数据集训练，泛化能力有限。
-
-\subsection{Continuous Batching：动态请求合并}
-\label{subsec:continuous-batching}
-
-Continuous Batching（连续批处理）\cite{kwon2023efficient}是vLLM提出的动态批处理机制，打破了传统静态批处理"等待-处理-等待"的串行模式。
-
-\textbf{核心机制}：在Decode阶段，每当有请求完成生成并释放资源时，系统立即从等待队列中选取新请求加入当前批次，保持GPU始终处于满负荷状态。如图~\ref{fig:continuous-batching}所示，与传统静态批处理相比，Continuous Batching显著减少了GPU空闲时间。
-
-\begin{figure}[htbp]
-    \centering
-    \includegraphics[width=0.9\textwidth]{example-image-a}
-    \caption{Static Batching与Continuous Batching的时间线对比}
-    \label{fig:continuous-batching}
-\end{figure}
-
-Continuous Batching的技术要点：
-
-\textbf{(1) 迭代级调度}。以迭代（iteration）而非请求为粒度进行调度，每个Decode步骤完成后重新评估批次组成。
-
-\textbf{(2) 显存动态管理}。配合PagedAttention技术（见第~\ref{subsec:vllm}节），动态分配和释放KV Cache显存，支持变长序列的高效批处理。
-
-\textbf{(3) 抢占与恢复}。当高优先级请求到达时，可抢占低优先级请求的显存资源，被抢占请求稍后恢复执行。
-
-Continuous Batching的优势在于高吞吐量和低延迟，但其调度决策仅基于当前系统状态，缺乏对未来负载的预测能力；同时，未考虑Prefill与Decode阶段的资源需求差异，在混合负载场景下可能出现资源竞争。
-
-\subsection{Orca中的In-flight Batching批处理机制}
-\label{subsec:orca}
-
-Orca\cite{yu2022orca}是NVIDIA提出的LLM推理服务系统，其\textbf{In-flight Batching}（飞行中批处理）机制进一步优化了Continuous Batching，实现了Prefill与Decode阶段的流水线并行。
-
-\textbf{关键观察}：在LLM推理中，Prefill阶段（计算密集）和Decode阶段（内存密集）对GPU资源的需求互补。传统系统串行执行两个阶段，导致资源利用率低下。
-
-In-flight Batching的核心设计：
-
-\textbf{(1) 阶段内批处理}。将Prefill和Decode分别批处理，但允许两个阶段在同一GPU上交替执行。当一批请求的Prefill完成后，立即开始Decode，同时GPU Tensor Core可处理下一批Prefill请求。
-
-\textbf{(2) 细粒度同步}。采用迭代级同步而非请求级同步，减少流水线气泡（bubble）。如图~\ref{fig:inflight-batching}所示，通过精细的流水线调度，GPU计算单元和内存带宽得到更充分利用。
-
-\begin{figure}[htbp]
-    \centering
-    \begin{tikzpicture}[
-        timeslot/.style={draw, minimum width=1.2cm, minimum height=0.6cm, font=\tiny},
-        prefill/.style={fill=red!30},
-        decode/.style={fill=blue!30},
-        label/.style={font=\small\bfseries}
-    ]
-        % 时间轴
-        \foreach \x in {0,1,2,3,4,5,6,7,8} {
-            \draw (\x,0) -- (\x,-0.1);
-            \node[font=\tiny] at (\x,-0.3) {\x};
-        }
-        
-        % 传统方法
-        \node[label] at (-1,1.5) {传统};
-        \node[timeslot, prefill] at (0.5,1.5) {P};
-        \node[timeslot, prefill] at (1.5,1.5) {P};
-        \node[timeslot, decode] at (2.5,1.5) {D};
-        \node[timeslot, decode] at (3.5,1.5) {D};
-        \node[timeslot, prefill] at (4.5,1.5) {P};
-        \node[timeslot, prefill] at (5.5,1.5) {P};
-        \node[timeslot, decode] at (6.5,1.5) {D};
-        \node[timeslot, decode] at (7.5,1.5) {D};
-        
-        % In-flight Batching
-        \node[label] at (-1,0.5) {Orca};
-        \node[timeslot, prefill] at (0.5,0.5) {P1};
-        \node[timeslot, prefill] at (1.5,0.5) {P2};
-        \node[timeslot, decode, fill=blue!20] at (2,0.5) {D1};
-        \node[timeslot, prefill] at (2.5,0.5) {P3};
-        \node[timeslot, decode, fill=blue!40] at (3,0.5) {D1};
-        \node[timeslot, decode, fill=blue!20] at (3.5,0.5) {D2};
-        \node[timeslot, prefill] at (4,0.5) {P4};
-        \node[timeslot, decode, fill=blue!40] at (4.5,0.5) {D2};
-        \node[timeslot, decode, fill=blue!20] at (5,0.5) {D3};
-        
-        \draw[thick,->] (0,0) -- (8.5,0) node[right, font=\small] {时间};
-    \end{tikzpicture}
-    \caption{In-flight Batching流水线调度示意（P=Prefill, D=Decode）}
-    \label{fig:inflight-batching}
-\end{figure}
-
-\textbf{(3) 选择性批处理}。对于Prefill阶段，仅对长度相近的请求批处理；对于Decode阶段，所有请求统一批处理，因为此时计算量与序列长度无关。
-
-In-flight Batching的局限在于：虽然实现了阶段内并行，但未完全解耦Prefill和Decode的资源分配；缺乏对KV Cache全局共享的支持，在多实例场景下缓存命中率受限。
+批式任务调度（Batch Scheduling）是提升LLM推理服务吞吐量、降低单请求服务成本的核心手段。其基本思想是将多个推理请求合并为一个批次（Batch）进行并行处理，通过权重共享减少冗余的模型参数加载，从而充分利用GPU的矩阵并行计算能力。然而，LLM推理的自回归生成特性使得批处理面临独特挑战：不同请求的输入输出长度差异悬殊，且输出长度在请求到达时完全未知。本节从传统调度策略到新型感知调度逐层递进，系统梳理现有方法。
 
 \subsection{传统调度策略}
-\label{subsec:traditional-scheduling}
 
-在LLM推理服务中，传统调度策略仍被广泛采用作为基准方法：
+传统推理系统主要采用三类基础调度策略，这些策略设计简单，但在LLM推理场景下均存在显著局限。
 
-\textbf{(1) FIFO（First-In-First-Out，先进先出）}。按请求到达顺序处理，实现简单、公平性好。但FIFO对请求特性不敏感，短请求可能被长请求阻塞，导致平均等待时间较长。
+\textbf{1. 先进先出调度（FIFO）}
 
-\textbf{(2) SJF（Shortest Job First，短作业优先）}。优先处理预计执行时间短的请求。在LLM推理中，"短作业"对应输入长度短或输出长度短的请求。SJF可降低平均延迟，但可能导致长请求饥饿（starvation）。
+先进先出（First-In-First-Out, FIFO）是最基础的调度策略，按请求到达的时间顺序依次处理。在静态批处理（Static Batching）框架下，系统等待固定数量的请求到达后组成一个批次，再统一提交推理引擎执行。
 
-\textbf{(3) LJF（Longest Job First，长作业优先）}。优先处理长请求，适用于需要尽快完成大任务的场景，但会显著增加短请求的等待时间。
+FIFO策略的主要问题在于\textbf{批内长度异构性}导致的计算浪费。当批次中同时存在短输出请求（如回答"中国的首都是北京"，仅需8个token）和长输出请求（如"比较猫和狗的异同"，需58个token）时，短请求完成后必须等待长请求全部生成完毕才能将整个批次返回。在此过程中，短请求的计算槽位被强制填充（Padding）大量无效token，产生严重的KV Cache冗余和计算资源浪费\cite{he2024uellm}。
 
-\textbf{(4) 优先级调度}。根据用户等级、请求类型等分配优先级，高优先级请求优先处理。需配合抢占机制避免低优先级请求长期等待。
+定量分析表明，对于批大小为$b$、最大输入序列长度为$s$、最大输出序列长度为$n$、隐藏层维度为$h$、Transformer层数为$l$的推理任务，KV Cache峰值存储字节数为：
+\begin{equation}
+  \text{KV Cache}_{\text{peak}} = 4 \times b \cdot l \cdot h \cdot (s + n)
+  \label{eq:kvcache_peak}
+\end{equation}
+可见KV Cache随批大小和最大输出长度线性增长\cite{sheng2023flexgen}。当批次内各请求输出长度差异显著时，短请求的完成不能及时释放其KV Cache槽位，导致显存被无效占用，进一步限制系统可接纳的有效批大小。
 
-传统策略的共性局限在于：\textbf{静态决策}，不考虑系统当前负载和资源状态；\textbf{缺乏预测}，无法利用输出长度等先验信息优化调度；\textbf{粗粒度}，以请求为调度单位，未探索更细粒度的资源分配。
+\textbf{2. 短作业优先调度（SJF）}
 
-\section{现有的KV缓存优化方法}
-\label{sec:kv-cache-optimization}
+短作业优先（Shortest Job First, SJF）将预估执行时间最短的请求优先调度处理，目标是最小化系统平均等待时间和响应时间。在LLM推理场景中，"作业长度"通常以预期输出token数量来衡量。
 
-KV Cache（键值缓存）是LLM推理中的核心数据结构，用于存储注意力机制中的Key和Value张量，避免重复计算。然而，KV Cache的显存占用随批次大小和序列长度线性增长，成为推理扩展的主要瓶颈。本节介绍四种代表性的KV缓存优化技术。
+SJF的理论优势在于其最优平均等待时间的数学性质：在非抢占式SJF下，对于$n$个已知执行时间的独立任务，SJF可使平均等待时间最小化。然而，该策略在LLM实践中面临三个主要挑战：其一，LLM推理的输出长度在请求开始前无法精确获取，SJF的实施依赖于长度预测器的准确性，预测偏差会直接导致调度次序错乱；其二，在高负载场景下，持续到来的短请求可能使长请求长期得不到调度，导致服务公平性问题和SLO违约；其三，纯SJF关注单请求调度顺序，未考虑批次内部的长度匹配问题，难以与批处理机制有效结合。
 
-\subsection{Mooncake：全局KV缓存池}
-\label{subsec:mooncake}
+\textbf{3. 长作业优先调度（LJF）}
 
-Mooncake\cite{qin2024mooncake}是月之暗面（Moonshot AI）提出的KV Cache-centric推理架构，其核心思想是将KV Cache从GPU显存解耦，构建全局共享的缓存池。
+长作业优先（Longest Job First, LJF）策略优先调度预期输出最长的请求，其设计初衷是避免长请求因频繁被短请求抢占而造成的队尾延迟（Tail Latency）问题。然而，LJF在LLM场景中同样存在明显缺陷：由于长请求占用KV Cache的时间更久，LJF可能导致系统显存长期处于高水位，限制并发处理能力；同时，大量短请求的响应时间因等待长请求完成而显著增加，严重影响用户体验。
 
-\textbf{系统架构}：Mooncake将推理集群划分为Prefill集群和Decode集群，两者之间通过高速RDMA网络连接。Prefill集群计算并产生KV Cache，Decode集群消费KV Cache进行自回归生成。关键创新在于引入\textbf{分布式KV Cache池}，作为独立存储层管理所有缓存数据。
+\textbf{4. 传统调度策略的共同局限}
 
-\textbf{核心技术}：
+综合来看，上述传统策略均缺乏对LLM推理两阶段异构特性的感知：不区分Prefill与Decode阶段的资源需求差异；调度决策不考虑SLO约束；批次构建未能利用输出长度信息消除填充浪费；静态配置无法适应动态变化的请求负载。这些局限共同导致了实际部署中GPU利用率低下（通常仅20\%--40\%）和SLO违约率偏高的问题\cite{he2024uellm}。
 
-\textbf{(1) 分层缓存存储}。KV Cache池采用分层设计：热数据驻留GPU显存，温数据存放CPU内存，冷数据持久化到SSD。通过LRU（Least Recently Used）策略动态迁移数据，平衡访问延迟和存储成本。
+\subsection{输出长度感知的S$^3$调度框架}
 
-\textbf{(2) 前缀复用}。利用请求间的前缀共享（如系统提示、多轮对话历史），通过前缀树（Trie）索引快速匹配缓存。匹配成功后，仅需计算增量部分的KV Cache，显著减少Prefill计算量。
+针对传统策略中输出长度未知导致的批处理低效问题，Jin等人\cite{jin2023s3}提出了S$^3$（Skipping Scheduling for GPU Sharing）框架，将输出长度预测与批处理调度联合优化，是该领域的重要里程碑工作。
 
-\textbf{(3) 异步预取}。基于请求特征预测未来访问模式，异步将所需KV Cache从远程节点或下层存储预取到本地GPU，隐藏传输延迟。
+\textbf{1. 核心思想：批组合的装箱问题建模}
 
-Mooncake的优势在于高缓存命中率和弹性扩展能力，但其调度决策与缓存位置紧耦合：路由器必须考虑KV Cache的物理位置进行请求分发，导致负载不均衡——热点缓存节点可能过载，而冷节点资源闲置。
+S$^3$将批次构建建模为一个\textbf{多维装箱问题}（Multi-dimensional Bin Packing Problem）。给定一组待调度请求$\mathcal{Q} = \{q_1, q_2, \ldots, q_N\}$，每个请求$q_i$具有输入长度$\text{Input}_i$和预测输出长度$\widehat{\text{Output}}_i$，批次构建的目标是将请求分配至若干批次$\mathcal{B} = \{B_1, B_2, \ldots, B_K\}$，使得所有批次中因填充产生的冗余token总数最小化：
+\begin{equation}
+  \min_{\mathcal{B}} \sum_{k=1}^{K} \left[ \max_{q_i \in B_k} \widehat{\text{Output}}_i \cdot |B_k|
+  - \sum_{q_i \in B_k} \widehat{\text{Output}}_i \right]
+  \label{eq:s3_objective}
+\end{equation}
+S$^3$通过将预测输出长度相近的请求聚合为同一批次，有效减少批内的最大输出长度差异，从而降低填充比例，提升有效计算密度。
 
-\subsection{MemServe：弹性内存管理}
-\label{subsec:memserve}
+\textbf{2. 轻量级输出长度预测器}
 
-MemServe\cite{hu2024memserve}聚焦于PD（Prefill-Decode）分离架构下的内存管理优化，提出\textbf{弹性内存池}（Elastic Memory Pool）概念。
+S$^3$的预测模块采用轻量级分类模型，将输出长度分桶（Bucketing）为若干离散区间（如$[0,8)$、$[8,16)$、$[16,32)$、$[32,64)$、……、$[1024,2048)$等），以请求的输入文本特征为输入，训练一个多分类器预测所属桶编号。分桶策略将连续的长度预测问题转化为分类问题，显著降低了预测复杂度，同时保证了调度决策的快速响应。预测器通常采用BERT等小型预训练语言模型进行微调，在保持较高预测精度的同时，推理延迟远低于目标LLM本身。
 
-\textbf{核心机制}：
+\textbf{3. S$^3$的贡献与局限}
 
-\textbf{(1) 内存解耦}。将KV Cache存储与计算实例分离，构建独立的内存服务器集群。计算实例（GPU）通过高速网络访问远程内存，按需获取KV Cache。
+S$^3$首次将输出长度预测与LLM批处理联合建模，验证了长度感知调度对GPU利用率提升的有效性。然而，S$^3$存在以下局限：未考虑SLO约束，仅优化填充浪费，在混合SLO场景下会产生大量违约；预测器基于历史数据离线训练，对输出长度分布的实时变化适应能力有限；未考虑GPU拓扑和设备映射（Device Map）的优化；对于预测错误的纠正依赖于周期性的离线重训练，实时性不足。上述局限性正是本文第三章提出UELLM框架的直接动机，UELLM在S$^3$基础上进一步将SLO感知调度与异构拓扑感知部署纳入统一优化框架\cite{he2024uellm}。
 
-\textbf{(2) 动态扩缩容}。根据负载变化动态调整内存池容量：高峰时段增加内存节点，低谷时段释放资源。结合Kubernetes等容器编排平台实现自动化运维。
+\subsection{连续批处理机制（Continuous Batching）}
 
-\textbf{(3) 冗余消除}。识别并合并重复的KV Cache块（如共享前缀），采用引用计数管理生命周期，减少存储冗余。
+传统静态批处理（Static Batching）的一个根本缺陷在于：批次中最长的请求完成之前，整个批次不能释放，GPU必须等待尾部请求生成完毕才能接受新的请求。这导致在动态请求流场景下，GPU大量时间处于等待状态，有效利用率严重受损。
 
-MemServe的局限性在于：远程内存访问引入额外延迟，对网络带宽要求高；内存池的管理开销随规模增长，超大规模部署时可能成为瓶颈；未充分考虑Prefill与Decode实例间的负载均衡。
+针对这一问题，\textbf{连续批处理}（Continuous Batching）打破了静态批次的边界，实现了请求级别的动态合并与退出，是现代LLM推理系统（如vLLM\cite{kwon2023efficient}）的核心调度机制之一。其核心思想是：在每个解码步骤（Decode Step）完成后，检查批次中已生成EOS（End-of-Sequence）token的请求，将其立即从批次中移除，同时从等待队列中选取新的请求补充进入批次，使GPU在任意时刻均保持接近满载的状态。
 
-\subsection{vLLM：PagedAttention显存优化}
-\label{subsec:vllm}
+设系统批次槽位数为$B$，第$i$个请求的生成长度为$L_i$。在静态批处理下，GPU有效利用率可近似表示为：
+\begin{equation}
+  \eta_{\text{static}} = \frac{\sum_{i=1}^{B} L_i}{B \cdot \max_{i} L_i}
+  \label{eq:static_util}
+\end{equation}
+当请求长度分布呈现重尾特性时，$\eta_{\text{static}}$可低至20\%以下。而连续批处理通过实时替换已完成请求，理论上可将GPU利用率提升至接近100\%，显著改善系统吞吐量。
 
-vLLM\cite{kwon2023efficient}是伯克利大学提出的开源LLM推理引擎，其\textbf{PagedAttention}技术从根本上解决了KV Cache的显存碎片问题。
+连续批处理的实现需要解决两个关键问题：其一，新请求插入时需即时分配KV Cache空间，而传统连续显存分配方案会产生严重碎片，难以支持动态插入，vLLM通过PagedAttention解决了这一问题（详见第~\ref{sec:pagedattention}节）；其二，动态插入的新请求处于Prefill阶段，而已有请求处于Decode阶段，两者混合执行会引入阶段间干扰，需要精细的调度策略加以协调。
 
-\textbf{问题背景}：传统LLM推理系统将KV Cache存储为连续的显存块，如图~\ref{fig:memory-fragmentation}(a)所示。由于请求长度动态变化，频繁分配和释放导致严重的显存碎片，实际可用显存远低于物理容量。
+\subsection{Orca中的In-flight Batching机制}
+
+Orca\cite{Orca}是最早系统性地提出并实现In-flight Batching（也称迭代级调度，Iteration-level Scheduling）的LLM推理框架，其核心思想与连续批处理高度一致，但在调度粒度和实现机制上进行了更为系统的设计。
+
+\textbf{1. 迭代级调度}
+
+Orca将调度粒度从"请求级"细化为"迭代级"，即在每次前向传播（Forward Pass）后重新做出调度决策。具体而言，Orca维护一个全局请求队列，每次迭代开始时检测当前批次中已完成的请求将其移出，并从等待队列中选取新请求加入批次直到达到显存上限，随后对批次中处于Prefill阶段的新请求和处于Decode阶段的旧请求采用统一的前向传播流程处理。
+
+\textbf{2. 选择性批处理（Selective Batching）}
+
+Orca观察到Transformer不同层的计算模式存在差异：注意力层需要访问各请求的KV Cache，难以对不同长度的请求做统一批处理；而前馈层（FFN Layer）和归一化层则对批内长度不敏感。基于这一观察，Orca提出\textbf{选择性批处理}策略：对FFN层采用标准批处理，对注意力层则按请求独立计算，在保证计算正确性的同时最大化批处理收益。Orca通过迭代级调度相比传统静态批处理实现了最高36.9倍的吞吐量提升\cite{Orca}。然而，Orca采用连续显存预分配策略，未能有效解决KV Cache碎片化问题；批次内同时存在Prefill和Decode请求时，计算密集的Prefill会显著增加Decode请求的TPOT延迟；此外，Orca的调度决策以最大化吞吐量为主要目标，未将不同请求的SLO差异纳入调度优先级考量。
+
+\section{KV缓存优化方法}
+
+KV Cache是LLM推理中显存占用的主要来源，其管理效率直接决定了系统的并发处理能力和服务吞吐量。本节系统梳理现有KV Cache优化技术，包括PagedAttention显存管理、全局KV Cache池架构、弹性内存管理以及模型量化压缩等方法。
+
+\subsection{PagedAttention与vLLM的显存管理}
+\label{sec:pagedattention}
+
+vLLM\cite{kwon2023efficient}提出的PagedAttention是迄今为止最具影响力的KV Cache管理技术之一，其设计思想直接借鉴了操作系统的虚拟内存分页管理机制。
+
+\textbf{1. 传统KV Cache管理的问题}
+
+在传统LLM推理系统中，KV Cache以连续显存块的形式为每个请求预分配。由于输出长度在请求开始时未知，系统通常按最大可能长度预留显存，导致严重的\textbf{内部碎片}（Internal Fragmentation）。此外，请求间共享前缀的KV Cache无法复用，产生大量\textbf{冗余存储}。实测表明，传统方案的KV Cache显存利用率通常仅为40\%--60\%\cite{kwon2023efficient}。
+
+\textbf{2. PagedAttention的核心机制}
+
+PagedAttention将每个请求的KV Cache划分为固定大小的\textbf{物理块}（Physical Block），每个块存储固定数量token的键值对。系统维护一张\textbf{块表}（Block Table），记录每个请求的逻辑块编号到物理块地址的映射关系。
+
+这种非连续存储机制带来了三项关键优势：\textbf{消除内部碎片}，KV Cache按需分配物理块，不再预留最大长度空间，内部碎片从平均30\%以上降至接近零；\textbf{支持动态扩展}，请求生成过程中随着输出长度增加按需分配新物理块，无需预先知道最终输出长度；\textbf{实现前缀共享}，多个请求共享相同系统提示时，其对应的KV Cache物理块可被多个逻辑块表同时引用，通过写时复制（Copy-on-Write）机制安全共享，显著减少冗余存储。
+
+\textbf{3. PagedAttention的性能表现与局限}
+
+vLLM在PagedAttention基础上实现了完整的连续批处理推理引擎。实验表明，相比FasterTransformer和Orca等先进系统，vLLM在相同硬件条件下吞吐量提升最高达24倍，KV Cache显存利用率从传统方案的40\%--60\%提升至90\%以上\cite{kwon2023efficient}。
+
+尽管如此，PagedAttention仍存在若干局限：其一，基于单实例的显存管理设计在PD分离架构下不支持高效的跨节点KV Cache共享；其二，块粒度的分配在极端长序列场景下仍存在少量外部碎片；其三，在超高并发场景下块表维护引入的地址转换开销可能成为性能瓶颈。
+
+\subsection{Mooncake的全局KV Cache池架构}
+
+Mooncake\cite{qin2024mooncake}由月之暗面（Moonshot AI）提出，是面向超长上下文（Long Context）推理场景的KV Cache中心化管理方案，代表了KV Cache管理从实例级向集群级演进的重要方向。
+
+\textbf{1. KVCache中心化架构}
+
+Mooncake的核心设计理念是将KV Cache从各推理实例的本地显存中剥离，构建一个\textbf{全局分布式KV Cache池}（Global KV Cache Pool），统一管理整个集群的KV Cache资源。该池由CPU内存和SSD共同组成存储层次，通过RDMA（Remote Direct Memory Access）网络实现跨节点的高速KV Cache访问。所有Prefill和Decode实例均可访问统一的KV Cache存储层，实现跨实例的缓存复用与SLO感知调度。
+
+\textbf{2. SLO感知的分层调度}
+
+Mooncake将请求按SLO紧迫程度分为不同优先级，结合KV Cache的访问热度（热数据保留在CPU内存，冷数据迁移至SSD），实现差异化的缓存驱逐策略。对于SLO紧迫的请求，优先从CPU内存加载KV Cache以最小化TTFT；对于SLO宽松的请求，允许从SSD加载，在降低存储成本的同时保证服务质量。
+
+\textbf{3. 前缀缓存的全局复用}
+
+Mooncake通过全局前缀树（Global Prefix Trie）索引所有已缓存的KV Cache前缀，任意推理实例均可查询并复用其他实例历史生成的KV Cache。这一机制在多轮对话、相似系统提示等场景下显著减少了重复的Prefill计算，整体前缀缓存命中率可达60\%以上。
+
+\textbf{4. Mooncake的局限}
+
+然而，Mooncake的分布式设计也引入了新的挑战。首先，跨节点KV Cache访问的RDMA传输延迟不可忽视，在网络拥塞时会显著增加TTFT。其次，全局元数据管理器存在单点瓶颈风险，在超大规模集群中的可扩展性有限。最关键的是，Mooncake的调度仍需感知KV Cache的物理位置，\textbf{缓存局部性约束未被彻底解耦}，前缀缓存命中率高的节点依然会吸引更多请求，引发负载倾斜（Load Skew）问题。这一缺陷正是BanaServe\cite{he2025banaserve}在设计全局KV Cache Store时着重解决的核心问题，详见第四章。
+
+\subsection{MemServe的弹性内存管理}
+
+MemServe\cite{hu2024memserve}提出了面向PD分离架构的\textbf{弹性内存池}（Elastic Memory Pool）方案，旨在解决Prefill实例与Decode实例之间内存资源的动态再分配问题。
+
+\textbf{1. 弹性内存池设计}
+
+MemServe的核心创新在于将传统静态绑定于单个实例的内存资源抽象为一个统一的弹性内存池，支持在Prefill和Decode实例之间动态迁移内存配额。当Decode阶段的KV Cache累积量快速增长导致显存紧张时，系统可从空闲的Prefill实例借用内存页；反之，当Prefill阶段计算压力骤增时，可回收Decode实例的冗余内存。
+
+\textbf{2. 上下文缓存与预取机制}
+
+MemServe还引入了\textbf{上下文缓存}（Context Caching）机制，对多轮对话中历史轮次的KV Cache进行持久化存储，避免每次对话轮次都重新计算相同的历史上下文。结合\textbf{异步预取}（Asynchronous Prefetching）策略，系统可在当前请求处理期间提前将下一轮可能需要的KV Cache从CPU内存传输至GPU显存，有效隐藏数据传输延迟。
+
+\textbf{3. MemServe的局限}
+
+MemServe的弹性内存池在一定程度上缓解了PD分离架构的内存不均衡问题，但其调度粒度仍停留在实例级（Instance-level），无法实现层级（Layer-level）或注意力头级别（Attention-level）的细粒度资源再分配。此外，MemServe对网络拓扑异构性（NVLink与PCIe带宽差异）缺乏感知，跨节点内存迁移的开销估算不够精确，在实际异构集群中的表现与理论值存在一定差距。
+
+\subsection{模型量化与压缩技术}
+
+除系统层面的KV Cache管理优化外，模型压缩技术通过直接减小模型参数和激活值的存储精度，从根本上降低显存占用，是缓解显存墙问题的重要补充手段。
+
+\textbf{1. 低比特权重量化}
+
+权重量化（Weight Quantization）将模型参数从FP16/FP32压缩至INT8、INT4乃至更低比特表示，在显著降低显存占用的同时，可利用整数计算单元加速矩阵乘法运算。LLM.int8()\cite{dettmers2022llm}首次在十亿级参数模型上实现无损INT8量化，通过\textbf{混合精度分解}策略将包含离群值（Outlier）的维度保留为FP16计算，其余维度采用INT8量化，实现了接近2倍的显存压缩。GPTQ\cite{frantar2022gptq}采用基于二阶近似的逐层量化策略，在INT4量化精度下的困惑度损失控制在1\%以内，量化过程一次性完成，推理时无额外开销。
+
+\textbf{2. KV Cache专项量化}
+
+KVQuant\cite{hooper2024kvquant}和H$_2$O\cite{zhang2023h2o}等工作观察到KV Cache中不同token的注意力分数分布极不均匀，少数"重要token"（Heavy Hitter）承载了绝大多数注意力权重。基于这一发现，这些工作提出选择性保留重要token的KV Cache（完整精度），对其余token的KV Cache进行激进量化（INT4甚至INT2）或直接驱逐，在几乎不影响生成质量的前提下，将KV Cache显存占用降低至原始的25\%--50\%。
+
+\textbf{3. 量化压缩技术的局限}
+
+量化与压缩技术虽能有效降低显存占用，但存在以下局限：量化比特数越低精度损失越大，对推理质量敏感的任务影响尤为显著；低比特量化需要专用的反量化内核支持，不同GPU架构的最优实现差异较大；KV Cache在推理过程中动态生成，无法像静态权重一样进行离线校准量化，在线量化方案会引入额外的计算开销；此外，量化技术主要解决显存容量问题，并不直接解决批处理调度、SLO感知和资源配置等系统级问题，需要与调度优化协同设计才能发挥最大效果。
+
+\section{部署配置与资源分配方法}
+
+除批处理调度和KV Cache管理外，模型的部署配置（Deployment Configuration）对LLM推理性能同样具有决定性影响。本节梳理现有的部署配置搜索方法和资源分配策略。
+
+\subsection{静态部署配置与设备映射}
+
+在分布式LLM推理中，模型需要跨多个GPU进行部署，核心决策包括：\textbf{GPU数量的选择}和\textbf{层到设备的映射关系}（Device Map）。如表~\ref{tab:devicemap_impact}所示，设备映射策略对推理吞吐量具有显著影响\cite{he2024uellm}。以ChatGLM2-6B在两张异构GPU（Tesla V100和RTX 3090）上的部署为例，将更多层分配至计算能力较强的GPU（RTX 3090），可使平均吞吐量从11.19 token/s提升至22.55 token/s，提升幅度超过100\%。这一结果揭示了\textbf{网络拓扑感知的设备映射}对推理性能的关键作用。
+
+\begin{table}[htbp]
+  \centering
+  \caption{不同设备映射策略对ChatGLM2-6B推理吞吐量的影响（参考UELLM\cite{he2024uellm}）}
+  \label{tab:devicemap_impact}
+  \begin{tabular}{cccc}
+    \toprule
+    \textbf{GPU\#0 分配层} & \textbf{GPU\#1 分配层} &
+    \textbf{平均吞吐量（token/s）} & \textbf{最大吞吐量（token/s）} \\
+    \midrule
+    layer 0--15  & layer 16--32 & 11.19 & 11.58 \\
+    layer 0--19  & layer 20--32 & 13.09 & 13.48 \\
+    layer 0--23  & layer 24--32 & 14.85 & 15.45 \\
+    layer 0--27  & layer 28--32 & 17.23 & 18.00 \\
+    layer 0--31  & layer 32     & 22.55 & 23.07 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+传统的静态部署方案通常采用\textbf{均匀层分配}策略，忽略了GPU计算能力差异和节点间通信带宽的异构性。在实际生产环境中，集群往往由不同型号的GPU混合组成，均匀分配会导致计算能力强的GPU长期等待计算能力弱的GPU完成计算，形成严重的\textbf{木桶效应}（Bottleneck Effect）。
+
+\subsection{基于元学习的配置搜索：Morphling}
+
+Morphling\cite{wang2021morphling}针对云原生模型服务的配置搜索问题，提出了基于\textbf{模型无关元学习}（Model-Agnostic Meta-Learning, MAML）的自动配置框架。Morphling将部署配置空间定义为GPU数量、批大小、模型并行度等超参数的笛卡尔积，在此空间上通过元学习快速拟合性能预测模型，利用已有服务的配置-性能数据以少量新配置的压力测试样本快速泛化至新模型的性能预测，将配置搜索代价从数小时压缩至数分钟。
+
+然而，Morphling在LLM推理场景下面临以下挑战：即便经过元学习加速，仍需对多个候选配置进行真实压力测试，对于参数量超过百亿的LLM，单次压力测试耗时可达数分钟，严重影响系统响应速度；Morphling的配置搜索目标为通用推理延迟，未将KV Cache动态增长的显存需求纳入约束建模；搜索到的最优配置在部署后固定不变，无法根据负载变化实时调整。
+
+\subsection{PD分离架构下的资源分配}
+
+随着PD分离架构（Prefill-Decode Disaggregation）的兴起，资源分配问题从单实例扩展至跨实例的协同优化。
+
+\textbf{1. DistServe的静态PD配比}
+
+DistServe\cite{zhong2024distserve}将Prefill实例与Decode实例分离部署，以\textbf{好吞吐量}（Goodput）最大化为目标，离线求解最优的Prefill实例数与Decode实例数之比（P:D Ratio）。DistServe建立了Prefill延迟和Decode延迟的解析模型，在给定SLO约束下，枚举不同P:D配比下的系统好吞吐量并选择最优配比进行部署。然而，DistServe的P:D配比在部署时一次性确定，运行期间固定不变，在实际工作负载的流量高峰期和低谷期均会出现资源利用率失衡的问题。
+
+\textbf{2. Splitwise的跨机器分离}
+
+Splitwise\cite{patel2024splitwise}将PD分离的粒度进一步提升至机器级别，Prefill阶段和Decode阶段分别在专用的物理机器上执行，通过高速互联网络（如InfiniBand）传输KV Cache。跨机器的物理隔离彻底消除了两阶段间的资源竞争，但也引入了更高的KV Cache传输延迟（通常为数十毫秒），在输入较短的场景下传输开销占TTFT的比例不可忽视。
+
+\textbf{3. 现有PD分离资源分配的共同局限}
+
+综合DistServe和Splitwise的设计可以发现，现有PD分离系统在资源分配层面存在以下共同局限：配置粒度粗，资源调整的最小粒度为GPU实例或GPU池，无法实现Transformer层级或注意力头级别的细粒度资源再分配；P:D实例配比在部署时固定，面对突发流量和负载模式切换时响应迟滞；调度决策受KV Cache物理位置约束，前缀缓存感知路由导致热点节点过载；Prefill阶段计算饱和但显存闲置，Decode阶段显存紧张但计算利用率低，两者的互补性未能通过动态机制加以利用。
+
+\section{现有方法的局限性总结与分析}
+
+综合本章对批式调度方法、KV Cache优化技术和部署配置策略的系统梳理，现有LLM推理优化研究在以下四个维度存在显著局限，这些局限共同构成了本文后续研究工作的出发点与改进动机。
+
+\textbf{（1）调度粒度与资源状态的紧耦合}
+
+现有调度系统（如SGLang\cite{zheng2024sglang}、Mooncake\cite{qin2024mooncake}）的路由决策与KV Cache的物理位置强绑定，前缀缓存感知路由机制导致负载热点持续倾斜。具体而言，缓存命中率高的实例持续吸引更多请求，形成正反馈循环：高命中率$\to$更多请求$\to$缓存进一步扩大$\to$命中率更高。路由器被迫在计算负载均衡与缓存命中率之间做困难权衡，缺乏计算-缓存联合优化的全局视角，最终导致集群资源利用严重失衡。以实测场景为例，缓存命中率最高的实例往往承载80\%以上的流量，计算利用率达到100\%，而其他实例利用率仅为40\%--60\%\cite{he2025banaserve}，集群整体资源效用严重低下。
+
+\textbf{（2）资源配置的静态化与刚性约束}
+
+现有PD分离系统（DistServe、Splitwise）在部署时固定Prefill与Decode实例的比例，无法在运行期间根据实际负载动态调整。传统部署方法（如Morphling）的配置搜索开销巨大，每次重新配置需要数分钟的压力测试，难以处理突发流量下的资源重分配需求。实测数据表明，在低请求率（RPS $\leq$ 10）场景下，静态配置的系统存在20\%--40\%的GPU资源空闲浪费\cite{he2025banaserve}；而在突发高负载场景下，配置调整的滞后性导致服务质量急剧下降，SLO违约率飙升。
+
+\textbf{（3）缺乏跨阶段的细粒度资源协同机制}
+
+Prefill与Decode阶段的资源需求（计算密集 vs. 内存密集）在时域和空域上具有天然的互补性，但现有系统缺乏在两个阶段之间实时优化资源配置的细粒度机制。如图~\ref{fig:pd_imbalance}所示，实测数据表明：Prefill实例的计算利用率通常高达95\%以上，而显存利用率仅约35\%；Decode实例则相反，计算利用率仅约35\%，而显存利用率高达90\%以上\cite{he2025banaserve}。这种系统性的资源利用率失衡意味着，若能实现Prefill与Decode实例之间的细粒度资源共享，理论上可将集群整体利用率提升至70\%以上。
 
 \begin{figure}[htbp]
-    \centering
-    \begin{subfigure}[b]{0.45\textwidth}
-        \centering
-        \begin{tikzpicture}[
-            block/.style={draw, minimum width=0.8cm, minimum height=0.6cm, font=\tiny}
-        ]
-            \foreach \x/\c in {0/white, 1/red!30, 2/red!30, 3/white, 4/white, 5/blue!30, 6/white, 7/green!30, 8/green!30, 9/white} {
-                \node[block, fill=\c] at (\x*0.9, 0) {};
-            }
-            \node[font=\small] at (4, -1) {碎片：3块，无法合并};
-        \end{tikzpicture}
-        \caption{传统连续存储}
-        \label{subfig:contiguous}
-    \end{subfigure}
-    \hfill
-    \begin{subfigure}[b]{0.45\textwidth}
-        \centering
-        \begin{tikzpicture}[
-            block/.style={draw, minimum width=0.8cm, minimum height=0.6cm, font=\tiny}
-        ]
-            \foreach \x/\c in {0/red!30, 1/blue!30, 2/green!30, 3/red!30, 4/green!30, 5/white, 6/white, 7/white, 8/white, 9/white} {
-                \node[block, fill=\c] at (\x*0.9, 0) {};
-            }
-            \draw[->, thick] (5*0.9, 0.5) -- (6*0.9, 0.5);
-            \node[font=\small] at (4, -1) {非连续存储，无碎片};
-        \end{tikzpicture}
-        \caption{PagedAttention分页存储}
-        \label{subfig:paged}
-    \end{subfigure}
-    \caption{显存碎片问题对比}
-    \label{fig:memory-fragmentation}
+  \centering
+  \begin{tikzpicture}[
+    scale=0.9,
+    every node/.style={font=\small},
+    bar/.style={draw, thick, minimum width=2.0cm},
+    label/.style={font=\small\bfseries}
+  ]
+
+  % ===== 坐标轴 =====
+  \draw[thick, ->] (0, 0) -- (0, 5.8)
+      node[above, font=\small] {利用率 (\%)};
+  \draw[thick, ->] (0, 0) -- (9.5, 0);
+
+  % 刻度
+  \foreach \y/\val in {0/0, 1/20, 2/40, 3/60, 4/80, 5/100}{
+      \draw (-0.12, \y) -- (0.12, \y);
+      \node[left, font=\scriptsize] at (-0.15, \y) {\val};
+  }
+
+  % ===== Prefill实例 =====
+  % 计算利用率（~95%）
+  \draw[bar, fill=red!40]  (0.8, 0) rectangle (2.8, 4.75);
+  \node[above, font=\scriptsize] at (1.8, 4.75) {$\approx$95\%};
+  \node[font=\scriptsize, align=center] at (1.8, -0.6)
+      {Prefill\\计算利用率};
+
+  % 显存利用率（~35%）
+  \draw[bar, fill=blue!25] (3.2, 0) rectangle (5.2, 1.75);
+  \node[above, font=\scriptsize] at (4.2, 1.75) {$\approx$35\%};
+  \node[font=\scriptsize, align=center] at (4.2, -0.6)
+      {Prefill\\显存利用率};
+
+  % ===== 阶段分界线 =====
+  \draw[dashed, gray!70, thick] (5.6, -0.9) -- (5.6, 5.8);
+  \node[gray, font=\scriptsize, rotate=90] at (5.85, 3.0) {阶段分界};
+
+  % ===== Decode实例 =====
+  % 计算利用率（~35%）
+  \draw[bar, fill=red!20]  (6.0, 0) rectangle (8.0, 1.75);
+  \node[above, font=\scriptsize] at (7.0, 1.75) {$\approx$35\%};
+  \node[font=\scriptsize, align=center] at (7.0, -0.6)
+      {Decode\\计算利用率};
+
+  % 显存利用率（~90%）
+  \draw[bar, fill=blue!50] (8.4, 0) rectangle (10.4, 4.5);
+  \node[above, font=\scriptsize] at (9.4, 4.5) {$\approx$90\%};
+  \node[font=\scriptsize, align=center] at (9.4, -0.6)
+      {Decode\\显存利用率};
+
+  % ===== 互补性双向箭头 =====
+  \draw[<->, dashed, orange!80!black, thick]
+      (2.8, 4.2) -- (8.4, 4.2)
+      node[midway, above, font=\scriptsize, text=orange!80!black]
+      {互补资源可通过细粒度迁移共享};
+
+  % ===== 图例 =====
+  \node[draw, fill=red!40,  minimum width=0.45cm,
+        minimum height=0.35cm, thick] at (1.5, 5.4) {};
+  \node[right, font=\scriptsize] at (1.8, 5.4) {计算利用率};
+  \node[draw, fill=blue!45, minimum width=0.45cm,
+        minimum height=0.35cm, thick] at (4.5, 5.4) {};
+  \node[right, font=\scriptsize] at (4.8, 5.4) {显存利用率};
+
+  \end{tikzpicture}
+  \caption{PD分离架构下Prefill与Decode实例资源利用率的系统性失衡示意图（数据来源：BanaServe\cite{he2025banaserve}，基于LLaMA-13B模型和Alpaca数据集的实测结果）。Prefill实例计算饱和而显存闲置，Decode实例显存紧张而计算利用率低，两阶段资源需求高度互补，具有通过细粒度迁移实现协同优化的理论潜力。}
+  \label{fig:pd_imbalance}
 \end{figure}
 
-\textbf{PagedAttention核心设计}：
+\textbf{（4）对异构性和动态性的适应性不足}
 
-\textbf{(1) 块表映射}。将KV Cache划分为固定大小的块（Block，通常为512 tokens），通过块表（Block Table）记录逻辑块到物理块的映射关系。逻辑上连续的KV Cache在物理上可以分散存储。
+现有方案多假设同构的GPU集群和稳态负载，对混合型号GPU（如A100与V100混用）、网络拓扑差异（NVLink与PCIe带宽差距可达5--10倍）以及重尾分布（Heavy-tailed Distribution）的动态负载缺乏有效建模。在实际生产环境中，请求到达率呈现显著的非平稳性（Non-stationarity），输入/输出长度分布随业务场景动态变化。Azure生产环境的实测数据显示，LLM推理负载的RPS峰谷比可达5倍以上，输入序列长度跨越从数十token到数万token的超宽范围\cite{he2025banaserve}，现有静态方案在这类动态异构场景下资源碎片化严重，难以维持稳定的SLO保障。
 
-\textbf{(2) 动态分配}。按需分配物理块，请求完成时立即回收。由于块大小固定，回收的块可立即被其他请求复用，消除外部碎片。
+\begin{table}[htbp]
+  \centering
+  \caption{现有LLM推理优化方法局限性对比}
+  \label{tab:limitation_comparison}
+  \begin{tabularx}{\textwidth}{p{3.2cm}AAAAA}
+    \toprule
+    \textbf{方法} &
+    \textbf{SLO感知} &
+    \textbf{输出长度预测} &
+    \textbf{动态资源配置} &
+    \textbf{异构拓扑感知} &
+    \textbf{跨阶段协同} \\
+    \midrule
+    FIFO静态批处理
+        & \textcolor{red}{\xmark}
+        & \textcolor{red}{\xmark}
+        & \textcolor{red}{\xmark}
+        & \textcolor{red}{\xmark}
+        & \textcolor{red}{\xmark} \\
+    S$^3$\cite{jin2023s3}
+        & \textcolor{red}{\xmark}
+        & \textcolor{green!60!black}{\cmark}
+        & \textcolor{red}{\xmark}
+        & \textcolor{red}{\xmark}
+        & \textcolor{red}{\xmark} \\
+    Orca\cite{Orca}
+        & \textcolor{red}{\xmark}
+        & \textcolor{red}{\xmark}
+        & \textcolor{orange}{$\triangle$}
+        & \textcolor{red}{\xmark}
+        & \textcolor{red}{\xmark} \\
+    vLLM\cite{kwon2023efficient}
+        & \textcolor{red}{\xmark}
+        & \textcolor{red}{\xmark}
+        & \textcolor{orange}{$\triangle$}
+        & \textcolor{red}{\xmark}
+        & \textcolor{red}{\xmark} \\
+    SGLang\cite{zheng2024sglang}
+        & \textcolor{red}{\xmark}
+        & \textcolor{red}{\xmark}
+        & \textcolor{orange}{$\triangle$}
+        & \textcolor{red}{\xmark}
+        & \textcolor{red}{\xmark} \\
+    Morphling\cite{wang2021morphling}
+        & \textcolor{red}{\xmark}
+        & \textcolor{red}{\xmark}
+        & \textcolor{orange}{$\triangle$}
+        & \textcolor{red}{\xmark}
+        & \textcolor{red}{\xmark} \\
+    DistServe\cite{zhong2024distserve}
+        & \textcolor{orange}{$\triangle$}
+        & \textcolor{red}{\xmark}
+        & \textcolor{red}{\xmark}
+        & \textcolor{red}{\xmark}
+        & \textcolor{orange}{$\triangle$} \\
+    Splitwise\cite{patel2024splitwise}
+        & \textcolor{orange}{$\triangle$}
+        & \textcolor{red}{\xmark}
+        & \textcolor{red}{\xmark}
+        & \textcolor{red}{\xmark}
+        & \textcolor{orange}{$\triangle$} \\
+    Mooncake\cite{qin2024mooncake}
+        & \textcolor{green!60!black}{\cmark}
+        & \textcolor{red}{\xmark}
+        & \textcolor{orange}{$\triangle$}
+        & \textcolor{red}{\xmark}
+        & \textcolor{orange}{$\triangle$} \\
+    MemServe\cite{hu2024memserve}
+        & \textcolor{red}{\xmark}
+        & \textcolor{red}{\xmark}
+        & \textcolor{orange}{$\triangle$}
+        & \textcolor{red}{\xmark}
+        & \textcolor{orange}{$\triangle$} \\
+    \midrule
+    \textbf{UELLM}\cite{he2024uellm}
+        & \textcolor{green!60!black}{\cmark}
+        & \textcolor{green!60!black}{\cmark}
+        & \textcolor{green!60!black}{\cmark}
+        & \textcolor{green!60!black}{\cmark}
+        & \textcolor{red}{\xmark} \\
+    \textbf{BanaServe}\cite{he2025banaserve}
+        & \textcolor{green!60!black}{\cmark}
+        & \textcolor{orange}{$\triangle$}
+        & \textcolor{green!60!black}{\cmark}
+        & \textcolor{orange}{$\triangle$}
+        & \textcolor{green!60!black}{\cmark} \\
+    \bottomrule
+    \multicolumn{6}{l}{%
+        \scriptsize
+        \textcolor{green!60!black}{\cmark}: 完整支持；\quad
+        \textcolor{orange}{$\triangle$}: 部分支持；\quad
+        \textcolor{red}{\xmark}: 不支持}
+  \end{tabularx}
+\end{table}
 
-\textbf{(3) 共享机制}。通过块表引用计数实现KV Cache共享：多个请求共享同一前缀时，物理块只存储一份，块表记录多个引用。Copy-on-Write机制确保写操作的安全性。
+综合以上四个维度的局限性分析，本文提出两种互补的优化方案，分别从批处理调度与层级资源分配两个层面构建大模型推理服务的完整优化体系：
 
-PagedAttention使vLLM的显存利用率从传统系统的40-50\%提升至90\%以上，支持更大的批次和更长的上下文。但其设计针对单实例优化，在多实例分布式场景下缺乏全局缓存共享能力。
+\begin{enumerate}
+    \item \textbf{UELLM}（第三章）：针对静态场景下批处理策略粗放和部署配置静态化的问题，提出SLO感知的动态批处理算法（SLO-ODBS）与异构拓扑感知的高效资源分配算法（HELR），实现从输出长度预测到端到端部署优化的完整技术闭环。UELLM重点解决上述局限（1）和（2）中的批处理调度与部署配置问题，在真实4-GPU异构集群上将推理延迟降低72.3\%至90.3\%，GPU利用率提升1.2倍至4.1倍，吞吐量提高1.92倍至4.98倍，并实现零SLO违约\cite{he2024uellm}。
 
-\subsection{量化：模型压缩与加速}
-\label{subsec:quantization}
+    \item \textbf{BanaServe}（第四章）：针对PD分离架构下资源利用率失衡和缓存感知路由导致的负载倾斜问题，提出层级权重迁移（Layer-level Migration）、注意力级KV Cache迁移（Attention-level Migration）和全局KV Cache Store等机制，实现细粒度的跨阶段资源协同优化。BanaServe重点解决上述局限（3）和（4）中的跨阶段协同与动态适应性问题，相比vLLM吞吐量提升1.2倍至3.9倍，延迟降低3.9\%至78.4\%；相比DistServe吞吐量提升1.1倍至2.8倍，延迟降低1.4\%至70.1\%\cite{he2025banaserve}。
+\end{enumerate}
 
-量化（Quantization）通过降低模型权重和激活值的数值精度，减少显存占用和计算量，是LLM推理优化的基础技术。
+两种方案在技术层面相互补充：UELLM解决静态场景下的批处理与部署联合优化，BanaServe解决动态场景下的PD分离架构资源协同，共同构成覆盖"静态优化-动态调度"全生命周期的LLM推理服务资源管理框架。
 
-\textbf{(1) 权重量化（Weight Quantization）}。将FP16/BF16精度的模型权重压缩至INT8、INT4甚至更低比特。代表性方法包括：
-\begin{itemize}
-    \item \textbf{LLM.int8()} \cite{dettmers2022llm}：对异常值（outliers）保持FP16精度，其余权重用INT8表示，减少精度损失。
-    \item \textbf{GPTQ} \cite{frantar2022gptq}：基于近似二阶信息的逐层量化，支持INT4精度且精度损失可控。
-    \item \textbf{AWQ} \cite{lin2023awq}：激活感知的权重量化，保护对激活值敏感的重要权重。
-\end{itemize}
+\section{本章小结}
 
-\textbf{(2) KV Cache量化}。对KV Cache进行低比特量化，显著降低长上下文场景的显存压力。例如，将KV Cache从FP16量化为INT8，显存占用减半，支持2倍长的上下文。
+本章系统梳理了LLM推理服务中批式任务调度与KV缓存优化的现有技术方案，并从多个维度分析了各方法的设计原理、技术贡献与局限性。
 
-\textbf{(3) 混合精度量化}。根据层的重要性或激活分布动态选择精度，关键层用高精度，次要层用低精度，平衡效率和精度。
+在批式任务调度方面，本章介绍了FIFO、短作业优先、长作业优先等传统调度策略，分析了其在LLM推理场景下因输出长度不可知和SLO差异被忽视而导致的低效问题。进一步介绍了S$^3$的输出长度感知装箱调度框架、Orca和vLLM中实现的连续批处理（Continuous Batching）与迭代级In-flight Batching机制。这些方法在吞吐量提升方面取得了显著进展，但均未能同时解决SLO约束感知、异构拓扑适配和跨阶段资源协同等问题。
 
-量化的优势在于通用性强，可与前述批处理、缓存优化技术正交叠加。但其局限在于：量化本身不解决资源调度和负载均衡问题；极低比特量化（如INT4以下）可能显著影响模型能力；需要硬件支持低比特运算才能发挥加速效果。
+在KV缓存优化方面，本章分析了vLLM的PagedAttention非连续显存分页管理机制、Mooncake的全局分布式KV Cache池架构、MemServe的弹性内存池方案，以及低比特量化、KV Cache专项量化和知识蒸馏等模型压缩技术。这些工作从不同角度缓解了显存墙问题，但在缓存局部性解耦、细粒度跨实例资源共享和动态负载适应性方面仍存在明显不足。
 
-\section{现有方法的缺陷}
-\label{sec:limitations}
+在部署配置与资源分配方面，本章介绍了Morphling的元学习配置搜索框架、DistServe的静态PD实例配比优化和Splitwise的跨机器PD分离方案，指出现有方法在配置粒度、动态响应速度和异构硬件感知能力上的共同局限。
 
-综合上述分析，当前LLM推理优化研究在以下维度存在显著局限，这些局限性构成了本文提出UELLM和BanaServe的改进动机。
+最后，本章从\textbf{调度粒度与资源状态紧耦合}、\textbf{资源配置静态化}、\textbf{缺乏跨阶段细粒度协同机制}、\textbf{对异构性和动态性适应性不足}四个维度总结了现有方法的系统性局限，并以表~\ref{tab:limitation_comparison}对各方法进行了量化对比。基于上述分析，明确了本文后续章节提出UELLM和BanaServe两种优化方案的改进动机与技术切入点：第三章将针对局限（1）和（2）提出UELLM框架，第四章将针对局限（3）和（4）提出BanaServe框架，从批处理优化和层级资源分配两个层面构建大模型推理服务的统一资源管理体系。
 
-\subsection{调度粒度与资源状态的紧耦合}
 
-现有系统（如SGLang、Mooncake）的调度决策严重依赖KV Cache的物理位置。前缀缓存感知路由（Cache-aware Routing）虽然提高了缓存命中率，但引入了\textbf{负载热点倾斜}问题：路由器被迫在计算负载均衡与缓存命中率之间做困难权衡（Cache-Load Balancing Trade-off）。
 
-具体表现为：高缓存命中率的节点持续接收新请求，计算负载迅速饱和；而低命中率节点虽有剩余算力，却因缺乏缓存数据无法分担负载。这种\textbf{正反馈效应}导致集群资源利用率严重失衡，部分节点过载而其他节点空闲。
 
-\subsection{资源配置的静态化与刚性约束}
-
-现有PD分离系统（DistServe、Splitwise、MemServe）在部署时固定Prefill与Decode实例比例，无法在运行期间根据实际负载动态调整。静态配置的问题在于：
-
-\textbf{(1) 负载失配}。实际生产环境中，Prefill和Decode的负载比例随时间动态变化（如白天交互式应用Decode密集，夜间批处理任务Prefill密集）。固定比例导致某一阶段资源过剩而另一阶段成为瓶颈。
-
-\textbf{(2) 扩容滞后}。突发流量（Bursty Traffic）下，静态系统无法快速重新分配资源，导致队列堆积和SLO违约。
-
-\textbf{(3) 配置搜索开销}。Morphling等配置优化方法需要对每个候选配置进行压力测试，产生巨大时间和计算开销，难以适应快速变化的负载模式。
-
-\subsection{缺乏跨阶段的细粒度资源协同机制}
-
-Prefill与Decode阶段的资源需求（计算vs内存）在时域和空域上互补，但现有系统缺乏在两个阶段之间实时优化资源配置的\textbf{细粒度机制}。
-
-如图~\ref{fig:resource-imbalance}所示，Prefill实例通常计算利用率>95\%但显存利用率<40\%，Decode实例则相反（计算<40\%，显存>90\%）。这种\textbf{资源利用率失衡}导致严重的资源浪费：Prefill实例的大量显存闲置无法被Decode利用，而Decode实例的计算能力未被充分利用。
-
-\begin{figure}[htbp]
-    \centering
-    \begin{tikzpicture}[
-        box/.style={draw, minimum width=3cm, minimum height=2cm, align=center},
-        bar/.style={draw, minimum width=0.6cm}
-    ]
-        % Prefill实例
-        \node[box] (prefill) at (0,0) {\textbf{Prefill实例}\\[0.3cm]
-            \begin{tikzpicture}[baseline]
-                \node[bar, fill=red!70, minimum height=1.2cm] at (0,0) {};
-                \node[bar, fill=blue!30, minimum height=0.4cm] at (0.8,0) {};
-                \node[font=\tiny] at (0,-0.8) {计算95\%};
-                \node[font=\tiny] at (0.8,-0.6) {显存35\%};
-            \end{tikzpicture}
-        };
-        
-        % Decode实例
-        \node[box] (decode) at (5,0) {\textbf{Decode实例}\\[0.3cm]
-            \begin{tikzpicture}[baseline]
-                \node[bar, fill=red!30, minimum height=0.4cm] at (0,0) {};
-                \node[bar, fill=blue!80, minimum height=1.1cm] at (0.8,0) {};
-                \node[font=\tiny] at (0,-0.6) {计算40\%};
-                \node[font=\tiny] at (0.8,-0.75) {显存95\%};
-            \end{tikzpicture}
-        };
-        
-        % 箭头表示资源浪费
-        \draw[<->, thick, dashed, red] (1.5,0.5) -- (3.5,0.5) node[midway, above, font=\small] {资源互补但无法流动};
-    \end{tikzpicture}
-    \caption{Prefill与Decode实例资源利用率失衡}
-    \label{fig:resource-imbalance}
-\end{figure}
-
-现有系统缺乏在实例间动态迁移计算任务或内存状态的能力，无法根据实时负载重新平衡资源。
-
-\subsection{对异构性和动态性的适应性不足}
-
-现有方案多假设同构的GPU集群和稳态负载，对以下实际场景缺乏有效支持：
-
-\textbf{(1) 硬件异构性}。实际数据中心常混合部署不同型号GPU（如A100、H100、RTX 3090），其计算能力、显存容量、互联带宽差异显著。现有方法未充分考虑这些差异，导致资源碎片化严重。
-
-\textbf{(2) 网络拓扑异构性}。GPU间通过NVLink、PCIe、InfiniBand等多种互联方式连接，带宽差异可达10倍以上。现有部署策略忽视拓扑结构，可能将频繁通信的层分配到高延迟链路上。
-
-\textbf{(3) 负载动态性}。生产环境负载呈现重尾分布（Heavy-tailed）和突发特性，现有静态或准静态策略无法及时响应，导致服务质量波动。
-
-针对上述局限，本文后续章节提出两种优化方案：第三章的\textbf{UELLM}聚焦于静态场景下的批处理优化与异构部署，通过输出长度预测和动态规划实现高效资源分配；第四章的\textbf{BanaServe}针对动态PD分离架构，通过层级资源迁移和全局KV Cache共享实现细粒度负载均衡。

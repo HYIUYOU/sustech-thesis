@@ -1,151 +1,164 @@
 % !TeX root = ../sustechthesis-example.tex
 
-% denotation 环境带一个可选参数，用来指定符号列的宽度（默认为 2.5cm），下面改3cm为例。
-% 如果论文中使用了大量的物理量符号、标志、缩略词、专门计量单位、自定义名词和术语等， 应编写“符号和缩略语说明”。
-% 论文中主要符号应全部采用法定单位， 严格执行《量和单位》(GB3100~3102-93)的有关规定、单位名称的书写，可以采用国际通用符号，也可以用中文名称，但全文应统一，不得两种混用。
-% 缩略语应列出中英文全称。符号和缩略语说明排序方法先按拉丁字母大写、小写排序， 再按希腊字母大写、小写排序， 如下表所示：
-% ABCDEFGHIJKLMNOPQRSTUVWXYZ
-% abcdefghijklmnopqrstuvwxyz
-% Alpha
-% Beta
-% Gamma
-% Delta
-% Epsilon
-% Zeta
-% Eta
-% Theta
-% Iota
-% Kappa
-% Lambda
-% Mu
-% Nu
-% Xi
-% Omicron
-% Pi
-% Rho
-% Sigma
-% Tau
-% Upsilon
-% Phi
-% Chi
-% Psi
-% Omega
-% alpha
-% beta
-% gamma
-% delta
-% epsilon
-% zeta
-% eta
-% theta
-% iota
-% kappa
-% lambda
-% mu
-% nu
-% xi
-% omicron
-% pi
-% rho
-% sigma
-% tau
-% upsilon
-% phi
-% chi
-% psi
-% omega
-
-% 希腊字母详见 https://xilazimu.net/
-
-
 \begin{denotation}[3cm]
-  \item[As-PPT]聚苯基不对称三嗪
-  \item[DFT]密度泛函理论 (Density Functional Theory)
-  \item[DMAsPPT]聚苯基不对称三嗪双模型化合物（水解实验模型化合物）
-  \item[$E_a$]化学反应的活化能 (Activation Energy)
-  \item[HMAsPPT]聚苯基不对称三嗪模型化合物的质子化产物
-  \item[HMPBI]聚苯并咪唑模型化合物的质子化产物
-  \item[HMPI]聚酰亚胺模型化合物的质子化产物
-  \item[HMPPQ]聚苯基喹噁啉模型化合物的质子化产物
-  \item[HMPY]聚吡咙模型化合物的质子化产物
-  \item[HMSPPT]聚苯基对称三嗪模型化合物的质子化产物
-  \item[HPCE]高效毛细管电泳色谱 (High Performance Capillary lectrophoresis)
-  \item[HPLC]高效液相色谱 (High Performance Liquid Chromatography)
-  \item[IRC]内禀反应坐标 (Intrinsic Reaction Coordinates)
-  \item[LC-MS]液相色谱-质谱联用 (Liquid chromatography-Mass Spectrum)
-  \item[MAsPPT]聚苯基不对称三嗪单模型化合物，3,5,6-三苯基-1,2,4-三嗪
-  \item[MPBI]聚苯并咪唑模型化合物，N-苯基苯并咪唑
-  \item[MPI]聚酰亚胺模型化合物，N-苯基邻苯酰亚胺
-  \item[MPPQ]聚苯基喹噁啉模型化合物，3,4-二苯基苯并二嗪
-  \item[MPY]聚吡咙模型化合物
-  \item[MSPPT]聚苯基对称三嗪模型化合物，2,4,6-三苯基-1,3,5-三嗪
-  \item[ONIOM]分层算法 (Our own N-layered Integrated molecular Orbital and molecular Mechanics)
-  \item[PBI]聚苯并咪唑
-  \item[PDT]热分解温度
-  \item[PES]势能面 (Potential Energy Surface)
-  \item[PI]聚酰亚胺
-  \item[PMDA-BDA]均苯四酸二酐与联苯四胺合成的聚吡咙薄膜
-  \item[PPQ]聚苯基喹噁啉
-  \item[PY]聚吡咙
-  \item[S-PPT]聚苯基对称三嗪
-  \item[SCF]自洽场 (Self-Consistent Field)
-  \item[SCRF]自洽反应场 (Self-Consistent Reaction Field)
-  \item[TIC]总离子浓度 (Total Ion Content)
-  \item[TS]过渡态 (Transition State)
-  \item[TST]过渡态理论 (Transition State Theory)
-  \item[ZPE]零点振动能 (Zero Vibration Energy)
-  \item[\textit{ab initio}]基于第一原理的量子化学计算方法，常称从头算法
-  \item[$\Delta G^\neq$]活化自由能(Activation Free Energy)
-  \item[$\kappa$]传输系数 (Transmission Coefficient)
-  \item[$\nu_i$]虚频 (Imaginary Frequency)
+
+  % ===== 大写拉丁字母 =====
+  \item[$A^{(j)}$]注意力权重矩阵，设备$j$上的注意力分数指数值
+  \item[$B$]有效网络带宽（Gbps）
+  \item[$B_{\text{net}}$]节点间有效互联带宽
+  \item[$B_{sz}$]批处理大小（Batch Size）
+  \item[$C_d$]设备$d$当前计算使用量
+  \item[$C^{\max}_d$]设备$d$的峰值计算能力上限
+  \item[$C_\ell$]每层每token的计算开销
+  \item[$C_{\text{gpu}}$]GPU峰值计算能力
+  \item[$CM$]当前批次综合优化指标
+  \item[$D$]硬件设备节点集合，$D=\{d_1,d_2,\ldots,d_n\}$
+  \item[$E$]硬件网络拓扑中节点间连接边集合
+  \item[$G$]硬件网络拓扑图，$G=(D,E)$
+  \item[$H$]注意力头总数
+  \item[$K$]输出长度分桶数量；键矩阵（Key Matrix）
+  \item[$K^{(j)}$]分配至设备$j$的键矩阵子集
+  \item[$K_{\text{acc}}$]Decode实例中解码过程累积的KV Cache大小
+  \item[$K_{\text{init}}$]Prefill实例的初始KV Cache分配大小
+  \item[$L$]输入序列长度（token数）
+  \item[$L_1$]并行计算引入的延迟系数（与SLO相关）
+  \item[$L_2$]并行计算引入的延迟系数（与输出长度相关）
+  \item[$L_{CM}$]当前批次中的最大SLO值
+  \item[$M$]LLM显存总需求
+  \item[$M_0$]进程基础内存开销
+  \item[$M_d$]设备$d$当前显存使用量
+  \item[$M^{\max}_d$]设备$d$的显存容量上限
+  \item[$M_\ell$]每层显存占用
+  \item[$N$]当前批次中的请求数量；Transformer总层数；并发请求总数
+  \item[$N_m$]模块选择和开销评估的计算量
+  \item[$O$]批次内最大输出长度；注意力输出矩阵
+  \item[$O^{(j)}$]设备$j$上计算得到的注意力输出子集
+  \item[$O_{CM}$]当前批次中的最大输出长度
+  \item[$P$]Prefill实例集合
+  \item[$Q$]查询矩阵（Query Matrix）；请求队列
+  \item[$S$]设备分配方案，$S\subseteq D$
+  \item[$S_{kv}$]单token每层KV Cache大小（字节）
+  \item[$S^{kv}_\ell$]第$\ell$层对应KV Cache大小
+  \item[$S^{\text{total}}_\ell$]层级迁移总数据量（权重+KV Cache）
+  \item[$S^w_\ell$]第$\ell$层权重大小
+  \item[$T$]KV Cache预留显存；延迟阈值
+  \item[$T_{\text{attn}}$]注意力级KV Cache迁移延迟
+  \item[$T_{\text{budget}}$]迁移延迟预算约束
+  \item[$T_c$]缓存访问延迟
+  \item[$T_d$]基础解码计算时间
+  \item[$T_F$]Prefill阶段总前向计算时间
+  \item[$T_{F,\text{layer}}$]每层前向计算时间
+  \item[$T_{\text{KV}}$]每层KV Cache传输时间
+  \item[$T_l$]批次总延迟优化目标
+  \item[$T_{\text{layer}}$]层级权重迁移延迟
+  \item[$T_m$]内存带宽停顿时间
+  \item[$T_{\text{mem\_realloc}}$]缓冲区重分配时间
+  \item[$T_o$]批次总输出长度优化目标
+  \item[$T_p$]Prefill计算时间
+  \item[$T_q$]Decode前的排队延迟
+  \item[$T_{\text{sync}}$]迁移同步开销
+  \item[$T_{\text{TPOT}}$]每输出token时间（Time Per Output Token）
+  \item[$T_{\text{TTFT}}$]首token延迟（Time To First Token）
+  \item[$T_x$]KV Cache传输时间（加载+获取）
+  \item[$U_{\text{avg}}$]集群平均GPU利用率
+  \item[$U_d$]设备$d$的归一化综合利用率
+  \item[$U_p$]Prefill实例平均利用率
+  \item[$U_{p_i}$]Prefill实例$p_i$的归一化负载
+  \item[$V$]值矩阵（Value Matrix）
+  \item[$V^{(j)}$]分配至设备$j$的值矩阵子集
+  \item[$W_\ell$]第$\ell$层的模型权重矩阵
+
+  % ===== 小写拉丁字母 =====
+  \item[$b$]批次中的请求数量
+  \item[$d$]注意力头维度
+  \item[$d_{\text{head}}$]每个注意力头的维度
+  \item[$d_{\text{model}}$]模型隐藏层维度
+  \item[$h_{kv}$]GQA下KV头数量
+  \item[$h_{\text{total}}$]总注意力头数量
+  \item[$m$]每层所需显存（$M/\text{Layer}(M)$）
+  \item[$n_d$]Decode实例分配的Transformer层数
+  \item[$n_p$]Prefill实例分配的Transformer层数
+  \item[$p$]性能-时间关系调节系数
+  \item[$q_i$]第$i$个推理请求
+  \item[$r$]平均前缀缓存命中率
+
+  % ===== 缩略语 =====
+  \item[AI]人工智能（Artificial Intelligence）
+  \item[API]应用程序接口（Application Programming Interface）
+  \item[BF16]Brain Float 16位浮点数格式
+  \item[CPU]中央处理器（Central Processing Unit）
+  \item[CUDA]统一计算设备架构（Compute Unified Device Architecture）
+  \item[DistServe]预填充-解码分离推理系统\cite{zhong2024distserve}
+  \item[DP]动态规划（Dynamic Programming）
+  \item[FIFO]先进先出调度策略（First-In-First-Out）
+  \item[FP16]16位浮点数格式（Float Point 16）
+  \item[GPU]图形处理单元（Graphics Processing Unit）
+  \item[GQA]分组查询注意力机制（Grouped Query Attention）
+  \item[HBM]高带宽显存（High Bandwidth Memory）
+  \item[HE]高效利用率模式（High-Efficiency Mode）
+  \item[HELR]高效低延迟资源分配算法（High-Efficiency Low-Latency Resource Allocation）
+  \item[HFT]Hugging Face Transformers推理框架
+  \item[INT4]4位整数量化格式
+  \item[INT8]8位整数量化格式
+  \item[KV Cache]键值缓存（Key-Value Cache）
+  \item[LJF]长作业优先调度（Longest Job First）
+  \item[LLM]大语言模型（Large Language Model）
+  \item[LongBench]长文本理解基准测试数据集\cite{longbench}
+  \item[LoRA]低秩自适应微调（Low-Rank Adaptation）
+  \item[LR]低延迟优先模式（Low-Latency Mode）
+  \item[MDP]马尔可夫决策过程（Markov Decision Process）
+  \item[MLaaS]机器学习即服务（Machine Learning as a Service）
+  \item[MPS]多进程服务（Multi-Process Service）
+  \item[MIG]多实例GPU（Multi-Instance GPU）
+  \item[NVLink]NVIDIA高速GPU互联技术
+  \item[ODBS]输出长度驱动的动态批处理调度算法（Output-Driven Batch Scheduler）
+  \item[OOM]显存溢出（Out-of-Memory）
+  \item[PCIe]高速串行计算机扩展总线标准（Peripheral Component Interconnect Express）
+  \item[PD分离]预填充-解码分离架构（Prefill-Decode Disaggregation）
+  \item[PPO]近端策略优化算法（Proximal Policy Optimization）
+  \item[QoS]服务质量（Quality of Service）
+  \item[QLoRA]量化低秩自适应微调（Quantized Low-Rank Adaptation）
+  \item[RAG]检索增强生成（Retrieval-Augmented Generation）
+  \item[RDMA]远程直接内存访问（Remote Direct Memory Access）
+  \item[RPS]每秒请求数（Requests Per Second）
+  \item[S3]基于输出长度感知的调度框架\cite{jin2023s3}
+  \item[SAC]软演员-评论家算法（Soft Actor-Critic）
+  \item[SGLang]结构化语言模型程序执行框架\cite{zheng2024sglang}
+  \item[SJF]短作业优先调度（Shortest Job First）
+  \item[SLO]服务等级目标（Service Level Objective）
+  \item[SLO-DBS]SLO感知的动态批处理调度算法（SLO-aware Dynamic Batch Scheduler）
+  \item[SLO-ODBS]SLO感知与输出长度驱动的动态批处理调度算法（SLO and Output-Driven Dynamic Batch Scheduler）
+  \item[SSD]固态硬盘（Solid State Drive）
+  \item[TPOT]每输出token时间（Time Per Output Token）
+  \item[TTFT]首token延迟（Time To First Token）
+  \item[UA]UELLM-all，同时采用HELR和SLO-ODBS的完整版本
+  \item[UB]UELLM-batch，仅使用SLO-ODBS批处理调度算法的版本
+  \item[UD]UELLM-deploy，仅使用HELR模型部署算法的版本
+  \item[UELLM]统一高效大语言模型推理服务框架（Unified and Efficient LLM Inference Serving）
+  \item[vLLM]基于PagedAttention的高效LLM推理系统\cite{kwon2023efficient}
+  \item[WAN]广域网（Wide Area Network）
+
+  % ===== 希腊字母 =====
+  \item[$\alpha$]联合优化目标中资源利用率的权重系数
+  \item[$\beta$]联合优化目标中延迟的权重系数
+  \item[$\gamma$]联合优化目标中吞吐量的权重系数
+  \item[$\delta$]负载不均衡阈值
+  \item[$\delta_L$]负载感知调度中的负载阈值
+  \item[$\delta_\uparrow$]迁移触发的上升阈值（滞后控制）
+  \item[$\delta_\downarrow$]迁移恢复的下降阈值（滞后控制）
+  \item[$\Delta$]过载设备与欠载设备之间的瞬时负载差
+  \item[$\eta_{\text{static}}$]静态批处理下GPU有效利用率
+  \item[$\Theta$]系统有效吞吐量（tokens/s或requests/s）
+  \item[$\kappa$]迁移收益-开销比阈值（效率比$\rho$）
+  \item[$\mathcal{B}$]输出长度分桶集合
+  \item[$\mathcal{D}$]Decode GPU实例集合
+  \item[$\mathcal{K}_\ell$]第$\ell$层的KV Cache
+  \item[$\mathcal{P}$]Prefill GPU实例集合
+  \item[$\ell^{(j)}$]设备$j$上注意力归一化因子（softmax分母）
+  \item[$\pi$]模块迁移方案
+  \item[$\pi^*$]最优模块迁移方案
+  \item[$\rho$]迁移效率比阈值（可配置参数）
+  \item[$w_1$]SLO-ODBS算法中总延迟的权重系数
+  \item[$w_2$]SLO-ODBS算法中总输出长度的权重系数
+
 \end{denotation}
-
-
-
-% 也可以使用 nomencl 宏包，需要在导言区
-% \usepackage{nomencl}
-% \makenomenclature
-
-% 在这里输出符号说明
-% \printnomenclature[3cm]
-
-% 在正文中的任意为都可以标题
-% \nomenclature{As-PPT}{聚苯基不对称三嗪}
-% \nomenclature{DFT}{密度泛函理论 (Density Functional Theory)}
-% \nomenclature{DMAsPPT}{聚苯基不对称三嗪双模型化合物（水解实验模型化合物）}
-% \nomenclature{$E_a$}{化学反应的活化能 (Activation Energy)}
-% \nomenclature{HMAsPPT}{聚苯基不对称三嗪模型化合物的质子化产物}
-% \nomenclature{HMPBI}{聚苯并咪唑模型化合物的质子化产物}
-% \nomenclature{HMPI}{聚酰亚胺模型化合物的质子化产物}
-% \nomenclature{HMPPQ}{聚苯基喹噁啉模型化合物的质子化产物}
-% \nomenclature{HMPY}{聚吡咙模型化合物的质子化产物}
-% \nomenclature{HMSPPT}{聚苯基对称三嗪模型化合物的质子化产物}
-% \nomenclature{HPCE}{高效毛细管电泳色谱 (High Performance Capillary lectrophoresis)}
-% \nomenclature{HPLC}{高效液相色谱 (High Performance Liquid Chromatography)}
-% \nomenclature{IRC}{内禀反应坐标 (Intrinsic Reaction Coordinates)}
-% \nomenclature{LC-MS}{液相色谱-质谱联用 (Liquid chromatography-Mass Spectrum)}
-% \nomenclature{MAsPPT}{聚苯基不对称三嗪单模型化合物，3,5,6-三苯基-1,2,4-三嗪}
-% \nomenclature{MPBI}{聚苯并咪唑模型化合物，N-苯基苯并咪唑}
-% \nomenclature{MPI}{聚酰亚胺模型化合物，N-苯基邻苯酰亚胺}
-% \nomenclature{MPPQ}{聚苯基喹噁啉模型化合物，3,4-二苯基苯并二嗪}
-% \nomenclature{MPY}{聚吡咙模型化合物}
-% \nomenclature{MSPPT}{聚苯基对称三嗪模型化合物，2,4,6-三苯基-1,3,5-三嗪}
-% \nomenclature{ONIOM}{分层算法 (Our own N-layered Integrated molecular Orbital and molecular Mechanics)}
-% \nomenclature{PBI}{聚苯并咪唑}
-% \nomenclature{PDT}{热分解温度}
-% \nomenclature{PES}{势能面 (Potential Energy Surface)}
-% \nomenclature{PI}{聚酰亚胺}
-% \nomenclature{PMDA-BDA}{均苯四酸二酐与联苯四胺合成的聚吡咙薄膜}
-% \nomenclature{PPQ}{聚苯基喹噁啉}
-% \nomenclature{PY}{聚吡咙}
-% \nomenclature{S-PPT}{聚苯基对称三嗪}
-% \nomenclature{SCF}{自洽场 (Self-Consistent Field)}
-% \nomenclature{SCRF}{自洽反应场 (Self-Consistent Reaction Field)}
-% \nomenclature{TIC}{总离子浓度 (Total Ion Content)}
-% \nomenclature{TS}{过渡态 (Transition State)}
-% \nomenclature{TST}{过渡态理论 (Transition State Theory)}
-% \nomenclature{ZPE}{零点振动能 (Zero Vibration Energy)}
-% \nomenclature{\textit{ab initio}}{基于第一原理的量子化学计算方法，常称从头算法}
-% \nomenclature{$\Delta G^\neq$}{活化自由能(Activation Free Energy)}
-% \nomenclature{$\kappa$}{传输系数 (Transmission Coefficient)}
-% \nomenclature{$\nu_i$}{虚频 (Imaginary Frequency)}
