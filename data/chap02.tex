@@ -39,7 +39,7 @@
 
 先进先出（First-In-First-Out, FIFO）是最基础的调度策略，按请求到达的时间顺序依次处理。在静态批处理（Static Batching）框架下，系统等待固定数量的请求到达后组成一个批次，再统一提交推理引擎执行。
 
-FIFO策略的主要问题在于\textbf{批内长度异构性}导致的计算浪费。当批次中同时存在短输出请求（如回答"中国的首都是北京"，仅需8个token）和长输出请求（如"比较猫和狗的异同"，需58个token）时，短请求完成后必须等待长请求全部生成完毕才能将整个批次返回。在此过程中，短请求的计算槽位被强制填充（Padding）大量无效token，产生严重的KV Cache冗余和计算资源浪费\cite{he2024uellm,hong2024flashdecoding++}。
+FIFO策略的主要问题在于批内长度异构性导致的计算浪费。当批次中同时存在短输出请求（如回答“中国的首都是北京”，仅需8个token）和长输出请求（如“比较猫和狗的异同”，需58个token）时，短请求完成后必须等待长请求全部生成完毕才能将整个批次返回。在此过程中，短请求的计算槽位被强制填充（Padding）大量无效token，产生严重的KV Cache冗余和计算资源浪费\cite{he2024uellm,hong2024flashdecoding++}。
 
 定量分析表明，对于批大小为$b$、最大输入序列长度为$s$、最大输出序列长度为$n$、隐藏层维度为$h$、Transformer层数为$l$的推理任务，KV Cache峰值存储字节数为：
 \begin{equation}
@@ -50,7 +50,7 @@ FIFO策略的主要问题在于\textbf{批内长度异构性}导致的计算浪�
 
 \item \textbf{短作业优先调度（SJF）}
 
-短作业优先（Shortest Job First, SJF）将预估执行时间最短的请求优先调度处理，目标是最小化系统平均等待时间和响应时间。在LLM推理场景中，"作业长度"通常以预期输出token数量来衡量\cite{zhu2021perph}。
+短作业优先（Shortest Job First, SJF）将预估执行时间最短的请求优先调度处理，目标是最小化系统平均等待时间和响应时间。在LLM推理场景中，作业长度通常以预期输出token数量来衡量\cite{zhu2021perph}。
 
 SJF的理论优势在于其最优平均等待时间的数学性质：在非抢占式SJF下，对于$n$个已知执行时间的独立任务，SJF可使平均等待时间最小化。然而，该策略在LLM实践中面临三个主要挑战：其一，LLM推理的输出长度在请求开始前无法精确获取，SJF的实施依赖于长度预测器的准确性，预测偏差会直接导致调度次序错乱；其二，在高负载场景下，持续到来的短请求可能使长请求长期得不到调度，导致服务公平性问题和SLO违约；其三，纯SJF关注单请求调度顺序，未考虑批次内部的长度匹配问题，难以与批处理机制有效结合。
 
@@ -112,7 +112,7 @@ Orca\cite{Orca}是最早系统性地提出并实现In-flight Batching（也称�
     
 \item \textbf{迭代级调度}
 
-Orca\cite{Orca}将调度粒度从"请求级"细化为"迭代级"，即在每次前向传播（Forward Pass）后重新做出调度决策。具体而言，Orca维护一个全局请求队列，每次迭代开始时检测当前批次中已完成的请求将其移出，并从等待队列中选取新请求加入批次直到达到显存上限，随后对批次中处于Prefill阶段的新请求和处于Decode阶段的旧请求采用统一的前向传播流程处理。
+Orca\cite{Orca}将调度粒度从请求级细化为迭代级，即在每次前向传播（Forward Pass）后重新做出调度决策。具体而言，Orca维护一个全局请求队列，每次迭代开始时检测当前批次中已完成的请求将其移出，并从等待队列中选取新请求加入批次直到达到显存上限，随后对批次中处于Prefill阶段的新请求和处于Decode阶段的旧请求采用统一的前向传播流程处理。
 
 \item \textbf{选择性批处理（Selective Batching）}
 
@@ -205,7 +205,7 @@ MemServe的弹性内存池在一定程度上缓解了PD分离架构的内存不�
 
 \item \textbf{KV Cache专项量化}
 
-KVQuant\cite{hooper2024kvquant}和H$_2$O\cite{zhang2023h2o}等工作观察到KV Cache中不同token的注意力分数分布极不均匀，少数"重要token"（Heavy Hitter）承载了绝大多数注意力权重。基于这一发现，这些工作提出选择性保留重要token的KV Cache（完整精度），对其余token的KV Cache进行激进量化（INT4甚至INT2）或直接驱逐，在几乎不影响生成质量的前提下，将KV Cache显存占用降低至原始的25\%--50\%。
+KVQuant\cite{hooper2024kvquant}和H$_2$O\cite{zhang2023h2o}等工作观察到KV Cache中不同token的注意力分数分布极不均匀，少数重要token（Heavy Hitter）承载了绝大多数注意力权重。基于这一发现，这些工作提出选择性保留重要token的KV Cache（完整精度），对其余token的KV Cache进行激进量化（INT4甚至INT2）或直接驱逐，在几乎不影响生成质量的前提下，将KV Cache显存占用降低至原始的25\%--50\%。
 
 \item \textbf{量化压缩技术的局限}
 
@@ -462,7 +462,7 @@ Prefill与Decode阶段的资源需求（计算密集 vs. 内存密集）在时�
     \item \textbf{BanaServe}（第四章）：针对PD分离架构下资源利用率失衡和缓存感知路由导致的负载倾斜问题，提出层级权重迁移（Layer-level Migration）、注意力级KV Cache迁移（Attention-level Migration）和全局KV Cache Store等机制，实现细粒度的跨阶段资源协同优化。BanaServe重点解决上述局限（3）和（4）中的跨阶段协同与动态适应性问题，相比vLLM吞吐量提升1.2倍至3.9倍，延迟降低3.9\%至78.4\%；相比DistServe吞吐量提升1.1倍至2.8倍，延迟降低1.4\%至70.1\%\cite{he2025banaserve}。
 \end{enumerate}
 
-两种方案在技术层面相互补充：UELLM解决静态场景下的批处理与部署联合优化，BanaServe解决动态场景下的PD分离架构资源协同，共同构成覆盖"静态优化-动态调度"全生命周期的LLM推理服务资源管理框架。
+两种方案在技术层面相互补充：UELLM解决静态场景下的批处理与部署联合优化，BanaServe解决动态场景下的PD分离架构资源协同，共同构成覆盖“静态优化-动态调度”全生命周期的LLM推理服务资源管理框架。
 
 \section{本章小结}
 
