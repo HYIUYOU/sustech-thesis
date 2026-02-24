@@ -16,44 +16,47 @@ Reallocated global_strs (elt_size=200001) to 20 items from 10.
 Reallocated glb_str_end (elt_size=4) to 20 items from 10.
 Reallocated singl_function (elt_size=4) to 100 items from 50.
 Database file #1: ref/refs.bib
-You've used 40 entries,
+Warning--I'm ignoring feng2025windserve's extra "series" field
+--line 489 of file ref/refs.bib
+You've used 58 entries,
             5374 wiz_defined-function locations,
-            1242 strings with 17953 characters,
-and the built_in function-call counts, 440192 in all, are:
-= -- 7819
-> -- 52611
-< -- 65373
-+ -- 18078
-- -- 3505
-* -- 2227
-:= -- 60924
-add.period$ -- 125
-call.type$ -- 40
-change.case$ -- 329
-chr.to.int$ -- 16036
-cite$ -- 40
-duplicate$ -- 1034
-empty$ -- 2821
-format.name$ -- 1704
-if$ -- 114174
+            1344 strings with 23528 characters,
+and the built_in function-call counts, 659913 in all, are:
+= -- 11552
+> -- 78984
+< -- 98076
++ -- 27054
+- -- 5286
+* -- 3326
+:= -- 91307
+add.period$ -- 185
+call.type$ -- 58
+change.case$ -- 471
+chr.to.int$ -- 24061
+cite$ -- 58
+duplicate$ -- 1465
+empty$ -- 4269
+format.name$ -- 2496
+if$ -- 171146
 int.to.chr$ -- 1
-int.to.str$ -- 41
+int.to.str$ -- 59
 missing$ -- 0
-newline$ -- 237
-num.names$ -- 120
-pop$ -- 22757
+newline$ -- 332
+num.names$ -- 174
+pop$ -- 34132
 preamble$ -- 1
-purify$ -- 40
+purify$ -- 58
 quote$ -- 0
-skip$ -- 46777
+skip$ -- 70278
 stack$ -- 0
-substring$ -- 20083
-swap$ -- 46
-text.length$ -- 1125
+substring$ -- 30290
+swap$ -- 64
+text.length$ -- 1642
 text.prefix$ -- 0
 top$ -- 0
-type$ -- 440
+type$ -- 638
 warning$ -- 0
-while$ -- 1163
+while$ -- 1700
 width$ -- 0
-write$ -- 521
+write$ -- 750
+(There was 1 warning)

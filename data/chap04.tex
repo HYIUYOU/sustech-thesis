@@ -16,11 +16,11 @@
 
 针对上述挑战，本章提出\textbf{BanaServe}，一个面向PD分离架构的动态编排框架，通过三项核心创新将资源分配与状态管理解耦：
 
-\begin{itemize}
+\begin{enumerate}
     \item \textbf{层级权重迁移}（Layer-level Weight Migration）：在Transformer层粒度上动态迁移模型权重，实现Prefill与Decode实例之间粗粒度的计算和显存资源再平衡；
     \item \textbf{注意力级KV Cache迁移}（Attention-level KV Cache Migration）：沿注意力头维度分割KV Cache，将部分KV状态迁移至空闲GPU进行并行计算，实现细粒度的负载均衡；
     \item \textbf{全局KV Cache存储}（Global KV Cache Store）：构建跨所有Prefill实例的统一KV Cache存储层，结合层级流水线重叠传输技术，使路由器摆脱缓存位置约束，实现纯负载感知调度。
-\end{itemize}
+\end{enumerate}
 
 BanaServe在vLLM和DistServe等主流推理栈上实现，并在Alpaca短文本和LongBench长文本等多种负载场景下进行评估。相比vLLM，BanaServe吞吐量提升1.2倍至3.9倍，总处理时间降低3.9\%至78.4\%；相比DistServe，吞吐量提升1.1倍至2.8倍，延迟降低1.4\%至70.1\%\cite{he2025banaserve}。
 
@@ -30,27 +30,25 @@ BanaServe在vLLM和DistServe等主流推理栈上实现，并在Alpaca短文本�
 \label{sec:bana_motivation}
 
 \subsection{静态配置导致的资源低效利用}
-
-现有LLM推理系统在静态分配策略下频繁出现资源利用率不足的问题，其根源在于两个方面：其一，在低请求率（RPS $\leq$ 10）条件下，系统大量计算和显存资源处于闲置状态；其二，固定资源分配与LLM推理动态工作负载特性之间存在根本性的失配——满足存储需求往往制约可用的计算能力，反之亦然。
-
-图~\ref{fig:bana_gpu_util}展示了在单台A100 GPU上部署LLaMA-13B模型时，Hugging Face Transformers（HFT）和vLLM在不同请求速率下的GPU资源利用率对比。实测结果表明，在低负载（RPS $\leq$ 10）条件下，两个系统均存在约20\%--40\%的GPU资源空闲浪费，验证了静态配置在资源效率方面的固有缺陷。
-
 \begin{figure}[htbp]
     \centering
     \includegraphics[width=0.8\textwidth]{figures/bg1.pdf}
     \caption{HFT和vLLM在不同请求速率下的GPU资源利用率对比（基于单台A100 GPU部署LLaMA-13B模型，每组实验重复5次）。在低负载（RPS $\leq$ 10）场景下，两个系统均存在约20\%--40\%的GPU资源空闲浪费。}
     \label{fig:bana_gpu_util}
 \end{figure}
+现有LLM推理系统在静态分配策略下频繁出现资源利用率不足的问题，其根源在于两个方面：（1）在低请求率（RPS $\leq$ 10）条件下，系统大量计算和显存资源处于闲置状态；（2）固定资源分配与LLM推理动态工作负载特性之间存在根本性的失配——满足存储需求往往制约可用的计算能力，反之亦然。
+
+图~\ref{fig:bana_gpu_util}展示了在单台A100 GPU上部署LLaMA-13B模型时，Hugging Face Transformers（HFT）和vLLM在不同请求速率下的GPU资源利用率对比。实测结果表明，在低负载（RPS $\leq$ 10）条件下，两个系统均存在约20\%--40\%的GPU资源空闲浪费，验证了静态配置在资源效率方面的固有缺陷。
 
 \subsection{前缀缓存感知路由引发的负载倾斜}
 
 图~\ref{fig:bana_cache_imbalance}展示了前缀缓存感知路由器在三个推理实例间分配请求的典型场景。该策略同时考虑缓存命中率和当前负载，但系统性地偏向命中率高的实例，导致持续性的负载倾斜：
 
-\begin{itemize}
+\begin{enumerate}
     \item \textbf{实例1}：命中率最高，接收大多数查询，计算利用率达100\%，缓存前缀Q1--Q5持续扩大，形成正反馈；
     \item \textbf{实例2}：接收较少查询，计算利用率仅40\%，存储的前缀Q6--Q7与其他实例存在冗余；
     \item \textbf{实例3}：计算利用率60\%，主要处理未缓存前缀Q8--Q10，需重复计算，丧失缓存收益。
-\end{itemize}
+\end{enumerate}
 
 这种分配模式形成正反馈动态：命中率高的实例吸引更多请求并扩大缓存内容，而低命中率实例处理较少查询却存储冗余数据或执行重复计算，最终导致排队延迟增加，系统整体吞吐量下降。
 
@@ -69,11 +67,11 @@ BanaServe在vLLM和DistServe等主流推理栈上实现，并在Alpaca短文本�
 
 如图~\ref{fig:bana_pd_imbalance}所示，基于DistServe框架、LLaMA-13B模型和Alpaca数据集的实测结果表明：
 
-\begin{itemize}
+\begin{enumerate}
     \item \textbf{Prefill实例}：处理长提示序列，计算密集，通常维持超过95\%的计算利用率，但显存利用率仅约35\%；
     \item \textbf{Decode实例}：执行迭代式自回归生成，利用Prefill阶段生成的KV Cache降低计算量，计算利用率约35\%，但显存利用率显著更高；
     \item \textbf{通信特征}：Prefill实例需向Decode实例传输KV Cache数据，导致单向带宽占主导，其他通信方向利用率低下。
-\end{itemize}
+\end{enumerate}
 
 这种计算-显存资源利用率的系统性不均衡在现有PD分离系统中无法通过动态机制加以利用，成为制约整体资源效率的核心瓶颈。
 
@@ -82,41 +80,43 @@ BanaServe在vLLM和DistServe等主流推理栈上实现，并在Alpaca短文本�
 
 BanaServe的整体架构由三个核心模块协同构成：
 
-\begin{itemize}
+\begin{enumerate}
     \item \textbf{负载感知请求调度器}：接收传入请求队列，基于各Prefill实例的实时归一化综合利用率（计算+显存）进行排序，将请求分配至负载最低的实例，摆脱对缓存位置的依赖；
     \item \textbf{全局KV Cache存储}：由CPU内存和SSD共同构成存储层次，支持跨所有Prefill实例的统一KV Cache共享，结合三阶段层级流水线重叠传输技术（预取-计算-存储并行），将通信延迟隐藏于计算过程中；
     \item \textbf{动态模块迁移引擎}：周期性监控各GPU实例的实时负载，根据负载差距$\Delta$和迁移效率比$\rho$自适应选择层级权重迁移（粗粒度）或注意力级KV Cache迁移（细粒度），实现Prefill与Decode实例之间的动态资源再平衡。
-\end{itemize}
+\end{enumerate}
 
 三个模块协同工作：调度器的纯负载感知决策由全局KV Cache存储提供支撑（消除缓存局部性约束），迁移引擎则持续监控并调整系统资源分配，形成闭环的自适应优化机制。
 
 \subsection{层级权重迁移}
 
-\textbf{1. 设计原理}
+\begin{enumerate}
+  
+\item \textbf{设计原理}
 
 在工作负载不均衡程度较高的场景下，BanaServe将一组连续的Transformer层从一个GPU实例迁移至另一个GPU实例。这种粗粒度的重分配实现了动态模型并行，通过同时迁移层权重和对应的KV Cache，在Prefill与Decode阶段之间重新分配大量计算和显存资源。
 
 如图~\ref{fig:bana_layer_migration}所示，设迁移层的权重大小为$S^w_\ell$，对应KV Cache大小为$S^{kv}_\ell$，总迁移数据量为：
 \begin{equation}
     S^{\text{total}}_\ell = S^w_\ell + S^{kv}_\ell
-    \label{eq:layer_migration_size}
+    \label{eq:layer_migration_size},
 \end{equation}
 给定有效互联带宽$B_{\text{net}}$和同步开销$T_{\text{sync}}$，层级迁移延迟近似为：
 \begin{equation}
-    T_{\text{layer}} \approx \frac{S^{\text{total}}_\ell}{B_{\text{net}}} + T_{\text{sync}}
+    T_{\text{layer}} \approx \frac{S^{\text{total}}_\ell}{B_{\text{net}}} + T_{\text{sync}},
     \label{eq:layer_migration_latency}
 \end{equation}
 由于$S^w_\ell \gg S^{kv}_\ell$，延迟主要由权重传输主导，但在高带宽数据中心互联（NVLink、InfiniBand）环境下仍保持实用性。
 
-\textbf{2. 执行正确性保证}
+\item \textbf{执行正确性保证}
 
 对于已迁移的层$f_\ell(\cdot)$，其权重$W_\ell$和KV Cache $\mathcal{K}_\ell$同步迁移至目标GPU后，计算语义保持不变：
 \begin{equation}
-    \mathbf{y}_\ell = f_\ell(\mathbf{x}_\ell; W_\ell, \mathcal{K}_\ell)
+    \mathbf{y}_\ell = f_\ell(\mathbf{x}_\ell; W_\ell, \mathcal{K}_\ell),
     \label{eq:layer_correctness}
 \end{equation}
 其中$\mathbf{x}_\ell$为上一层的输入激活。通过同步传输$(W_\ell, \mathcal{K}_\ell)$，确保迁移后自回归解码可以无缝继续，不产生计算结果的语义变化。
-
+\end{enumerate}
 \begin{figure}[htbp]
     \centering
     \subcaptionbox{层级权重迁移\label{fig:bana_layer_migration}}
@@ -128,61 +128,67 @@ BanaServe的整体架构由三个核心模块协同构成：
     \label{fig:bana_migration}
 \end{figure}
 
-\subsection{注意力级KV Cache迁移}
 
-\textbf{1. 设计原理}
+\subsection{注意力级KV Cache迁移}
+\begin{enumerate}
+  
+\item \textbf{设计原理}
 
 当需要细粒度负载调整时，BanaServe沿注意力头维度对KV Cache进行分割，将部分头的KV状态选择性地迁移至空闲的冷GPU（Cold GPU）。由于不传输任何模型权重，仅移动中间的键值激活，该方法引入的迁移开销极小。
 
 如图~\ref{fig:bana_attn_migration}所示，流程从QKV投影层开始，生成查询矩阵$Q$、键矩阵$K$和值矩阵$V$，随后将注意力头划分为两个不相交子集：
-\begin{itemize}
+\begin{enumerate}
     \item $K^{(1)},V^{(1)}$（KV1）：保留在热GPU（Hot GPU）上进行本地处理；
     \item $K^{(2)},V^{(2)}$（KV2）：卸载至冷GPU进行远程并行处理。
-\end{itemize}
+\end{enumerate}
 
-\textbf{2. 并行计算可行性分析}
+\item \textbf{并行计算可行性分析}
 
 设$H$为注意力头总数，$d$为头维度，$Q \in \mathbb{R}^{B_q \times Hd}$为查询矩阵，$K^{(j)}, V^{(j)} \in \mathbb{R}^{B_k \times d h_j}$为分配给设备$j \in \{1,2\}$的键值子集。各子集的注意力分数和值聚合分别计算为：
 \begin{equation}
-    S^{(j)} = Q \cdot (K^{(j)})^\top
+    S^{(j)} = Q \cdot (K^{(j)})^\top,
     \label{eq:attn_score}
 \end{equation}
 \begin{equation}
-    A^{(j)} = \exp\!\left(S^{(j)}\right)
+    A^{(j)} = \exp\!\left(S^{(j)}\right),
     \label{eq:attn_softmax}
 \end{equation}
 \begin{equation}
     \ell^{(j)} = \begin{cases}
         \sum_i A^{(1)}_i, & j = 1 \\
         \ell^{(1)} + \sum_i A^{(2)}_i, & j = 2
-    \end{cases}
+    \end{cases},
     \label{eq:attn_norm}
 \end{equation}
 \begin{equation}
-    O^{(j)} = \frac{A^{(j)}}{\ell^{(j)}} \cdot V^{(j)}
+    O^{(j)} = \frac{A^{(j)}}{\ell^{(j)}} \cdot V^{(j)},
     \label{eq:attn_output}
 \end{equation}
 最终注意力输出为：
 \begin{equation}
-    O = O^{(1)} + O^{(2)}
+    O = O^{(1)} + O^{(2)},
     \label{eq:attn_final}
 \end{equation}
 由于$K^{(1)},V^{(1)}$和$K^{(2)},V^{(2)}$来自不相交的头分区，$S^{(1)}$和$S^{(2)}$可在两个设备上完全并行计算，无中间数据依赖。跨设备仅需传输$\ell^{(1)}$（归一化因子）和$O^{(1)}$，确保全局softmax的正确性，同时将传输量控制在极小范围内。
 
-\textbf{3. 迁移延迟分析}
+\item \textbf{迁移延迟分析}
 
 设迁移的KV数据大小为$S_{kv}$，网络带宽为$B_{\text{net}}$，则注意力级迁移延迟为：
 \begin{equation}
-    T_{\text{attn}} \approx \frac{S_{kv}}{B_{\text{net}}}
+    T_{\text{attn}} \approx \frac{S_{kv}}{B_{\text{net}}},
     \label{eq:attn_migration_latency}
 \end{equation}
 由于$S_{kv} \ll S_\ell$（层级状态大小），因此$T_{\text{attn}} \ll T_{\text{layer}}$，注意力级迁移具有轻量、低延迟的特性，特别适合异构解码工作负载的实时负载均衡。
 
 通过将粗粒度层迁移与细粒度注意力迁移相结合，BanaServe可在运行时自适应选择最优策略，在迁移开销（$T_{\text{mig}}$）与利用率收益（最小化$\max_g U_g$）之间权衡，同时满足延迟预算约束$T_{\text{mig}} \leq T_{\text{budget}}$。
 
+\end{enumerate}
+
 \subsection{全局KV Cache存储}
 
-\textbf{1. 设计原理}
+\begin{enumerate}
+  
+\item \textbf{设计原理}
 
 前缀缓存感知路由器的核心瓶颈在于前缀缓存存储在Prefill节点间的不均衡分布，导致路由器必须同时考虑计算负载和缓存位置。为解决这一问题，BanaServe引入\textbf{全局KV Cache存储}（Global KV Cache Store），跨所有Prefill和Decode节点共享KV Cache。
 
@@ -195,28 +201,29 @@ BanaServe的整体架构由三个核心模块协同构成：
     \label{fig:bana_kvcache_store}
 \end{figure}
 
-\textbf{2. 层级流水线重叠传输}
+\item \textbf{层级流水线重叠传输}
 
 全局KV Cache存储面临的主要挑战是频繁加载和存取操作引入的延迟。BanaServe利用Transformer模型逐层执行的特性，设计了三阶段流水线，将预取、计算和加载操作相互重叠，隐藏大部分内存访问延迟。
+\end{enumerate}
 
 设$T_F$为Prefill阶段的总前向计算时间，$r$为平均前缀缓存命中率，$L$为输入序列长度（token），$N$为Transformer层数。每层前向计算时间为：
 \begin{equation}
-    T_{F,\text{layer}} = \frac{T_F \cdot r}{N}
+    T_{F,\text{layer}} = \frac{T_F \cdot r}{N},
     \label{eq:layer_compute_time}
 \end{equation}
 设$S_{kv}$为单token的每层KV Cache大小（字节），$B$为有效PCIe带宽，每层KV Cache传输时间为：
 \begin{equation}
-    T_{KV} = \frac{S_{kv} \cdot L \cdot r}{B}
+    T_{KV} = \frac{S_{kv} \cdot L \cdot r}{B},
     \label{eq:kv_transfer_time}
 \end{equation}
 以LLaMA-3.1-8B模型为例（隐藏维度$d_{\text{model}} = 4096$，总注意力头$h_{\text{total}} = 32$，GQA下KV头$h_{kv} = 8$，BF16精度），每头维度为：
 \begin{equation}
-    d_{\text{head}} = \frac{d_{\text{model}}}{h_{\text{total}}} = 128
+    d_{\text{head}} = \frac{d_{\text{model}}}{h_{\text{total}}} = 128,
     \label{eq:head_dim}
 \end{equation}
 每层KV Cache大小（每个KV头存储键和值两组激活）为：
 \begin{equation}
-    S_{kv} = h_{kv} \cdot d_{\text{head}} \cdot 2 \cdot 2\ \text{字节} = 8 \times 128 \times 2 \times 2 = 4096\ \text{字节（4 KB）}
+    S_{kv} = h_{kv} \cdot d_{\text{head}} \cdot 2 \cdot 2\ \text{字节} = 8 \times 128 \times 2 \times 2 = 4096\ \text{字节（4 KB）},
     \label{eq:kv_size}
 \end{equation}
 乘以$N = 32$层，每token的总KV Cache大小为$S_{kv,\text{total}} = 32 \times 4\ \text{KB} = 128\ \text{KB}$。
@@ -224,7 +231,7 @@ BanaServe的整体架构由三个核心模块协同构成：
 在$L = 1000$ tokens、$r = 0.5$、$B = 200$ Gbps、$T_F = 270$ ms的实验条件下：
 \begin{equation}
     T_{F,\text{layer}} = \frac{270\ \text{ms} \times 0.5}{32} \approx 4.22\ \text{ms}, \quad
-    T_{KV} = \frac{4\ \text{KB} \times 1000 \times 0.5}{200\ \text{Gbps}} \approx 0.082\ \text{ms}
+    T_{KV} = \frac{4\ \text{KB} \times 1000 \times 0.5}{200\ \text{Gbps}} \approx 0.082\ \text{ms},
     \label{eq:overlap_validation}
 \end{equation}
 由于$T_{KV} \ll T_{F,\text{layer}}$，KV Cache传输延迟完全可被前向计算所覆盖，实现通信与计算的有效重叠。图~\ref{fig:bana_pipeline}展示了三阶段流水线的执行时序：在GPU执行第$L_i$层前向计算的同时，HtoD通道预取第$L_{i+1}$层的KV Cache，DtoH通道存储第$L_{i-1}$层的缓存，三个阶段并行执行，有效隐藏通信延迟。
@@ -245,13 +252,13 @@ BanaServe将PD分离系统的性能优化建模为多目标问题，目标是最
 
 设$\mathcal{P}$和$\mathcal{D}$分别为Prefill和Decode GPU集合，$U_g$为GPU $g$的利用率，$T_{\text{TTFT}}$为首token延迟，$T_{\text{TPOT}}$为每输出token时间，$\Theta$为系统有效吞吐量（tokens/s）。联合优化目标定义为：
 \begin{equation}
-    \max_\pi\ \alpha \cdot U_{\text{avg}}(\pi) - \beta \cdot T_{\text{avg-latency}}(\pi) + \gamma \cdot \Theta(\pi)
+    \max_\pi\ \alpha \cdot U_{\text{avg}}(\pi) - \beta \cdot T_{\text{avg-latency}}(\pi) + \gamma \cdot \Theta(\pi),
     \label{eq:joint_objective}
 \end{equation}
 其中：
 \begin{equation}
     U_{\text{avg}}(\pi) = \frac{1}{|\mathcal{P} \cup \mathcal{D}|} \sum_g U_g(\pi), \quad
-    T_{\text{avg-latency}} = \frac{1}{N} \sum_{i=1}^{N} \left(T^{(i)}_{\text{TTFT}} + T^{(i)}_{\text{TPOT}}\right)
+    T_{\text{avg-latency}} = \frac{1}{N} \sum_{i=1}^{N} \left(T^{(i)}_{\text{TTFT}} + T^{(i)}_{\text{TPOT}}\right),
     \label{eq:utilization_latency}
 \end{equation}
 $\alpha, \beta, \gamma$为利用率、延迟和吞吐量三项的权重系数，$\pi$为当前模块迁移方案。
@@ -260,14 +267,14 @@ $\alpha, \beta, \gamma$为利用率、延迟和吞吐量三项的权重系数，
 
 首token延迟（TTFT）建模为：
 \begin{equation}
-    T_{\text{TTFT}} = T_p + T_x + T_q
+    T_{\text{TTFT}} = T_p + T_x + T_q,
     \label{eq:ttft_model}
 \end{equation}
 其中$T_p$为Prefill计算时间，$T_x = T_{\text{load}} + T_{\text{fetch}}$为KV Cache传输时间（包含从存储加载时间和从远程GPU获取时间），$T_q$为Decode前的排队延迟。
 
 每输出token时间（TPOT）建模为：
 \begin{equation}
-    T_{\text{TPOT}} = T_d + T_c + T_m
+    T_{\text{TPOT}} = T_d + T_c + T_m,
     \label{eq:tpot_model}
 \end{equation}
 其中$T_d$为基础解码计算时间，$T_c$为缓存访问延迟，$T_m$为内存带宽停顿时间。
@@ -276,26 +283,29 @@ $\alpha, \beta, \gamma$为利用率、延迟和吞吐量三项的权重系数，
 
 对于具有$n_p$个Transformer层的Prefill实例，设$M_0$为进程基础内存开销，$M_\ell$为每层内存，$K_{\text{init}}$为初始KV Cache分配，总显存占用为：
 \begin{equation}
-    \text{Mem}_p = M_0 + n_p \cdot M_\ell + K_{\text{init}}
+    \text{Mem}_p = M_0 + n_p \cdot M_\ell + K_{\text{init}}.
     \label{eq:prefill_mem}
 \end{equation}
+
 设$C_\ell$为每层每token的计算开销，$B_{sz}$为批大小，$L_{\text{in}}$为输入长度，总计算需求为：
 \begin{equation}
-    \text{Comp}_p = n_p \cdot C_\ell \cdot B_{sz} \cdot L_{\text{in}}
+    \text{Comp}_p = n_p \cdot C_\ell \cdot B_{sz} \cdot L_{\text{in}}.
     \label{eq:prefill_comp}
 \end{equation}
+
 类似地，对于具有$n_d$个Transformer层的Decode实例，设$K_{\text{acc}}$为解码过程中累积的KV Cache大小，$L_{\text{gen}}$为生成长度：
 \begin{equation}
-    \text{Mem}_d = M_0 + n_d \cdot M_\ell + K_{\text{acc}}
+    \text{Mem}_d = M_0 + n_d \cdot M_\ell + K_{\text{acc}},
     \label{eq:decode_mem}
 \end{equation}
 \begin{equation}
-    \text{Comp}_d = n_d \cdot C_\ell \cdot B_{sz} \cdot L_{\text{gen}}
+    \text{Comp}_d = n_d \cdot C_\ell \cdot B_{sz} \cdot L_{\text{gen}}.
     \label{eq:decode_comp}
 \end{equation}
+
 给定GPU峰值计算能力$C_{\text{gpu}}$，各阶段的平均利用率为：
 \begin{equation}
-    U_p = \frac{\text{Comp}_p}{C_{\text{gpu}}}, \quad U_d = \frac{\text{Comp}_d}{C_{\text{gpu}}}
+    U_p = \frac{\text{Comp}_p}{C_{\text{gpu}}}, \quad U_d = \frac{\text{Comp}_d}{C_{\text{gpu}}}.
     \label{eq:stage_utilization}
 \end{equation}
 
@@ -303,7 +313,7 @@ $\alpha, \beta, \gamma$为利用率、延迟和吞吐量三项的权重系数，
 
 迁移$k$个模块所引入的总开销为：
 \begin{equation}
-    \text{Cost}_{\text{mig}} = k \cdot \left(T_{x\_\text{lat}} + T_{\text{sync}} + T_{\text{mem\_realloc}}\right)
+    \text{Cost}_{\text{mig}} = k \cdot \left(T_{x\_\text{lat}} + T_{\text{sync}} + T_{\text{mem\_realloc}}\right),
     \label{eq:migration_cost}
 \end{equation}
 其中$T_{x\_\text{lat}}$为KV Cache加权重的传输延迟，$T_{\text{sync}}$为与正在进行的计算同步所需时间，$T_{\text{mem\_realloc}}$为缓冲区重分配时间。
@@ -311,7 +321,7 @@ $\alpha, \beta, \gamma$为利用率、延迟和吞吐量三项的权重系数，
 模块迁移方案$\pi$须满足延迟约束：
 \begin{equation}
     T_{\text{TTFT}}(\pi) \leq T^{\text{budget}}_{\text{TTFT}}, \quad
-    T_{\text{TPOT}}(\pi) \leq T^{\text{budget}}_{\text{TPOT}}
+    T_{\text{TPOT}}(\pi) \leq T^{\text{budget}}_{\text{TPOT}}.
     \label{eq:latency_constraint}
 \end{equation}
 
@@ -320,12 +330,13 @@ $\alpha, \beta, \gamma$为利用率、延迟和吞吐量三项的权重系数，
 给定$N$个并发请求和每请求总输出长度$L_{\text{out}}$（token），系统吞吐量为：
 \begin{equation}
     \Theta = \frac{N \cdot L_{\text{out}}}{T_{\text{TTFT}} + L_{\text{out}} \cdot T_{\text{TPOT}}}
-    \label{eq:throughput}
+    \label{eq:throughput}.
 \end{equation}
+
 调度器周期性地求解最优迁移方案：
 \begin{equation}
     \pi^* = \arg\max_\pi \left(\alpha U_{\text{avg}}(\pi) - \beta T_{\text{avg\_latency}}(\pi) + \gamma \Theta(\pi)\right)
-    \label{eq:optimal_plan}
+    \label{eq:optimal_plan},
 \end{equation}
 在满足迁移开销和延迟约束的前提下执行。
 
@@ -336,11 +347,13 @@ $\alpha, \beta, \gamma$为利用率、延迟和吞吐量三项的权重系数，
 
 \subsection{自适应模块迁移算法}
 
-\textbf{1. 算法设计}
+\begin{enumerate}
+  
+\item \textbf{算法设计}
 
 自适应模块迁移算法通过周期性监控实时负载并执行模块迁移来均衡工作负载，同时限制迁移开销。设$D = \{d_1, d_2, \ldots, d_{|D|}\}$为当前参与服务的GPU集合，$\delta > 0$为负载不均衡阈值。对每个设备$d$，定义归一化利用率为：
 \begin{equation}
-    U_d = \frac{C_d}{C^{\max}_d} + \frac{M_d}{M^{\max}_d}
+    U_d = \frac{C_d}{C^{\max}_d} + \frac{M_d}{M^{\max}_d},
     \label{eq:normalized_util}
 \end{equation}
 其中$C_d$为当前计算使用量，$M_d$为当前显存使用量，$C^{\max}_d$和$M^{\max}_d$为对应的硬件容量上限。$U_d$的范围为$[0, 2.0]$，值越大表示综合计算和显存负载越重。
@@ -348,7 +361,7 @@ $\alpha, \beta, \gamma$为利用率、延迟和吞吐量三项的权重系数，
 算法~\ref{algo:dynamic_migration}详述了完整的执行流程。
 
 \begin{algorithm}[htbp]
-    \caption{自适应模块迁移算法（BanaServe Dynamic Migration）}
+    \caption{自适应模块迁移算法}
     \label{algo:dynamic_migration}
     \KwIn{设备集合$D$；当前模块分配方案$cfg$；负载不均衡阈值$\delta$}
     \KwOut{更新后的模块分配方案$cfg'$}
@@ -377,7 +390,7 @@ $\alpha, \beta, \gamma$为利用率、延迟和吞吐量三项的权重系数，
     \Return{$cfg'$}\;
 \end{algorithm}
 
-\textbf{2. 算法执行分四个阶段：}
+\item \textbf{算法执行分四个阶段：}
 
 \textbf{阶段一：负载测量（第1--3行）}
 
@@ -387,23 +400,26 @@ $\alpha, \beta, \gamma$为利用率、延迟和吞吐量三项的权重系数，
 
 通过以下条件构建过载和欠载设备集合：
 \begin{equation}
-    overload = \{d \in D \mid load[d] - \min(load) > \delta\}, \quad
-    underload = \{d \in D \mid \max(load) - load[d] > \delta\}
+    \begin{aligned}
+        overload  &= \{d \in D \mid load[d] - \min(load) > \delta\},\\
+        underload &= \{d \in D \mid \max(load) - load[d] > \delta\}
+    \end{aligned},
     \label{eq:load_classification}
 \end{equation}
-过载设备的利用率超过最轻负载设备超过阈值$\delta$，欠载设备的利用率低于最重负载设备超过$\delta$。
+其中，过载设备的利用率超过最轻负载设备超过阈值$\delta$，欠载设备的利用率低于最重负载设备超过$\delta$。
 
 \textbf{阶段三：迁移决策与执行（第6--13行）}
 
 当存在过载设备$d_o$和欠载设备$d_u$时，计算瞬时负载差：
 \begin{equation}
-    \Delta = load[d_o] - load[d_u]
+    \Delta = load[d_o] - load[d_u].
     \label{eq:load_gap}
 \end{equation}
+
 若$\Delta \geq \delta$且$d_o$支持层级迁移，调用MigrateLayer迁移连续Transformer层；若$\Delta \geq \delta$且$d_o$支持注意力级迁移，调用MigrateKVHeads迁移选定KV Cache段。执行前评估迁移的收益-开销比：
 \begin{equation}
     \text{Benefit}(m) = \Delta_{\text{before}} - \Delta_{\text{after}}, \quad
-    \text{Cost}(m) = T_{\text{transfer}}(m) + T_{\text{sync}}(m)
+    \text{Cost}(m) = T_{\text{transfer}}(m) + T_{\text{sync}}(m),
     \label{eq:benefit_cost}
 \end{equation}
 仅当$\text{Benefit}(m) / \text{Cost}(m) \geq \rho$（可配置效率比）时才执行迁移。
@@ -412,30 +428,34 @@ $\alpha, \beta, \gamma$为利用率、延迟和吞吐量三项的权重系数，
 
 每次迁移后更新$load[d_o]$和$load[d_u]$，修订$cfg'$以反映新的模块放置，重复直至不再存在同时满足过载和欠载条件的设备对，最终返回更新后的$cfg'$。
 
-\textbf{3. 复杂度与收敛性分析}
+\item \textbf{复杂度与收敛性分析}
 
 每个控制周期的时间复杂度为：
 \begin{equation}
-    O(|D| + N_m)
+    O(|D| + N_m).
     \label{eq:complexity}
 \end{equation}
+
 其中$|D|$来自负载测量和分类，$N_m$来自模块选择和开销评估。在典型部署中$|D|$为数十量级，$N_m$受模型深度约束，支持实时运行。为防止振荡，采用滞后控制，设置不同的上升阈值$\delta_\uparrow$和下降阈值$\delta_\downarrow$。全局KV Cache存储的集成确保迁移过程中所有KV状态得以保存，避免重新计算并维持稳定吞吐量。
+\end{enumerate}
 
 \subsection{负载感知请求调度算法}
 
-\textbf{1. 算法设计}
+\begin{enumerate}
+ 
+\item \textbf{算法设计}
 
 负载感知请求调度算法（算法~\ref{algo:load_aware_scheduling}）将传入请求高效分配给Prefill实例。与缓存感知路由策略不同，由于全局KV Cache存储支持所有Prefill GPU之间的KV Cache共享，该调度器无需考虑前缀缓存命中率，调度决策完全基于实时负载指标。
 
 对每个Prefill实例$p_i$，归一化负载定义为：
 \begin{equation}
-    U_{p_i} = \frac{C_{p_i}}{C^{\max}_{p_i}} + \frac{M_{p_i}}{M^{\max}_{p_i}}
+    U_{p_i} = \frac{C_{p_i}}{C^{\max}_{p_i}} + \frac{M_{p_i}}{M^{\max}_{p_i}},
     \label{eq:prefill_load}
 \end{equation}
 其中$C_{p_i}$和$M_{p_i}$为当前计算和显存使用量，$C^{\max}_{p_i}$和$M^{\max}_{p_i}$为对应容量上限。
 
 \begin{algorithm}[htbp]
-    \caption{负载感知请求调度算法（BanaServe Load-aware Scheduling）}
+    \caption{负载感知请求调度算法}
     \label{algo:load_aware_scheduling}
     \KwIn{请求队列$Q$；Prefill实例集合$P$；负载阈值$\delta_L$}
     \KwOut{调度方案$D^*$}
@@ -467,7 +487,7 @@ $\alpha, \beta, \gamma$为利用率、延迟和吞吐量三项的权重系数，
     \Return{$D^*$}\;
 \end{algorithm}
 
-\textbf{2. 算法执行分四个阶段：}
+\item \textbf{算法执行分四个阶段：}
 
 \textbf{阶段一：负载测量（第1--4行）}
 
@@ -485,23 +505,24 @@ $\alpha, \beta, \gamma$为利用率、延迟和吞吐量三项的权重系数，
 
 调用GetDispatchMap生成调度映射$D^*$并返回至编排组件执行。
 
-\textbf{3. 复杂度分析}
+\item \textbf{复杂度分析}
 
 每个调度周期的时间复杂度为：
 \begin{equation}
-    O(|P| \log |P| + |Q|)
+    O(|P| \log |P| + |Q|),
     \label{eq:scheduling_complexity}
 \end{equation}
 其中$O(|P| \log |P|)$来自按当前负载和队列长度对实例排序，$O(|Q|)$来自逐请求分配循环。在典型部署中$|P|$为数十量级（数十个GPU），算法适合实时调度。
 
 通过全局KV Cache存储将缓存命中率从路由标准中剥离，该调度器专注于均衡负载和最小化排队延迟，有效降低了调度复杂度，避免Prefill节点热点形成，并在动态工作负载下确保稳定吞吐量。
+\end{enumerate}
 
 \section{实验评估}
 \label{sec:bana_eval}
 
 \subsection{实验设置}
 
-\textbf{评估模型。}选用两种具有代表性的13B参数级大语言模型，如表~\ref{tab:bana_models}所示。LLaMA-13B作为LLaMA系列的主要评估目标，用于评估BanaServe处理大规模纯解码器Transformer的能力；OPT-13B采用不同的架构优化和训练方法，用于跨架构的泛化性验证。
+\textbf{评估模型：}选用两种具有代表性的13B参数级大语言模型，如表~\ref{tab:bana_models}所示。LLaMA-13B作为LLaMA系列的主要评估目标，用于评估BanaServe处理大规模纯解码器Transformer的能力；OPT-13B采用不同的架构优化和训练方法，用于跨架构的泛化性验证。
 
 \begin{table}[htbp]
     \centering
@@ -517,24 +538,24 @@ $\alpha, \beta, \gamma$为利用率、延迟和吞吐量三项的权重系数，
     \end{tabularx}
 \end{table}
 
-\textbf{基准测试与工作负载。}实验设计采用两个互补的公开基准测试：
+\textbf{基准测试与工作负载：}实验设计采用两个互补的公开基准测试：
 
-\begin{itemize}
+\begin{enumerate}
     \item \textbf{Alpaca}\cite{alpaca}（短文本场景）：包含52,000条指令跟随样例，输入序列长度集中在4--50 token，代表聊天机器人、代码助手和问答系统等交互式应用的典型生产推理工作负载；
     \item \textbf{LongBench}\cite{longbench}（长文本场景）：覆盖21项多样化任务，上下文长度从约2,000 token跨越至超过85,000 token，涵盖多文档问答、文档摘要、少样本学习和代码补全等场景，对KV Cache管理和显存优化策略形成全面压力测试。
-\end{itemize}
+\end{enumerate}
 
 所有实验中最大输出长度上限设为512 token，以确保跨基准测试的一致性并聚焦于输入长度差异对系统性能的影响。
 
-\textbf{负载测试方法。}请求速率从1到20 RPS（每秒请求数）系统性地递增，采用泊松到达过程模拟真实流量的突发特性。每组实验配置包含60秒预热期以确保系统稳定并填充缓存，所有实验重复5次（不同随机种子），报告均值及95\%置信区间。
+\textbf{负载测试方法：}请求速率从1到20 RPS（每秒请求数）系统性地递增，采用泊松到达过程模拟真实流量的突发特性。每组实验配置包含60秒预热期以确保系统稳定并填充缓存，所有实验重复5次（不同随机种子），报告均值及95\%置信区间。
 
-\textbf{评估指标。}采用三项核心指标：吞吐量（requests/s）、总处理时间（s）和平均延迟（ms），分别衡量系统原始处理能力、端到端效率和用户感知响应性。
+\textbf{评估指标：}采用三项核心指标：吞吐量（requests/s）、总处理时间（s）和平均延迟（ms），分别衡量系统原始处理能力、端到端效率和用户感知响应性。
 
-\textbf{对比基线。}与两个当前最优LLM推理系统进行对比：
-\begin{itemize}
+\textbf{对比基线：}与两个当前最优LLM推理系统进行对比：
+\begin{enumerate}
     \item \textbf{vLLM}\cite{kwon2023efficient}：学术界和工业界广泛采用的推理系统，基于连续批处理和PagedAttention实现高效KV Cache管理，但单体架构难以平衡Prefill和Decode阶段的竞争需求；
     \item \textbf{DistServe}\cite{zhong2024distserve}：将Prefill和Decode计算分配至专用实例的分离式推理系统，虽缓解了阶段间干扰，但引入了额外的通信开销和组件协调需求。
-\end{itemize}
+\end{enumerate}
 
 \subsection{短文本场景性能评估}
 
@@ -550,7 +571,7 @@ $\alpha, \beta, \gamma$为利用率、延迟和吞吐量三项的权重系数，
     \hfill
     \subcaptionbox{平均延迟\label{fig:bana_short_llama_lat}}
         {\includegraphics[width=0.32\textwidth]{figures/llama_short_avg_latency.pdf}}
-    \caption{LLaMA-13B短文本场景性能结果。在1--20 RPS的全请求速率范围内，BanaServe在吞吐量、总处理时间和平均延迟三项指标上均优于DistServe和vLLM，吞吐量提升1.1倍至1.2倍，总处理时间显著降低。}
+    \caption{LLaMA-13B短文本场景性能结果。在1到20 RPS的全请求速率范围内，BanaServe在吞吐量、总处理时间和平均延迟三项指标上均优于DistServe和vLLM，吞吐量提升1.1倍至1.2倍，总处理时间显著降低。}
     \label{fig:bana_short_llama}
 \end{figure}
 
@@ -570,7 +591,7 @@ $\alpha, \beta, \gamma$为利用率、延迟和吞吐量三项的权重系数，
 
 \textbf{LLaMA-13B短文本分析：}在整个RPS范围内，BanaServe持续提供更高吞吐量（相比DistServe和vLLM提升1.1倍至1.2倍），同时保持更低延迟和更短总处理时间。这些改进源于BanaServe最小化的调度开销和高效的KV Cache处理机制，支持快速上下文切换而不引发显著的流水线停顿。
 
-\textbf{OPT-13B短文本分析：}在OPT-13B上，性能提升更为显著。BanaServe吞吐量相比DistServe提升2.8倍至3.9倍，相比vLLM最高提升3.9倍；平均延迟相比vLLM降低3.9\%至78.4\%，相比DistServe降低1.4\%至70.1\%。这些结果凸显了BanaServe在高频上下文切换场景下的效率优势——其批处理和缓存复用策略使GPU利用率接近饱和同时保持响应性。
+\textbf{OPT-13B短文本分析：}在OPT-13B上，性能提升更为显著。BanaServe吞吐量相比DistServe提升2.8倍至3.9倍，相比vLLM最高提升3.9倍；平均延迟相比vLLM降低3.9\%至78.4\%，相比DistServe降低1.4\%至70.1\%。这些结果凸显了BanaServe在高频上下文切换场景下的效率优势，其批处理和缓存复用策略使GPU利用率接近饱和同时保持响应性。
 
 \subsection{长文本场景性能评估}
 
@@ -586,7 +607,7 @@ $\alpha, \beta, \gamma$为利用率、延迟和吞吐量三项的权重系数，
     \hfill
     \subcaptionbox{平均延迟\label{fig:bana_long_llama_lat}}
         {\includegraphics[width=0.32\textwidth]{figures/llama_long_avg_latency.pdf}}
-    \caption{LLaMA-13B长文本场景性能结果。BanaServe在1--10 RPS范围内吞吐量提升1.3倍至1.5倍（相比DistServe和vLLM），延迟降低1.4\%至65.3\%（相比vLLM）。在高负载（10 RPS以上）场景下优势更为明显。}
+    \caption{LLaMA-13B长文本场景性能结果。BanaServe在1到10 RPS范围内吞吐量提升1.3倍至1.5倍（相比DistServe和vLLM），延迟降低1.4\%至65.3\%（相比vLLM）。在高负载（10 RPS以上）场景下优势更为明显。}
     \label{fig:bana_long_llama}
 \end{figure}
 
@@ -645,44 +666,44 @@ $\alpha, \beta, \gamma$为利用率、延迟和吞吐量三项的权重系数，
 
 \textbf{Azure生产负载实验结果分析：}在LLaMA-13B和OPT-13B两个模型上，BanaServe均持续提供更高吞吐量和更低延迟，在Azure工作负载特有的重尾输入/输出分布和突发请求到达模式下性能提升尤为显著。具体而言：
 
-\begin{itemize}
+\begin{enumerate}
     \item \textbf{LLaMA-13B}：BanaServe吞吐量相比vLLM提升40.4\%，相比DistServe提升35.2\%；平均延迟相比vLLM降低71.2\%，相比DistServe降低27.6\%；
     \item \textbf{OPT-13B}：性能提升更为显著，吞吐量相比vLLM提升58.3\%，相比DistServe提升47.2\%；延迟相比vLLM降低74.1\%，相比DistServe降低27.4\%。
-\end{itemize}
+\end{enumerate}
 
 这些改进突出了BanaServe在重尾输入/输出分布和突发流量模式下维持高效率的能力。两个模型架构上一致的增益表明，系统设计能够有效泛化至不同Transformer实现，在生产风格工作负载下均表现出色。
 
 \subsection{综合性能对比分析}
 
-表~\ref{tab:bana_results_summary}对BanaServe在不同评估场景下的性能提升进行了系统性汇总，综合对比了相对于vLLM和DistServe的吞吐量提升和延迟降低幅度。
+% 表~\ref{tab:bana_results_summary}对BanaServe在不同评估场景下的性能提升进行了系统性汇总，综合对比了相对于vLLM和DistServe的吞吐量提升和延迟降低幅度。
 
-\begin{table}[htbp]
-    \centering
-    \caption{BanaServe与基线方法在不同场景下的综合性能对比}
-    \label{tab:bana_results_summary}
-    \begin{tabularx}{\textwidth}{p{2.8cm}p{2.0cm}AAA}
-        \toprule
-        \textbf{评估场景} & \textbf{模型} &
-        \textbf{vs. vLLM吞吐量} &
-        \textbf{vs. DistServe吞吐量} &
-        \textbf{延迟降低} \\
-        \midrule
-        短文本（Alpaca）
-            & LLaMA-13B & 1.1$\times$--1.2$\times$ & 1.1$\times$--1.2$\times$ & 较低 \\
-        短文本（Alpaca）
-            & OPT-13B   & 最高3.9$\times$          & 2.8$\times$--3.9$\times$ & 3.9\%--78.4\% \\
-        长文本（LongBench）
-            & LLaMA-13B & 最高1.5$\times$          & 1.3$\times$--1.5$\times$ & 20.6\%--65.3\% \\
-        长文本（LongBench）
-            & OPT-13B   & 最高1.3$\times$          & 1.1$\times$--1.3$\times$ & 稳定改善 \\
-        \midrule
-        Azure生产追踪
-            & LLaMA-13B & $+$40.4\%               & $+$35.2\%               & $-$71.2\%（vs. vLLM） \\
-        Azure生产追踪
-            & OPT-13B   & $+$58.3\%               & $+$47.2\%               & $-$74.1\%（vs. vLLM） \\
-        \bottomrule
-    \end{tabularx}
-\end{table}
+% \begin{table}[htbp]
+%     \centering
+%     \caption{BanaServe与基线方法在不同场景下的综合性能对比}
+%     \label{tab:bana_results_summary}
+%     \begin{tabularx}{\textwidth}{p{2.8cm}p{2.0cm}AAA}
+%         \toprule
+%         \textbf{评估场景} & \textbf{模型} &
+%         \textbf{vs. vLLM吞吐量} &
+%         \textbf{vs. DistServe吞吐量} &
+%         \textbf{延迟降低} \\
+%         \midrule
+%         短文本（Alpaca）
+%             & LLaMA-13B & 1.1$\times$--1.2$\times$ & 1.1$\times$--1.2$\times$ & 较低 \\
+%         短文本（Alpaca）
+%             & OPT-13B   & 最高3.9$\times$          & 2.8$\times$--3.9$\times$ & 3.9\%--78.4\% \\
+%         长文本（LongBench）
+%             & LLaMA-13B & 最高1.5$\times$          & 1.3$\times$--1.5$\times$ & 20.6\%--65.3\% \\
+%         长文本（LongBench）
+%             & OPT-13B   & 最高1.3$\times$          & 1.1$\times$--1.3$\times$ & 稳定改善 \\
+%         \midrule
+%         Azure生产追踪
+%             & LLaMA-13B & $+$40.4\%               & $+$35.2\%               & $-$71.2\%（vs. vLLM） \\
+%         Azure生产追踪
+%             & OPT-13B   & $+$58.3\%               & $+$47.2\%               & $-$74.1\%（vs. vLLM） \\
+%         \bottomrule
+%     \end{tabularx}
+% \end{table}
 
 实验结果验证了BanaServe设计的三个核心判断：
 

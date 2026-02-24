@@ -1,4 +1,4 @@
-\begin{thebibliography}{40}
+\begin{thebibliography}{58}
 \providecommand{\natexlab}[1]{#1}
 \providecommand{\url}[1]{#1}
 \expandafter\ifx\csname urlstyle\endcsname\relax\else
@@ -62,9 +62,36 @@ WU C~J, RAGHAVENDRA R, GUPTA U, et~al.
 
 \bibitem[He et~al.(2024)He, Xu, Wu, Zheng, Ye, and Xu]{he2024uellm}
 HE Y, XU M, WU J, et~al.
-\newblock {UELLM}: A Unified and Efficient Approach for Large Language Model Inference Serving\allowbreak[C]//\allowbreak
-Proceedings of the 22nd International Conference on Service-Oriented Computing (ICSOC).
-\newblock Springer, 2024: 218-235.
+\newblock Service-Oriented Computing: 22nd International Conference, ICSOC 2024, Tunis, Tunisia, December 3--6, 2024, Proceedings, Part I: UELLM: A Unified and Efficient Approach for Large Language Model Inference Serving\allowbreak[M/OL].
+\newblock Berlin, Heidelberg: Springer-Verlag, 2024: 218-235.
+\newblock \url{https://doi.org/10.1007/978-981-96-0805-8_16}.
+
+\bibitem[Wolf et~al.(2020)Wolf, Debut, Sanh, Chaumond, Delangue, Moi, Cistac, Rault, Louf, Funtowicz, Davison, Shleifer, von Platen, Ma, Jernite, Plu, Xu, Scao, Gugger, Drame, Lhoest, and Rush]{transformers}
+WOLF T, DEBUT L, SANH V, et~al.
+\newblock Proceedings of the 2020 Conference on Empirical Methods in Natural Language Processing: System Demonstrations: Transformers: State-of-the-Art Natural Language Processing\allowbreak[M/OL].
+\newblock Online: Association for Computational Linguistics, 2020: 38-45.
+\newblock \url{https://www.aclweb.org/anthology/2020.emnlp-demos.6}.
+
+\bibitem[Nguyen-Duc et~al.(2025)Nguyen-Duc, Cabrero-Daniel, Przybylek, Arora, Khanna, Herda, Rafiq, Melegati, Guerra, Kemell, et~al.]{nguyen2025generative}
+NGUYEN-DUC A, CABRERO-DANIEL B, PRZYBYLEK A, et~al.
+\newblock Generative artificial intelligence for software engineering—A research agenda\allowbreak[J].
+\newblock Software: Practice and Experience, 2025.
+
+\bibitem[Feng et~al.(2025)Feng, Huang, Zhang, Liang, Yan, and Wu]{feng2025windserve}
+FENG J, HUANG Y, ZHANG R, et~al.
+\newblock Proceedings of the 52nd Annual International Symposium on Computer Architecture: WindServe: Efficient Phase-Disaggregated LLM Serving with Stream-based Dynamic Scheduling\allowbreak[M/OL].
+\newblock New York, NY, USA: Association for Computing Machinery, 2025: 1283-1295.
+\newblock \url{https://doi.org/10.1145/3695053.3730999}.
+
+\bibitem[Zhou et~al.(2024)Zhou, Ning, Hong, Fu, Xu, Li, Lou, Wang, Yuan, Li, et~al.]{zhou2024survey}
+ZHOU Z, NING X, HONG K, et~al.
+\newblock A survey on efficient inference for large language models\allowbreak[A].
+\newblock 2024.
+
+\bibitem[{NVIDIA Corporation}()]{tensorrtllm}
+{NVIDIA Corporation}.
+\newblock TensorRT-LLM: High-performance LLM inference library from NVIDIA\allowbreak[EB/OL].
+\newblock \url{https://developer.nvidia.com/tensorrt-llm}.
 
 \bibitem[Leviathan et~al.(2023)Leviathan, Kalman, and Matias]{leviathan2022fast}
 LEVIATHAN Y, KALMAN M, MATIAS Y.
@@ -75,6 +102,13 @@ LEVIATHAN Y, KALMAN M, MATIAS Y.
 CHEN C, BORGEAUD S, IRVING G, et~al.
 \newblock Accelerating Large Language Model Decoding with Speculative Decoding\allowbreak[J].
 \newblock International Conference on Machine Learning (ICML), 2023: 6159-6181.
+
+\bibitem[Yu et~al.(2022)Yu, Jeong, Kim, Kim, and Chun]{Orca}
+YU G~I, JEONG J~S, KIM G~W, et~al.
+\newblock Orca: A Distributed Serving System for {Transformer-Based} Generative Models\allowbreak[C/OL]//\allowbreak
+16th USENIX Symposium on Operating Systems Design and Implementation (OSDI 22).
+\newblock Carlsbad, CA: USENIX Association, 2022: 521-538.
+\newblock \url{https://www.usenix.org/conference/osdi22/presentation/yu}.
 
 \bibitem[Schuster et~al.(2022)Schuster, Fisch, Gupta, Dehghani, Bahri, Tran, Tay, and Metzler]{schuster2022confident}
 SCHUSTER T, FISCH A, GUPTA J, et~al.
@@ -145,6 +179,27 @@ PATEL P, CHOUKSE E, ZHANG C, et~al.
 Proceedings of the 51st Annual International Symposium on Computer Architecture (ISCA).
 \newblock 2024: 118-132.
 
+\bibitem[Hong et~al.(2025)Hong, Chen, Wang, Li, Mao, Ma, Xiong, Wu, Han, Dai, et~al.]{hong2025semi}
+HONG K, CHEN L, WANG Z, et~al.
+\newblock semi-PD: Towards Efficient LLM Serving via Phase-Wise Disaggregated Computation and Unified Storage\allowbreak[A].
+\newblock 2025.
+
+\bibitem[Wu et~al.(2024)Wu, Liu, Zhong, Sun, Liu, and Jin]{wu2024loongserve}
+WU B, LIU S, ZHONG Y, et~al.
+\newblock Proceedings of the ACM SIGOPS 30th Symposium on Operating Systems Principles: Loongserve: Efficiently serving long-context large language models with elastic sequence parallelism\allowbreak[Z].
+\newblock ACM, 2024: 640-654.
+
+\bibitem[Hu et~al.(2024)Hu, Huang, Xu, Chen, Xu, Chen, Feng, Wang, Wang, Bao, et~al.]{hu2024tetriInfer}
+HU C, HUANG H, XU L, et~al.
+\newblock Inference without interference: Disaggregate llm inference for mixed downstream workloads\allowbreak[A].
+\newblock 2024.
+
+\bibitem[{NVIDIA Corporation}(2025)]{nvidiadynamo}
+{NVIDIA Corporation}.
+\newblock NVIDIA Dynamo: Distributed orchestration for large-scale LLM serving\allowbreak[EB/OL].
+\newblock 2025.
+\newblock \url{https://developer.nvidia.com/nvidia-dynamo}.
+
 \bibitem[Qin et~al.(2024)Qin, Li, He, Zhang, Yu, Huang, He, Liu, Li, Xin, et~al.]{qin2024mooncake}
 QIN R, LI Z, HE W, et~al.
 \newblock Mooncake: A {KVCache}-centric Disaggregated Architecture for {LLM} Serving\allowbreak[A].
@@ -191,18 +246,53 @@ TAORI R, GULRAJANI I, ZHANG T, et~al.
 \newblock GitHub repository, 2023.
 \newblock \url{https://github.com/tatsu-lab/stanford_alpaca}.
 
+\bibitem[Ruan et~al.(2025)Ruan, Chen, Tian, Shi, Wu, Li, and Li]{ruan2025dynaserve}
+RUAN C, CHEN Y, TIAN D, et~al.
+\newblock DynaServe: Unified and Elastic Execution for Dynamic Disaggregated LLM Serving\allowbreak[A].
+\newblock 2025.
+
+\bibitem[Zhang et~al.(2025)Zhang, Wang, Liu, Wei, Shan, Chen, and Chen]{blitzscale}
+ZHANG D, WANG H, LIU Y, et~al.
+\newblock 19th USENIX Symposium on Operating Systems Design and Implementation (OSDI 25): BlitzScale: Fast and Live Large Model Autoscaling with O(1) Host Caching\allowbreak[Z].
+\newblock USENIX, 2025: 275-293.
+
 \bibitem[Zhang et~al.(2022)Zhang, Roller, Goyal, Artetxe, Chen, Chen, Dewan, Diab, Li, Lin, Mihaylov, Ott, Shleifer, Shuster, Simig, Koura, Sridhar, Wang, and Zettlemoyer]{zhang2022opt}
 ZHANG S, ROLLER S, GOYAL N, et~al.
 \newblock OPT: Open Pre-trained Transformer Language Models\allowbreak[A].
 \newblock 2022.
 \newblock arXiv: \eprint{https://arxiv.org/abs/2205.01068}{2205.01068}.
 
-\bibitem[Yu et~al.(2022)Yu, Jeong, Kim, Kim, and Chun]{Orca}
-YU G~I, JEONG J~S, KIM G~W, et~al.
-\newblock Orca: A Distributed Serving System for {Transformer-Based} Generative Models\allowbreak[C/OL]//\allowbreak
-16th USENIX Symposium on Operating Systems Design and Implementation (OSDI 22).
-\newblock Carlsbad, CA: USENIX Association, 2022: 521-538.
-\newblock \url{https://www.usenix.org/conference/osdi22/presentation/yu}.
+\bibitem[Hong et~al.(2024)Hong, Dai, Xu, Mao, Li, Liu, Chen, Dong, and Wang]{hong2024flashdecoding++}
+HONG K, DAI G, XU J, et~al.
+\newblock Flashdecoding++: Faster large language model inference with asynchronization, flat gemm optimization, and heuristics\allowbreak[J].
+\newblock Proceedings of Machine Learning and Systems, 2024, 6: 148-161.
+
+\bibitem[Zhu et~al.(2021)Zhu, Yang, Hu, Wo, Xue, Ouyang, and Xu]{zhu2021perph}
+ZHU J, YANG R, HU C, et~al.
+\newblock 2021 IEEE/ACM 21st International Symposium on Cluster, Cloud and Internet Computing (CCGrid): Perph: A workload co-location agent with online performance prediction and resource inference\allowbreak[Z].
+\newblock IEEE, 2021: 176-185.
+
+\bibitem[Sun et~al.(2024)Sun, Huang, Zhao, Xiao, Zhang, Li, and Lin]{Llumnix}
+SUN B, HUANG Z, ZHAO H, et~al.
+\newblock 18th USENIX Symposium on Operating Systems Design and Implementation (OSDI 24): Llumnix: Dynamic Scheduling for Large Language Model Serving\allowbreak[M/OL].
+\newblock Santa Clara, CA: USENIX Association, 2024: 173-191.
+\newblock \url{https://www.usenix.org/conference/osdi24/presentation/sun-biao}.
+
+\bibitem[Miao et~al.(2024)Miao, Shi, Duan, Xi, Lin, Cui, and Jia]{SpotServe}
+MIAO X, SHI C, DUAN J, et~al.
+\newblock ASPLOS '24: SpotServe: Serving Generative Large Language Models on Preemptible Instances\allowbreak[M/OL].
+\newblock New York, NY, USA: Association for Computing Machinery, 2024: 1112-1127.
+\newblock \url{https://doi.org/10.1145/3620665.3640411}.
+
+\bibitem[Holmes et~al.(2024)Holmes, Tanaka, Wyatt, Awan, Rasley, Rajbhandari, Aminabadi, Qin, Bakhtiari, Kurilenko, et~al.]{holmes2024deepspeed}
+HOLMES C, TANAKA M, WYATT M, et~al.
+\newblock Deepspeed-fastgen: High-throughput text generation for llms via mii and deepspeed-inference\allowbreak[A].
+\newblock 2024.
+
+\bibitem[Chen et~al.(2024)Chen, Jiang, Yu, Xu, Chao, Meng, Jiang, Xu, and Liu]{chen2024kvdirect}
+CHEN S, JIANG R, YU D, et~al.
+\newblock KVDirect: Distributed Disaggregated LLM Inference\allowbreak[A].
+\newblock 2024.
 
 \bibitem[He et~al.(2025)He, Xu, Wu, Hu, Ma, Shen, Chen, Xu, Qu, and Ye]{he2025banaserve}
 HE Y, XU M, WU J, et~al.
@@ -221,6 +311,11 @@ ZHANG Z, SHENG Y, ZHOU T, et~al.
 \newblock {H$_2$O}: Heavy-Hitter Oracle for Efficient Generative Inference of Large Language Models\allowbreak[C]//\allowbreak
 Advances in Neural Information Processing Systems (NeurIPS): Vol.~36.
 \newblock 2023.
+
+\bibitem[Agrawal et~al.(2024)Agrawal, Kedia, Panwar, Mohan, Kwatra, Gulavani, Tumanov, and Ramjee]{taming}
+AGRAWAL A, KEDIA N, PANWAR A, et~al.
+\newblock 18th USENIX Symposium on Operating Systems Design and Implementation (OSDI 24): Taming Throughput-Latency tradeoff in LLM inference with Sarathi-Serve\allowbreak[Z].
+\newblock USENIX, 2024: 117-134.
 
 \bibitem[Du et~al.(2022)Du, Qian, Liu, et~al.]{du2022glm}
 DU Z, QIAN Y, LIU X, et~al.

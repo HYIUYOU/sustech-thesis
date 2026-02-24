@@ -38,10 +38,10 @@ LLM的分布式部署涉及两个关键决策：\textbf{GPU数量的选择}和\t
   \label{fig:deployment_sensitivity}
 \end{figure}
 图~\ref{fig:deployment_sensitivity}展示了在不同GPU数量和批大小配置下，归一化延迟、显存占用和GPU利用率的变化规律。实验结果表明，合理的GPU数量配置可将GPU利用率提升4倍，并将推理延迟降低20倍（最坏情况涉及显存卸载时）。这一结果揭示了以下规律：
-\begin{itemize}
+\begin{enumerate}
     \item \textbf{GPU数量并非越多越好}：随着GPU数量增加，节点间通信延迟和同步开销显著上升，过多的GPU反而会拖慢推理速度；
     \item \textbf{设备映射影响巨大}：即使在确定了最优GPU数量后，不合理的层分配仍会造成严重的性能退化。如第二章表~\ref{tab:devicemap_impact}所示，通过调整ChatGLM2-6B在两张异构GPU上的层分配比例，平均吞吐量可从11.19 token/s提升至22.55 token/s，提升幅度超过100\%\cite{he2024uellm}。
-\end{itemize}
+\end{enumerate}
 
 \subsection{批处理策略对推理性能的影响}
 
@@ -68,33 +68,36 @@ LLM的分布式部署涉及两个关键决策：\textbf{GPU数量的选择}和\t
 
 \subsection{基于微调大模型的输出长度预测}
 
-\textbf{1. 预测模型选择与微调策略}
+\begin{enumerate}
+  
+\item \textbf{预测模型选择与微调策略}
 
 UELLM采用ChatGLM3-6B\cite{du2022glm}作为输出长度预测的基础模型，通过LoRA（Low-Rank Adaptation）\cite{dettmers2023qlora}高效微调策略，在Alpaca\cite{alpaca}问答数据集上进行任务适配。微调时，以用户问题文本作为输入，以对应答案的token数量所属桶编号作为分类标签。
 
 具体而言，输出长度被离散化为$K$个桶（Bucket）：
 \begin{equation}
-    \mathcal{B} = \{[0,8),\ [8,16),\ [16,32),\ [32,64),\ \ldots,\ [1024,2048)\}
+    \mathcal{B} = \{[0,8),\ [8,16),\ [16,32),\ [32,64),\ \ldots,\ [1024,2048)\},
     \label{eq:bucket_definition}
 \end{equation}
 每个桶对应一个类别标签，将连续的长度回归问题转化为$K$类分类问题，显著降低了预测复杂度，同时保证调度决策的快速响应。
 
-\textbf{2. 预测精度评估}
+\item \textbf{预测精度评估}
 
 微调后的预测模型在测试集上达到了\textbf{99.51\%}的分桶准确率。为验证模型的泛化能力，进一步在Google Natural Questions数据集和Alpaca GPT-4数据集上进行评估，准确率均超过80\%，表明模型对不同问答分布具有良好的泛化性能\cite{he2024uellm}。
 
+\end{enumerate}
 相比S$^3$\cite{jin2023s3}采用的轻量级BERT分类器，UELLM选择微调同类大模型（ChatGLM3-6B）作为预测器，具有以下优势：
-\begin{itemize}
+\begin{enumerate}
     \item \textbf{语义理解深度}：大模型对问题语义的理解更为深入，能够捕捉影响答案长度的细粒度语言特征（如问题类型、领域、复杂度等）；
     \item \textbf{预测精度显著更高}：99.51\%的分桶准确率远高于基于规则或轻量级分类器的方案；
     \item \textbf{在线学习能力}：支持基于实时反馈的增量更新，适应输出长度分布的动态变化。
-\end{itemize}
+\end{enumerate}
 
 \subsection{SLO获取与资源画像}
 
 资源画像器在预测输出长度的同时，从请求元数据中提取SLO约束（即请求必须在该时间内完成推理的截止时间）。对于每个请求$q_i$，资源画像器输出一个三元组：
 \begin{equation}
-    \text{Profile}(q_i) = (\text{Input}_i,\ \widehat{\text{Output}}_i,\ \text{SLO}_i)
+    \text{Profile}(q_i) = (\text{Input}_i,\ \widehat{\text{Output}}_i,\ \text{SLO}_i),
     \label{eq:profile}
 \end{equation}
 其中$\text{Input}_i$为实际输入长度，$\widehat{\text{Output}}_i$为预测输出长度桶的代表值，$\text{SLO}_i$为请求的延迟截止时间。该三元组作为批处理调度器的输入，支持后续的SLO感知批次构建决策。
@@ -102,10 +105,10 @@ UELLM采用ChatGLM3-6B\cite{du2022glm}作为输出长度预测的基础模型，
 \subsection{在线监控与自适应校正}
 
 UELLM在后台运行实时监控程序，持续追踪GPU利用率、显存占用和推理执行时间等指标。当监控程序检测到预测输出长度与实际输出长度存在显著偏差时，触发自适应校正机制：
-\begin{itemize}
+\begin{enumerate}
     \item \textbf{显存动态调整}：根据实际KV Cache增长速率调整已分配显存大小，防止OOM错误；
     \item \textbf{预测器在线更新}：将预测错误的样本加入在线学习队列，周期性地对预测模型进行增量微调，提升对动态负载分布的适应能力。
-\end{itemize}
+\end{enumerate}
 
 \section{批处理调度器：SLO-ODBS算法}
 \label{sec:uellm_scheduler}
@@ -120,27 +123,27 @@ UELLM在后台运行实时监控程序，持续追踪GPU利用率、显存占用
 
 总延迟$T_l$定义为：
 \begin{equation}
-    T_l = \sum_{i=1}^{N} \left[ (\text{SLO}_i + L_{CM}) \times (|\text{batch}_c| + 1) \times L_1 \right]
+    T_l = \sum_{i=1}^{N} \left[ (\text{SLO}_i + L_{CM}) \times (|\text{batch}_c| + 1) \times L_1 \right],
     \label{eq:total_latency}
 \end{equation}
 总输出长度$T_o$定义为：
 \begin{equation}
-    T_o = \sum_{i=1}^{N} \left[ (\text{Length}_i + O_{CM}) \times (|\text{batch}_c| + 1) \times L_2 \right]
+    T_o = \sum_{i=1}^{N} \left[ (\text{Length}_i + O_{CM}) \times (|\text{batch}_c| + 1) \times L_2 \right],
     \label{eq:total_output}
 \end{equation}
 其中，$N$为当前批次$\text{batch}_c$中的请求数量，$L_{CM}$为当前批次的最大延迟，$O_{CM}$为当前批次的最大输出长度，$L_1$和$L_2$分别为并行计算引入的额外延迟系数。通过权重系数$w_1$和$w_2$平衡两个优化目标的重要性，综合优化目标为：
 \begin{equation}
-    \max_{w_1, w_2}\ (w_1 \times T_l + w_2 \times T_o) \leq \text{Threshold}
+    \max_{w_1, w_2}\ (w_1 \times T_l + w_2 \times T_o) \leq \text{Threshold},
     \label{eq:optimization_objective}
 \end{equation}
 系统通过确保每次加入新请求后批次的综合指标$\text{Total} \leq T$（阈值），将请求序列重新组合为$\text{batch}_1, \text{batch}_2, \ldots, \text{batch}_n$。
 
 \subsection{SLO-ODBS算法设计}
 
-基于上述问题建模，本文提出\textbf{SLO感知与输出长度驱动的动态批处理调度算法}（SLO and Output-Driven Dynamic Batch Scheduler, SLO-ODBS），如算法~\ref{algo:slo_odbs}所示。
+基于上述问题建模，本文提出SLO感知与输出长度驱动的动态批处理调度算法（SLO and Output-Driven Dynamic Batch Scheduler, SLO-ODBS），如算法~\ref{algo:slo_odbs}所示。
 
 \begin{algorithm}[htbp]
-  \caption{SLO感知与输出长度驱动的动态批处理调度算法（SLO-ODBS）}
+  \caption{SLO感知与输出长度驱动的动态批处理调度算法}
   \label{algo:slo_odbs}
   \KwIn{requests：经资源画像器处理后的请求列表}
   \KwOut{batches：批次列表}
@@ -191,11 +194,11 @@ UELLM在后台运行实时监控程序，持续追踪GPU利用率、显存占用
 \subsection{算法变体：灵活适配不同调度目标}
 
 SLO-ODBS通过调整权重系数$w_1$和$w_2$，可灵活适配不同的调度优化目标：
-\begin{itemize}
+\begin{enumerate}
     \item \textbf{当$w_1 = 0$时}（SLO-DBS模式）：算法退化为纯SLO感知调度，仅以$T_o$为批次构建依据，优先降低SLO违约率，适合对服务质量保障要求严格的场景；
     \item \textbf{当$w_2 = 0$时}（ODBS模式）：算法退化为纯输出长度驱动调度，仅以$T_l$为依据，优先最小化推理延迟，适合对吞吐量要求高但对SLO公平性要求相对宽松的场景；
     \item \textbf{当$w_1, w_2 > 0$时}（完整SLO-ODBS模式）：算法同时兼顾SLO约束与输出长度差异，在低延迟和低违约率之间寻求最优平衡，适合生产环境的通用部署。
-\end{itemize}
+\end{enumerate}
 
 \section{LLM部署器：HELR算法}
 \label{sec:uellm_deployer}
@@ -205,23 +208,23 @@ LLM部署器（LLM Deployer）在模型部署阶段运行，根据当前集群�
 \subsection{问题形式化建模}
 
 将集群硬件网络抽象为图$G = (D, E)$，其中$D = \{d_1, d_2, \ldots, d_n\}$为硬件设备节点集合，$E$为节点间的连接边集合。对于待部署的大模型$\text{llm}_i$，其显存需求为$M(\text{llm}_i)$，模型层数为$\text{Layer}(\text{llm}_i)$。每个节点$d_i$具有以下属性：
-\begin{itemize}
+\begin{enumerate}
     \item $\text{Memory}(d_i)$：节点$d_i$的可用显存容量；
     \item $\text{Performance}(d_i)$：节点$d_i$的计算处理能力；
     \item $\text{Latency}(E[i][j])$：节点$d_i$与$d_j$之间的通信延迟。
-\end{itemize}
+\end{enumerate}
 目标是寻找设备分配方案$S \subseteq D$，在满足显存约束的前提下最小化推理延迟：
 \begin{equation}
-    \sum_{i=1}^{|S|} \text{Memory}(d_i) \geq M
+    \sum_{i=1}^{|S|} \text{Memory}(d_i) \geq M.
     \label{eq:memory_constraint}
 \end{equation}
 
 \subsection{HELR算法设计}
 
-该问题可建模为一个动态规划（Dynamic Programming）问题。本文提出\textbf{高效低延迟资源分配算法}（High-Efficiency Low-Latency Resource Allocation, HELR），如算法~\ref{algo:helr}所示。
+该问题可建模为一个动态规划（Dynamic Programming）问题。本文提出高效低延迟资源分配算法（High-Efficiency Low-Latency Resource Allocation, HELR），如算法~\ref{algo:helr}所示。
 
 \begin{algorithm}[htbp]
-  \caption{高效低延迟资源分配算法（HELR）}
+  \caption{高效低延迟资源分配算法}
   \label{algo:helr}
   \KwIn{$M$：LLM显存需求；$\text{Layer}(M)$：模型层数；
         $G(D,E)$：硬件平台图；$\text{Latency}(E[i][j])$：节点间通信延迟；
@@ -270,17 +273,17 @@ LLM部署器（LLM Deployer）在模型部署阶段运行，根据当前集群�
 \textbf{阶段二：动态规划求解（第3--16行）}
 
 维护二维数组$dp$，其中$dp[\text{mark}][i]$表示从初始状态到设备节点$d_i$的最小延迟，$\text{mark}$为状态压缩的位掩码。动态规划的状态转移方程为：
-\begin{equation}
-    dp[\text{mark}][i] = \min_{1 \leq j \leq |S|}
-    \left( dp[\text{mark}][i],\  dp[i][j] + \text{Latency}(E[i][j])
-    + p \times \frac{\text{layers}[i] \times m}{\text{Performance}(i)} \right)
+\begin{multline}
+    dp[\text{mark}][i] = \\
+    \min_{1 \leq j \leq |S|}
+    \Bigl( dp[\text{mark}][i],\ dp[i][j] + \text{Latency}(E[i][j]) + p \times \frac{\text{layers}[i] \times m}{\text{Performance}(i)} \Bigr),
     \label{eq:dp_recurrence}
-\end{equation}
+\end{multline}
 最终的优化目标为最小化总延迟：
 \begin{equation}
     \min_{1 \leq i \leq |S|} dp[2^k - 1][i]
     + \sum_{j=1}^{|S|} \left( \text{Latency}(E[i][j])
-    + p \times \frac{\text{layers}[i] \times m}{\text{Performance}(i)} \right)
+    + p \times \frac{\text{layers}[i] \times m}{\text{Performance}(i)} \right),
     \label{eq:helr_objective}
 \end{equation}
 其中$\text{layers}[i]$为分配给节点$d_i$的层数，$p$为处理性能-时间关系的调节系数。
@@ -292,18 +295,18 @@ LLM部署器（LLM Deployer）在模型部署阶段运行，根据当前集群�
 \subsection{HELR的算法变体}
 
 类似于SLO-ODBS，HELR同样通过调整权重参数$a_1$实现不同部署目标的灵活适配：
-\begin{itemize}
+\begin{enumerate}
     \item \textbf{高效模式（HE，High-Efficiency）}：设$a_1 = 0$，动态规划仅最小化GPU数量，优先在尽可能少的GPU上完成部署，充分利用每个GPU的计算能力，适合资源受限的环境；由于LLM推理的顺序执行特性，在最少GPU上部署可有效提升GPU利用率；
     \item \textbf{低延迟模式（LR，Low-Latency）}：设$a_1 \gg a_2$（如10:1），动态规划赋予延迟最高权重，在不考虑资源消耗的前提下追求最低推理延迟，适合对响应时间极为敏感的场景；
     \item \textbf{均衡模式（HELR）}：同时考虑GPU利用率和推理延迟，在资源效率与服务质量之间寻求最优权衡，适合生产环境的通用部署场景。
-\end{itemize}
+\end{enumerate}
 
 \section{实验评估}
 \label{sec:uellm_eval}
 
 \subsection{实验设置}
 
-\textbf{测试平台。}实验在由4块NVIDIA RTX 3090 GPU组成的本地集群上进行。为模拟异构集群环境，对各GPU设置不同的性能限制。集群网络拓扑如表~\ref{tab:cluster_topology}所示，节点间连接类型分为三种：自身连接（X）、单PCIe桥连接（PIX）和NUMA节点内PCIe互联（NODE）。
+\textbf{测试平台：}实验在由4块NVIDIA RTX 3090 GPU组成的本地集群上进行。为模拟异构集群环境，对各GPU设置不同的性能限制。集群网络拓扑如表~\ref{tab:cluster_topology}所示，节点间连接类型分为三种：自身连接（X）、单PCIe桥连接（PIX）和NUMA节点内PCIe互联（NODE）。
 
 \begin{table}[htbp]
   \centering
@@ -324,19 +327,19 @@ LLM部署器（LLM Deployer）在模型部署阶段运行，根据当前集群�
   \end{tabularx}
 \end{table}
 
-\textbf{推理模型。}选用ChatGLM2-6B\cite{du2022glm}作为推理目标模型。由于该模型在实验时尚不支持批推理，UELLM对其推理代码进行适配以支持批处理。
+\textbf{推理模型：}选用ChatGLM2-6B\cite{du2022glm}作为推理目标模型。由于该模型在实验时尚不支持批推理，UELLM对其推理代码进行适配以支持批处理。
 
-\textbf{SLO设置。}为贴近真实场景，为不同推理请求设计随机SLO，范围从1秒到350秒，确保每个请求的SLO完全随机。
+\textbf{SLO设置：}为贴近真实场景，为不同推理请求设计随机SLO，范围从1秒到350秒，确保每个请求的SLO完全随机。
 
-\textbf{对比基线。}构建三个UELLM原型版本：
-\begin{itemize}
+\textbf{对比基线：}构建三个UELLM原型版本：
+\begin{enumerate}
     \item \textbf{UELLM-deploy（UD）}：仅使用HELR模型部署算法；
     \item \textbf{UELLM-batch（UB）}：仅使用SLO-ODBS批处理调度算法；
     \item \textbf{UELLM-all（UA）}：同时采用HELR和SLO-ODBS两种算法。
-\end{itemize}
+\end{enumerate}
 选取Morphling\cite{wang2021morphling}和S$^3$\cite{jin2023s3}作为SOTA基线进行对比。
 
-\textbf{评估指标。}采用四项核心指标：推理延迟（Latency）、吞吐量（Throughput，token/s）、GPU利用率（GPU Utilization）和SLO违约率（SLO Violation Rate）。每组实验重复5次，取平均值以消除随机性影响。
+\textbf{评估指标：}采用四项核心指标：推理延迟（Latency）、吞吐量（Throughput，token/s）、GPU利用率（GPU Utilization）和SLO违约率（SLO Violation Rate）。每组实验重复5次，取平均值以消除随机性影响。
 
 \subsection{批处理算法与部署算法的消融分析}
 
@@ -389,22 +392,22 @@ LLM部署器（LLM Deployer）在模型部署阶段运行，根据当前集群�
 
 \textbf{SLO不违约率分析（图~\ref{fig:sota_comparison}(b)）：}
 五种方案的SLO不违约率由低到高依次为：S$^3$（51.8\%）$<$ Morphling（70.4\%）$<$ UD（76.6\%）$<$ UB（87.4\%）$<$ UA（100.0\%）。
-\begin{itemize}
+\begin{enumerate}
     \item S$^3$仅考虑显存优化，不感知各请求的SLO差异，表现最差；
     \item Morphling和UD均仅优化部署策略而不考虑SLO调度，虽然推理延迟较低，但SLO不违约率仍低于UB；
     \item UB通过SLO-ODBS算法感知SLO，将87.4\%的请求控制在SLO内；
     \item UA同时优化部署策略和批处理调度，实现了\textbf{零SLO违约}，所有请求均在截止时间内完成。
-\end{itemize}
+\end{enumerate}
 相比S$^3$和Morphling，UELLM（UA）将SLO不违约率分别提升了48.2\%和29.6\%。
 
 \textbf{推理延迟与吞吐量分析（图~\ref{fig:sota_comparison}(c)(d)）：}
 UA在推理延迟和吞吐量两个指标上均取得最优结果：
-\begin{itemize}
+\begin{enumerate}
     \item 相比Morphling，UD通过消除压力测试环节，直接降低了测试阶段的时间开销，从而减少整体推理延迟并提升吞吐量；
     \item 相比S$^3$，UD通过HELR优化资源分配，改善GPU利用率和通信延迟，显著降低推理延迟；
     \item UB通过SLO-ODBS优化批次组合，减少迭代次数，降低推理延迟并提升吞吐量；
     \item UA综合HELR和SLO-ODBS的双重优化，在五次实验中均取得最优结果。
-\end{itemize}
+\end{enumerate}
 总体而言，相比S$^3$和Morphling，UELLM将推理延迟降低\textbf{72.3\%至90.3\%}，吞吐量提升\textbf{1.92倍至4.98倍}\cite{he2024uellm}。
 
 \subsection{实验结果综合分析}
