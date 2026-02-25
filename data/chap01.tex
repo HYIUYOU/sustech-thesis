@@ -4,15 +4,15 @@
 \chapter{绪论}
 \section{研究背景}
 
-近年来,以GPT-4\cite{achiam2023gpt4}、LLaMA\cite{touvron2023llama}、Claude\cite{anthropic2025claude}等为代表的大语言模型(Large Language Models, LLMs)在自然语言处理、代码生成、知识检索和内容创作等领域展现出卓越的性能,推动了人工智能技术的跨越式发展。这些模型通过数百亿乃至万亿级参数的规模化效应,涌现出强大的上下文学习与推理能力,已成为智能时代的关键基础设施。然而,随着模型参数规模的指数级增长,其训练和推理过程对计算资源提出了极高的要求,由此产生的资源密集型特征与高效部署需求之间的矛盾日益尖锐。
+近年来,以GPT-4\cite{achiam2023gpt4}、LLaMA\cite{touvron2023llama}、Claude\cite{anthropic2025claude}等为代表的大语言模型(Large Language Models, LLMs)在自然语言处理、代码生成、知识检索和内容创作等领域展现出卓越的性能,推动了人工智能技术的跨越式发展。这些模型通过数百亿乃至万亿级参数的规模化效应,涌现出强大的上下文学习与推理能力,已成为智能时代的关键基础设施。然而,随着模型参数规模的指数级增长,其训练和推理过程对计算资源提出了极高的要求,由此产生的资源密集型特征与高效部署需求之间的矛盾日益尖锐\cite{zhang2023llm_survey,li2022cloud_resource}。
 
-在机器学习即服务(MLaaS)的范式下,大模型的生命周期呈现出训练集中,推理分散的显著特征。据统计,云平台中约90\%的人工智能计算资源被用于模型推理服务而非训练\cite{wu2022sustainable},且推理成本随着模型规模呈超线性增长。以OpenAI的ChatGPT为例,为维持其日均7000万次访问的服务规模,需要部署超过6万张NVIDIA A100 GPU,初始投资成本高达16亿美元,每日电费支出约10万美元\cite{he2024uellm}。这些数字清晰地揭示了大模型推理阶段对计算资源的巨额消耗及其带来的沉重经济负担。
+在机器学习即服务(MLaaS)的范式下,大模型的生命周期呈现出训练集中,推理分散的显著特征。据统计,云平台中约90\%的人工智能计算资源被用于模型推理服务而非训练\cite{wu2022sustainable,wang2023kv_cache},且推理成本随着模型规模呈超线性增长。以OpenAI的ChatGPT为例,为维持其日均7000万次访问的服务规模,需要部署超过6万张NVIDIA A100 GPU,初始投资成本高达16亿美元,每日电费支出约10万美元\cite{he2024uellm}。这些数字清晰地揭示了大模型推理阶段对计算资源的巨额消耗及其带来的沉重经济负担。
 
-大模型推理过程具有独特的两阶段执行特性：预填充(Prefill)阶段与解码(Decode)阶段\cite{transformers,nguyen2025generative},这种内在的计算模式差异构成了资源优化的核心挑战。Prefill阶段计算密集,需并行处理整个输入序列以计算注意力键值(KV Cache)并生成首个令牌(Time to First Token, TTFT),其延迟直接影响用户感知的响应速度\cite{feng2025windserve}。Decode阶段则受限于自回归生成机制,需逐令牌迭代输出,呈现显著的内存密集型特征,其关键指标为每输出令牌时间(Time Per Output Token, TPOT)。两个阶段在计算强度、内存访问模式和延迟敏感度上的固有不对称性,使得传统单一架构难以同时优化,往往导致严重的资源利用率低下和负载不均衡问题\cite{zhou2024survey}。
+大模型推理过程具有独特的两阶段执行特性：预填充(Prefill)阶段与解码(Decode)阶段\cite{transformers,nguyen2025generative},这种内在的计算模式差异构成了资源优化的核心挑战。Prefill阶段计算密集,需并行处理整个输入序列以计算注意力键值(KV Cache)并生成首个令牌(Time to First Token, TTFT),其延迟直接影响用户感知的响应速度\cite{feng2025windserve,zhao2022gpu_sched}。Decode阶段则受限于自回归生成机制,需逐令牌迭代输出,呈现显著的内存密集型特征,其关键指标为每输出令牌时间(Time Per Output Token, TPOT)。两个阶段在计算强度、内存访问模式和延迟敏感度上的固有不对称性,使得传统单一架构难以同时优化,往往导致严重的资源利用率低下和负载不均衡问题\cite{zhou2024survey}。
 
 此外,大模型推理面临着严峻的显存墙(Memory Wall)挑战。以千亿级参数模型为例,其参数本身需占用数百GB显存,而KV Cache的动态增长进一步加剧了显存压力。由于单张GPU显存容量有限(通常为40GB或80GB),必须采用张量并行(Tensor Parallelism)\cite{tensorrtllm}或流水线并行(Pipeline Parallelism)等分布式部署策略。然而,随着部署GPU数量的增加,节点间通信开销和同步延迟显著上升。反之,若GPU资源配置不足,则会导致显存溢出(Out-of-Memory, OOM)错误或极长的推理延迟。这种资源配置的刚性约束与服务质量(Quality of Service, QoS)要求之间的张力,构成了大模型部署的核心难点。
 
-更为复杂的是,生产环境的推理负载具有高度动态性和不可预测性。请求到达率(Requests Per Second, RPS)随时间呈现剧烈波动,输入/输出序列长度分布呈现显著的重尾特性(Heavy-tailed),即少数长序列请求占据了大量资源。传统静态资源配置策略在负载低谷期造成严重的资源浪费(GPU利用率常仅20\%-40\%),而在突发流量(Bursty Traffic)下又因扩容滞后导致服务等级目标(Service Level Objective, SLO)违约甚至服务中断。现有系统如vLLM\cite{kwon2023efficient}通过PagedAttention优化显存管理,DistServe\cite{zhong2024distserve}采用PD分离架构消除阶段间干扰,但这些方案仍受限于粗粒度的资源配置(实例级或GPU池级)和缺乏前瞻性的静态调度策略,无法适应快速变化的负载模式。因此,如何在保障严格SLO的前提下,实现计算与内存资源的细粒度调度,成为大模型推理服务从实验室走向规模化产业应用必须攻克的关键瓶颈。
+更为复杂的是,生产环境的推理负载具有高度动态性和不可预测性。请求到达率(Requests Per Second, RPS)随时间呈现剧烈波动,输入/输出序列长度分布呈现显著的重尾特性(Heavy-tailed),即少数长序列请求占据了大量资源。传统静态资源配置策略在负载低谷期造成严重的资源浪费(GPU利用率常仅20\%-40\%),而在突发流量(Bursty Traffic)下又因扩容滞后导致服务等级目标(Service Level Objective, SLO)违约甚至服务中断\cite{chen2022batch_schedule,liu2023distributed_infer}。现有系统如vLLM\cite{kwon2023efficient}通过PagedAttention优化显存管理,DistServe\cite{zhong2024distserve}采用PD分离架构消除阶段间干扰,但这些方案仍受限于粗粒度的资源配置(实例级或GPU池级)和缺乏前瞻性的静态调度策略,无法适应快速变化的负载模式。因此,如何在保障严格SLO的前提下,实现计算与内存资源的细粒度调度,成为大模型推理服务从实验室走向规模化产业应用必须攻克的关键瓶颈。
 
 \section{研究意义}
 
@@ -28,29 +28,35 @@
 
 \subsection{算法层面的推理优化}
 
-\textbf{（1）解码策略相关研究}
+\begin{enumerate}
+  
+\item  \textbf{解码策略相关研究}
 
 为突破自回归生成的序列依赖瓶颈,学术界提出了多种非传统的解码范式。推测性解码(Speculative Decoding)通过小规模草稿模型(Draft Model)快速生成候选序列,再由目标模型并行验证并修正,在保持输出质量不变的前提下实现2-3倍的加速比\cite{leviathan2022fast,chen2023accelerating}。非自回归解码(Non-autoregressive Decoding)则彻底打破逐token生成的限制,通过迭代精化(Iterative Refinement)\cite{Orca}或掩码预测(Masked Prediction)机制并行输出生成序列,虽然牺牲部分质量,但在实时性要求极高的场景(如实时翻译)展现潜力。
 
 针对生成过程的不确定动态性,早退出机制(Early Exiting)和级联推理(Cascade Inference)根据中间层置信度自适应决定计算深度。例如,CALM\cite{schuster2022confident}通过动态层级退出减少简单查询的计算量。CascadeBERT\cite{li2020cascade}采用模型级联策略,对简单样本使用轻量级模型,仅将困难样本路由至大模型。这类方法通过计算量与任务难度的自适应匹配,显著提升了平均推理效率。
 
-\textbf{（2）模型压缩与量化}
+\item \textbf{模型压缩与量化}
 
 为缓解显存墙(Memory Wall)问题,模型压缩技术成为研究热点。低比特量化(Low-bit Quantization)将FP16/FP32权重压缩至INT8甚至INT4,配合权重量化(Weight-only Quantization)和激活量化(Activation Quantization)策略,使千亿级模型可在单卡消费级GPU上部署\cite{dettmers2022llm,frantar2022gptq}。近期研究还探索了1-bit量化(如BitNet\cite{wang2023bitnet})和混合精度量化,通过细粒度分组量化(Group-wise Quantization)减少精度损失。
 
 知识蒸馏(Knowledge Distillation)通过将大模型(教师)的知识迁移至小模型(学生),在保持性能的同时显著降低推理成本。MiniLLM\cite{gu2023knowledge}和LaMini-GPT\cite{wu2023laminigpt}等工作表明,经过针对性蒸馏的7B参数模型在特定任务上可逼近70B模型的性能。国内研究机构在此领域成果显著,清华大学的QLoRA\cite{dettmers2023qlora}和Knowledge Fusion方法在低资源场景下的压缩效率达到国际领先水平。
+\end{enumerate}
 
 \subsection{系统架构与内存管理优化}
 
-\textbf{（1）注意力机制与显存优化}
+\begin{enumerate}
+
+\item \textbf{注意力机制与显存优化}
 
 Transformer的注意力机制计算复杂度高,显存占用随序列长度平方增长。PagedAttention\cite{kwon2023efficient}借鉴操作系统虚拟内存管理思想,将KV Cache划分为非连续的物理块(Block),通过块表(Block Table)映射实现动态分配,消除了传统连续存储导致的显存碎片,使GPU显存利用率从40-50\%提升至90\%以上。在此基础上,vLLM实现了连续批处理(Continuous Batching),通过动态合并新到达请求并移除已完成请求,最大化吞吐率。
 
 针对长上下文(Long Context)场景,滑动窗口注意力(Sliding Window Attention)和稀疏注意力(Sparse Attention)通过限制注意力范围降低计算复杂度。StreamingLLM\cite{xiao2023streamingllm}发现注意力汇点(Attention Sinks)现象,仅需保留初始token的KV Cache即可维持长序列生成稳定性,将显存消耗从序列长度的二次方降至线性。
 
-\textbf{（2）内核优化与硬件协同}
+\item \textbf{内核优化与硬件协同}
 
 为充分发挥GPU Tensor Core的计算能力,算子融合(Operator Fusion)和自动编译(Automatic Compilation)技术被广泛采用。FlashAttention\cite{dao2022flashattention}系列算法通过IO感知的精确计算调度和分块策略(Tiling),将注意力计算中的HBM访问次数从$O(N)$降至$O(N^2/\text{block\_size})$,在A100 GPU上实现2-4倍的加速。TVM\cite{chen2018tvm}和MLIR等编译器框架通过自动生成针对特定硬件的微内核(Micro-kernel),进一步优化了矩阵乘法和内存访问模式。
+\end{enumerate}
 
 \subsection{批处理与请求调度策略}
 
@@ -64,7 +70,9 @@ SLO感知调度方面,ClockWork\cite{gujarati2020serving}针对传统模型提�
 
 \subsection{计算和存储资源配置策略}
 
-\textbf{（1）PD分离架构的演进}
+\begin{enumerate}
+  
+\item \textbf{PD分离架构的演进}
 
 大模型推理的Prefill阶段(计算密集)与Decode阶段(内存密集)具有截然不同的资源需求特征,催生了预填充-解码分离(Prefill-Decode Disaggregation)架构(PD分离)。DistServe\cite{zhong2024distserve}和Splitwise\cite{patel2024splitwise}将两个阶段部署在不同GPU实例上,消除阶段间干扰,使各自可独立优化。然而,现有方案多采用静态配比(如1:1或固定比例),无法适应动态负载中Prefill与Decode需求的实时变化\cite{hong2025semi,wu2024loongserve,hu2024tetriInfer,nvidiadynamo}。
 
@@ -121,11 +129,12 @@ SLO感知调度方面,ClockWork\cite{gujarati2020serving}针对传统模型提�
     \label{fig:pd-architecture}
 \end{figure}
 
-\textbf{（2）部署配置优化}
+\item \textbf{部署配置优化}
 
 传统模型部署采用静态配置方式,在部署时固定GPU数量和层到设备的映射关系,无法在运行期间根据实际负载动态调整。Morphling\cite{wang2021morphling}提出基于元学习的配置搜索框架,但需要对每个候选配置进行压力测试,产生额外计算负担。
 
 在异构资源管理方面,AntMan\cite{xiao2022antman}和Allox\cite{qin2022allox}提出针对深度学习任务的GPU时间片调度,但主要针对训练场景,未考虑LLM推理中KV Cache的状态保持需求。NVIDIA MPS和MIG(Multi-Instance GPU)支持硬件级的GPU切分,但配置刚性且缺乏软件层面的灵活性。
+\end{enumerate}
 
 \subsection{国内外研究现状对比}
 

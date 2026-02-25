@@ -93,6 +93,6 @@
 \setcounter {tocdepth}{0}
 \contentsline {chapter}{结\hskip 1em\relax 论}{61}{section*.47}%
 \contentsline {chapter}{参考文献}{63}{section*.49}%
-\contentsline {chapter}{致\hskip 1em\relax 谢}{67}{section*.51}%
-\contentsline {chapter}{个人简历、在学期间完成的相关学术成果}{69}{section*.53}%
+\contentsline {chapter}{致\hskip 1em\relax 谢}{68}{section*.51}%
+\contentsline {chapter}{个人简历、在学期间完成的相关学术成果}{70}{section*.53}%
 \contentsfinish 

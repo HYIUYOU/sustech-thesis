@@ -1,4 +1,4 @@
-This is XeTeX, Version 3.141592653-2.6-0.999997 (TeX Live 2025) (preloaded format=xelatex 2026.1.26)  24 FEB 2026 22:51
+This is XeTeX, Version 3.141592653-2.6-0.999997 (TeX Live 2025) (preloaded format=xelatex 2026.1.26)  25 FEB 2026 14:11
 entering extended mode
  \write18 enabled.
  file:line:error style messages enabled.
@@ -1455,19 +1455,19 @@ LaTeX Font Info:    Font shape `TU/CambriaMath.otf(3)/m/n' will be
 [3]
 
 [4]
-LaTeX Font Info:    Calculating math sizes for size <11.04124> on input line 86.
+LaTeX Font Info:    Calculating math sizes for size <11.04124> on input line 94.
 LaTeX Font Info:    Font shape `TU/CambriaMath.otf(2)/m/n' will be
-(Font)              scaled to size 11.04242pt on input line 86.
+(Font)              scaled to size 11.04242pt on input line 94.
 LaTeX Font Info:    Font shape `TU/CambriaMath.otf(2)/m/n' will be
-(Font)              scaled to size 7.72966pt on input line 86.
+(Font)              scaled to size 7.72966pt on input line 94.
 LaTeX Font Info:    Font shape `TU/CambriaMath.otf(2)/m/n' will be
-(Font)              scaled to size 5.5212pt on input line 86.
+(Font)              scaled to size 5.5212pt on input line 94.
 LaTeX Font Info:    Font shape `TU/CambriaMath.otf(3)/m/n' will be
-(Font)              scaled to size 11.04005pt on input line 86.
+(Font)              scaled to size 11.04005pt on input line 94.
 LaTeX Font Info:    Font shape `TU/CambriaMath.otf(3)/m/n' will be
-(Font)              scaled to size 7.728pt on input line 86.
+(Font)              scaled to size 7.728pt on input line 94.
 LaTeX Font Info:    Font shape `TU/CambriaMath.otf(3)/m/n' will be
-(Font)              scaled to size 5.52002pt on input line 86.
+(Font)              scaled to size 5.52002pt on input line 94.
 
 
 [5]
@@ -1478,7 +1478,7 @@ File: figures/frame.pdf Graphic file (type pdf)
 
 
 [7]
-Underfull \hbox (badness 1152) in paragraph at lines 214--215
+Underfull \hbox (badness 1152) in paragraph at lines 223--224
 []\TU/SimSun.ttc(0)/m/n/12.045 当 面 临 \TU/SimSun.ttc(0)/b/n/12.045 动 态 变 化 \TU/SimSun.ttc(0)/m/n/12.045 的 负 载 时\TU/times(0)/m/n/12.045 , \TU/SimSun.ttc(0)/m/n/12.045 静 态 配 置 的 系 统 难 以 维 持 高 效 运 行。|  特 别 是
  []
 
@@ -1719,11 +1719,6 @@ File: figures/azure_latency.pdf Graphic file (type pdf)
 [54]
 
 [55]
-Underfull \hbox (badness 1005) in paragraph at lines 729--730
-[]\TU/SimSun.ttc(0)/b/n/12.045 自 适 应 模 块 迁 移 算 法 \TU/SimSun.ttc(0)/m/n/12.045 周 期 性 监 控 归 一 化 综 合 利 用 率  |（$[][] [] [][][][][] []
- []
-
-
 
 [56]) (./data/chap05.tex
 
@@ -1754,31 +1749,33 @@ LaTeX Font Info:    Font shape `TU/CambriaMath.otf(2)/m/n' will be
 LaTeX Font Info:    Font shape `TU/CambriaMath.otf(3)/m/n' will be
 (Font)              scaled to size 6.99925pt on input line 27.
 
-Underfull \hbox (badness 1418) in paragraph at lines 92--95
-[]\TU/times(0)/m/n/10.53937 NVIDIA Corporation.  TensorRT-LLM: High-performance LLM inference library from
- []
-
-
 
 [63
 
 
 ]
+Underfull \hbox (badness 1418) in paragraph at lines 112--115
+[]\TU/times(0)/m/n/10.53937 NVIDIA Corporation.  TensorRT-LLM: High-performance LLM inference library from
+ []
+
+
 
 [64]
 
-[65]) (./data/acknowledgements.tex
+[65]
 
-[66]
+[66]) (./data/acknowledgements.tex
 
-[67
+[67]
+
+[68
 
 
 ]) (./data/resume.tex
 
-[68])
+[69])
 
-[69
+[70
 
 
 ] (./sustechthesis-example.aux (./bu.aux))
@@ -1790,12 +1787,12 @@ Package rerunfilecheck Info: File `sustechthesis-example.out' has not changed.
 (rerunfilecheck)             Checksum: 0A00A7BC34EFDAD257F370C859EB847C;16012.
  ) 
 Here is how much of TeX's memory you used:
- 45406 strings out of 473832
- 1003868 string characters out of 5729481
- 1522639 words of memory out of 5000000
- 67629 multiletter control sequences out of 15000+600000
+ 45424 strings out of 473832
+ 1004366 string characters out of 5729481
+ 1522880 words of memory out of 5000000
+ 67647 multiletter control sequences out of 15000+600000
  572095 words of font info for 222 fonts, out of 8000000 for 9000
  1350 hyphenation exceptions out of 8191
- 106i,25n,128p,2281b,2923s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 106i,25n,128p,2281b,2960s stack positions out of 10000i,1000n,20000p,200000b,200000s
 
-Output written on sustechthesis-example.xdv (93 pages, 1768572 bytes).
+Output written on sustechthesis-example.xdv (94 pages, 1777740 bytes).

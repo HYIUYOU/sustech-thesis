@@ -93,7 +93,7 @@ S$^3$将输出长度预测与LLM批处理联合建模，验证了长度感知调
 
 传统静态批处理（Static Batching）的一个根本缺陷在于：批次中最长的请求完成之前，整个批次不能释放，GPU必须等待尾部请求生成完毕才能接受新的请求。这导致在动态请求流场景下，GPU大量时间处于等待状态，有效利用率严重受损。
 
-针对这一问题，\textbf{连续批处理}（Continuous Batching）打破了静态批次的边界，实现了请求级别的动态合并与退出，是现代LLM推理系统（如vLLM\cite{kwon2023efficient}）的核心调度机制之一。其核心思想是：在每个解码步骤（Decode Step）完成后，检查批次中已生成EOS（End-of-Sequence）token的请求，将其立即从批次中移除，同时从等待队列中选取新的请求补充进入批次，使GPU在任意时刻均保持接近满载的状态。
+针对这一问题，连续批处理（Continuous Batching）打破了静态批次的边界，实现了请求级别的动态合并与退出，是现代LLM推理系统（如vLLM\cite{kwon2023efficient}）的核心调度机制之一。其核心思想是：在每个解码步骤（Decode Step）完成后，检查批次中已生成EOS（End-of-Sequence）token的请求，将其立即从批次中移除，同时从等待队列中选取新的请求补充进入批次，使GPU在任意时刻均保持接近满载的状态。
 
 设系统批次槽位数为$B$，第$i$个请求的生成长度为$L_i$。在静态批处理下，GPU有效利用率可近似表示为：
 \begin{equation}
@@ -116,7 +116,7 @@ Orca\cite{Orca}将调度粒度从请求级细化为迭代级，即在每次前�
 
 \item \textbf{选择性批处理（Selective Batching）}
 
-Orca观察到Transformer\cite{transformers}不同层的计算模式存在差异：注意力层需要访问各请求的KV Cache，难以对不同长度的请求做统一批处理；而前馈层（FFN Layer）和归一化层则对批内长度不敏感。基于这一观察，Orca提出\textbf{选择性批处理}策略：对FFN层采用标准批处理，对注意力层则按请求独立计算，在保证计算正确性的同时最大化批处理收益。Orca通过迭代级调度相比传统静态批处理实现了最高36.9倍的吞吐量提升\cite{Orca}。然而，Orca采用连续显存预分配策略，未能有效解决KV Cache碎片化问题；批次内同时存在Prefill和Decode请求时，计算密集的Prefill会显著增加Decode请求的TPOT延迟；此外，Orca的调度决策以最大化吞吐量为主要目标，未将不同请求的SLO差异纳入调度优先级考量。
+Orca观察到Transformer\cite{transformers}不同层的计算模式存在差异：注意力层需要访问各请求的KV Cache，难以对不同长度的请求做统一批处理；而前馈层（FFN Layer）和归一化层则对批内长度不敏感。基于这一观察，Orca提出选择性批处理策略：对FFN层采用标准批处理，对注意力层则按请求独立计算，在保证计算正确性的同时最大化批处理收益。Orca通过迭代级调度相比传统静态批处理实现了最高36.9倍的吞吐量提升\cite{Orca}。然而，Orca采用连续显存预分配策略，未能有效解决KV Cache碎片化问题；批次内同时存在Prefill和Decode请求时，计算密集的Prefill会显著增加Decode请求的TPOT延迟；此外，Orca的调度决策以最大化吞吐量为主要目标，未将不同请求的SLO差异纳入调度优先级考量。
 
  
 \end{enumerate}
@@ -201,7 +201,7 @@ MemServe的弹性内存池在一定程度上缓解了PD分离架构的内存不�
     
 \item \textbf{低比特权重量化}
 
-权重量化（Weight Quantization）将模型参数从FP16/FP32压缩至INT8、INT4乃至更低比特表示，在显著降低显存占用的同时，可利用整数计算单元加速矩阵乘法运算。LLM.int8()\cite{dettmers2022llm}在十亿级参数模型上实现无损INT8量化，通过\textbf{混合精度分解}策略将包含离群值（Outlier）的维度保留为FP16计算，其余维度采用INT8量化，实现了接近2倍的显存压缩。GPTQ\cite{frantar2022gptq}采用基于二阶近似的逐层量化策略，在INT4量化精度下的困惑度损失控制在1\%以内，量化过程一次性完成，推理时无额外开销。
+权重量化（Weight Quantization）将模型参数从FP16/FP32压缩至INT8、INT4乃至更低比特表示，在显著降低显存占用的同时，可利用整数计算单元加速矩阵乘法运算。LLM.int8()\cite{dettmers2022llm}在十亿级参数模型上实现无损INT8量化，通过混合精度分解策略将包含离群值（Outlier）的维度保留为FP16计算，其余维度采用INT8量化，实现了接近2倍的显存压缩。GPTQ\cite{frantar2022gptq}采用基于二阶近似的逐层量化策略，在INT4量化精度下的困惑度损失控制在1\%以内，量化过程一次性完成，推理时无额外开销。
 
 \item \textbf{KV Cache专项量化}
 
@@ -254,7 +254,7 @@ Morphling\cite{wang2021morphling}针对云原生模型服务的配置搜索问�
 \begin{enumerate}
 \item \textbf{DistServe的静态PD配比}
 
-DistServe\cite{zhong2024distserve}将Prefill实例与Decode实例分离部署，以\textbf{好吞吐量}（Goodput）最大化为目标，离线求解最优的Prefill实例数与Decode实例数之比（P:D Ratio）。DistServe建立了Prefill延迟和Decode延迟的解析模型，在给定SLO约束下，枚举不同P:D配比下的系统好吞吐量并选择最优配比进行部署。然而，DistServe的P:D配比在部署时一次性确定，运行期间固定不变，在实际工作负载的流量高峰期和低谷期均会出现资源利用率失衡的问题。
+DistServe\cite{zhong2024distserve}将Prefill实例与Decode实例分离部署，以好吞吐量（Goodput）最大化为目标，离线求解最优的Prefill实例数与Decode实例数之比（P:D Ratio）。DistServe建立了Prefill延迟和Decode延迟的解析模型，在给定SLO约束下，枚举不同P:D配比下的系统好吞吐量并选择最优配比进行部署。然而，DistServe的P:D配比在部署时一次性确定，运行期间固定不变，在实际工作负载的流量高峰期和低谷期均会出现资源利用率失衡的问题。
 
 \item \textbf{Splitwise的跨机器分离}
 
