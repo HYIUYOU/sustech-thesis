@@ -1,6 +1,6 @@
 \contentsline {chapter}{摘\hskip 1em\relax 要}{I}{section*.9}%
 \contentsline {chapter}{\textbf {Abstract}}{III}{section*.11}%
-\contentsline {chapter}{符号和缩略语说明}{X}{section*.15}%
+\contentsline {chapter}{符号和缩略语说明}{IX}{section*.15}%
 \contentsline {chapter}{\numberline {第1章}绪论}{1}{chapter.1}%
 \contentsline {section}{\numberline {1.1}研究背景}{1}{section.1.1}%
 \contentsline {section}{\numberline {1.2}研究意义}{2}{section.1.2}%

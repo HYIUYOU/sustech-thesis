@@ -1,15 +1,13 @@
 % !TeX root = ../sustechthesis-example.tex
 
-% 中英文摘要和关键字
-
 \begin{abstract}
   随着大语言模型（LLMs）在云计算环境中的广泛部署，其推理服务面临资源消耗巨大、服务等级目标（SLO）要求严格、预填充（Prefill）与解码（Decode）阶段资源需求异构以及负载动态多变等多重挑战。据统计，云平台中约90\%的人工智能计算资源用于模型推理而非训练，而现有系统受限于粗粒度的静态资源配置，GPU利用率通常仅为20\%--40\%，且在突发流量下因扩容滞后导致严重的SLO违约。针对这些问题，本文围绕面向大模型的推理任务批式调度和KV缓存优化这一主题，构建了从静态优化到动态调控的技术体系，实现了对LLM推理服务资源管理的系统性优化。
 
-  首先，针对静态场景下批处理策略粗放、部署配置忽视网络拓扑异构性、缺乏服务质量（SLO）感知等问题，本文提出了UELLM（Unified and Efficient LLM Inference Serving）统一高效批式调度与部署框架。该框架通过微调ChatGLM3-6B模型对请求输出长度进行预测，分桶准确率达到99.51\%，为后续批处理优化提供关键先验知识；设计了SLO与输出长度驱动的动态批处理算法（SLO-ODBS），通过权重化目标函数平衡总延迟与总输出长度，采用贪心策略将长度相近的请求组合成批，有效减少KV Cache冗余填充和计算浪费；提出了基于动态规划的高效低延迟资源分配算法（HELR），综合考虑集群网络拓扑异构性（NVLink/PCIe带宽差异）和GPU计算能力差异，自动优化层到GPU的映射策略，支持高利用率（HE）与低延迟（LR）两种模式灵活切换。在4-GPU异构集群上的验证表明，UELLM相比Morphling和S$^3$等先进方案，降低推理延迟72.3\%至90.3\%，提升GPU利用率1.2倍至4.1倍，吞吐量提高1.92倍至4.98倍，并实现零SLO违约。
+  首先，针对静态场景下批处理策略粗放、部署配置忽视网络拓扑异构性、缺乏SLO感知等问题，本文提出了UELLM（Unified and Efficient LLM Inference Serving）统一高效批式调度与部署框架。该框架通过微调ChatGLM3-6B模型对请求输出长度进行预测，分桶准确率达到99.51\%，为后续批处理优化提供关键先验知识。在此基础上，设计了SLO与输出长度驱动的动态批处理算法（SLO-ODBS），通过权重化目标函数平衡总延迟与总输出长度，采用贪心策略将长度相近的请求组合成批，有效减少KV Cache冗余填充和计算浪费。同时，提出了基于动态规划的高效低延迟资源分配算法（HELR），综合考虑集群网络拓扑异构性（NVLink/PCIe带宽差异）和GPU计算能力差异，自动优化层到GPU的映射策略，支持高利用率（HE）与低延迟（LR）两种模式灵活切换。在4-GPU异构集群上的验证表明，UELLM相比Morphling和S$^3$等先进方案，推理延迟降低72.3\%至90.3\%，GPU利用率提升1.2倍至4.1倍，吞吐量提高1.92倍至4.98倍，并实现零SLO违约。
 
-  其次，面向PD（Prefill-Decode）分离架构中固有的计算--内存负载失衡、静态资源配置无法适应动态负载变化、前缀缓存感知路由导致的热点倾斜等问题，本文提出了BanaServe细粒度弹性资源管理与KV缓存优化框架。该框架创新性地引入了模块级细粒度迁移机制，包括层级（Layer-level）权重迁移与注意力级（Attention-level）KV Cache迁移：前者支持连续Transformer层的动态重配置，实现粗粒度负载均衡；后者通过按注意力头维度切分KV Cache，选择性将部分注意力头状态迁移至辅助GPU，实现细粒度计算卸载，且无需传输模型权重，迁移开销极低；设计了全局KV Cache存储与层间流水线重叠传输机制，通过解耦缓存状态与计算位置，消除前缀缓存对调度决策的约束，使路由器可基于纯负载指标进行调度，同时利用Transformer逐层计算特性，将第$i$层计算与第$i+1$层KV Cache预取重叠，隐藏通信延迟；提出了基于实时负载感知的请求调度算法，周期性地测量各Prefill实例的综合负载（计算+内存利用率），将新请求分发至负载最轻的实例，配合动态迁移机制实现快速负载均衡。在13B参数模型（LLaMA-13B/OPT-13B）和公开基准（Alpaca/LongBench）上的评估表明，BanaServe相比主流的开源推理系统vLLM吞吐量提升1.2倍至3.9倍、总处理时间降低3.9\%至78.4\%；相比主流的pd分离系统DistServe吞吐量提升1.1倍至2.8倍、延迟降低1.4\%至70.1\%，并在突发流量场景下展现出优异的鲁棒性。
+  其次，针对PD（Prefill-Decode）分离架构中固有的计算--内存负载失衡、静态资源配置无法适应动态负载变化、前缀缓存感知路由导致热点倾斜等问题，本文提出了BanaServe细粒度弹性资源管理与KV缓存优化框架。该框架创新性地引入了模块级细粒度迁移机制，包括层级（Layer-level）权重迁移与注意力级（Attention-level）KV Cache迁移：前者支持连续Transformer层的动态重配置，实现粗粒度负载均衡；后者通过按注意力头维度切分KV Cache，选择性将部分注意力头状态迁移至辅助GPU，实现细粒度计算卸载，且无需传输模型权重，迁移开销极低。此外，框架设计了全局KV Cache存储与层间流水线重叠传输机制，通过解耦缓存状态与计算位置消除前缀缓存对调度决策的约束，使路由器可基于纯负载指标进行调度，同时利用Transformer逐层计算特性将第$i$层计算与第$i+1$层KV Cache预取重叠，隐藏通信延迟。在此基础上，提出了基于实时负载感知的请求调度算法，周期性测量各Prefill实例的综合负载（计算+内存利用率），将新请求分发至负载最轻的实例，配合动态迁移机制实现快速负载均衡。在13B参数模型（LLaMA-13B/OPT-13B）和公开基准（Alpaca/LongBench）上的评估表明，BanaServe相比主流开源推理系统vLLM吞吐量提升1.2倍至3.9倍、总处理时间降低3.9\%至78.4\%，相比主流PD分离系统DistServe吞吐量提升1.1倍至2.8倍、延迟降低1.4\%至70.1\%，并在突发流量场景下展现出优异的鲁棒性。
 
-  本文所提出的方法在真实GPU集群和公开基准数据集上得到了充分验证，构建的静态批处理优化--动态层级资源调控技术体系，为大模型推理服务的高效部署与资源管理提供了新的理论依据和技术路径，对推动大模型技术在智能客服、内容创作、知识检索等延迟敏感场景的规模化应用具有重要意义。
+  本文所提出的方法在真实GPU集群和公开基准数据集上得到了充分验证，构建的"静态批处理优化--动态层级资源调控"技术体系为大模型推理服务的高效部署与资源管理提供了新的理论依据和技术路径，对推动大模型技术在智能客服、内容创作、知识检索等延迟敏感场景的规模化应用具有重要意义。
 
   \thusetup{
     keywords = {大语言模型推理, 批式调度, PD分离架构, 动态批处理, 异构部署优化},
@@ -17,16 +15,83 @@
 \end{abstract}
 
 \begin{abstract*}
-  With the widespread deployment of Large Language Models (LLMs) in cloud computing environments, inference services face critical challenges including massive resource consumption, strict Service Level Objective (SLO) requirements, heterogeneous resource demands between the prefill and decode phases, and highly dynamic workload variations. Statistics indicate that approximately 90\% of AI computing resources in cloud platforms are dedicated to model inference rather than training. However, existing systems are constrained by coarse-grained static resource configurations, resulting in GPU utilization typically ranging merely between 20\%--40\%, and severe SLO violations due to delayed scaling during bursty traffic. To address these issues, this thesis focuses on ``Batch Scheduling and KV Cache Optimization for Large Language Model Inference,'' constructing a technical architecture spanning from static optimization to dynamic scaling, thereby achieving systematic optimization of resource management for LLM inference services.
+  With the widespread deployment of Large Language Models (LLMs) in cloud
+  computing environments, inference services face critical challenges including
+  massive resource consumption, strict Service Level Objective (SLO)
+  requirements, heterogeneous resource demands between the prefill and decode
+  phases, and highly dynamic workload variations. Approximately 90\% of AI
+  computing resources in cloud platforms are dedicated to model inference rather
+  than training. Yet existing systems suffer from coarse-grained static resource
+  configurations, resulting in GPU utilization of only 20\%--40\%, and severe
+  SLO violations due to delayed scaling during bursty traffic. To address these
+  issues, this thesis focuses on ``Batch Scheduling and KV Cache Optimization
+  for Large Language Model Inference,'' constructing a technical architecture
+  spanning from static optimization to dynamic scaling for systematic LLM
+  inference resource management.
 
-  Firstly, to address coarse-grained batching strategies, deployment configurations that neglect network topology heterogeneity, and the lack of Service Level Objective (SLO) awareness in static scenarios, this thesis proposes UELLM (Unified and Efficient LLM Inference Serving), a unified batch scheduling and deployment optimization framework. The framework employs a fine-tuned ChatGLM3-6B model to predict request output lengths, achieving a bucketing accuracy of 99.51\% to provide critical prior knowledge for subsequent batching optimization. It introduces the SLO and Output-Driven Dynamic Batch Scheduler (SLO-ODBS), which balances total latency and total output length through a weighted objective function, and adopts a greedy strategy to group requests with similar lengths into batches, effectively reducing KV Cache redundancy and computational waste. Additionally, the High-Efficiency Low-Latency Resource Allocation (HELR) algorithm based on dynamic programming is proposed, which automatically optimizes layer-to-GPU mapping strategies by comprehensively considering cluster network topology heterogeneity (NVLink/PCIe bandwidth variations) and GPU computational capability differences, supporting flexible switching between High Efficiency (HE) and Low Latency (LR) modes. Experimental validation on a 4-GPU heterogeneous cluster demonstrates that UELLM reduces inference latency by 72.3\% to 90.3\%, improves GPU utilization by 1.2$\times$ to 4.1$\times$, and increases throughput by 1.92$\times$ to 4.98$\times$ compared to state-of-the-art methods such as Morphling and S$^3$, while achieving zero SLO violations.
+  Firstly, to address coarse-grained batching strategies, deployment
+  configurations that neglect network topology heterogeneity, and the lack of
+  SLO awareness in static scenarios, this thesis proposes UELLM (Unified and
+  Efficient LLM Inference Serving), a unified batch scheduling and deployment
+  optimization framework. The framework employs a fine-tuned ChatGLM3-6B model
+  to predict request output lengths, achieving a bucketing accuracy of 99.51\%
+  for subsequent batching optimization. The SLO and Output-Driven Dynamic Batch
+  Scheduler (SLO-ODBS) balances total latency and total output length through a
+  weighted objective function and adopts a greedy strategy to group requests
+  with similar lengths into batches, effectively reducing KV Cache redundancy
+  and computational waste. Furthermore, the High-Efficiency Low-Latency Resource
+  Allocation (HELR) algorithm based on dynamic programming automatically
+  optimizes layer-to-GPU mapping by considering cluster network topology
+  heterogeneity (NVLink/PCIe bandwidth variations) and GPU computational
+  capability differences, supporting flexible switching between High Efficiency
+  (HE) and Low Latency (LR) modes. Validation on a 4-GPU heterogeneous cluster
+  demonstrates that UELLM reduces inference latency by 72.3\%--90.3\%, improves
+  GPU utilization by 1.2$\times$--4.1$\times$, and increases throughput by
+  1.92$\times$--4.98$\times$ compared to state-of-the-art methods such as
+  Morphling and S$^3$, while achieving zero SLO violations.
 
-  Secondly, targeting the inherent compute-memory load imbalance, inability of static resource configurations to adapt to dynamic workload changes, and hotspot skews caused by prefix cache-aware routing in PD (Prefill-Decode) disaggregated architectures, this thesis presents BanaServe, a fine-grained elastic resource management and KV cache optimization framework. The framework introduces novel module-level migration mechanisms, including layer-level weight migration and attention-level KV Cache migration: the former supports dynamic reconfiguration of consecutive Transformer layers for coarse-grained load rebalancing; the latter achieves fine-grained computation offloading by partitioning KV Cache along the attention head dimension and selectively migrating partial attention head states to auxiliary GPUs without transferring model weights, incurring minimal migration overhead. It designs a Global KV Cache Store with layer-wise pipelined transmission to eliminate constraints imposed by prefix caching on scheduling decisions by decoupling cache state from compute placement, enabling purely load-based routing decisions, while simultaneously hiding communication latency by overlapping the computation of layer $i$ with the prefetching of KV Cache for layer $i+1$ leveraging the layer-wise execution characteristic of Transformers. Furthermore, a real-time load-aware request scheduling algorithm is proposed, which periodically measures the combined load (compute and memory utilization) of each prefill instance and dispatches new requests to the least-loaded instance, working in coordination with dynamic migration for rapid load balancing. Evaluations on 13B-parameter models (LLaMA-13B/OPT-13B) and public benchmarks (Alpaca/LongBench) demonstrate that BanaServe achieves $1.2\times$--$3.9\times$ higher throughput and $3.9\%$--$78.4\%$ lower total processing time compared to the mainstream open-source inference system vLLM, and $1.1\times$--$2.8\times$ higher throughput with $1.4\%$--$70.1\%$ lower latency compared to the mainstream prefill-decode disaggregation system DistServe, while also exhibiting superior robustness under bursty traffic scenarios.
+  Secondly, targeting the inherent compute-memory load imbalance, inability of
+  static resource configurations to adapt to dynamic workload changes, and
+  hotspot skews caused by prefix cache-aware routing in PD (Prefill-Decode)
+  disaggregated architectures, this thesis presents BanaServe, a fine-grained
+  elastic resource management and KV cache optimization framework. The framework
+  introduces module-level migration mechanisms, including layer-level weight
+  migration and attention-level KV Cache migration: the former supports dynamic
+  reconfiguration of consecutive Transformer layers for coarse-grained load
+  rebalancing, while the latter achieves fine-grained computation offloading by
+  partitioning KV Cache along the attention head dimension and selectively
+  migrating partial attention head states to auxiliary GPUs without transferring
+  model weights, incurring minimal migration overhead. A Global KV Cache Store
+  with layer-wise pipelined transmission is designed to eliminate constraints
+  imposed by prefix caching on scheduling decisions by decoupling cache state
+  from compute placement, enabling purely load-based routing while hiding
+  communication latency by overlapping the computation of layer $i$ with the
+  prefetching of KV Cache for layer $i+1$ leveraging the layer-wise execution
+  characteristic of Transformers. A real-time load-aware request scheduling
+  algorithm is further proposed, which periodically measures the combined load
+  (compute and memory utilization) of each prefill instance and dispatches new
+  requests to the least-loaded instance, working in coordination with dynamic
+  migration for rapid load balancing. Evaluations on 13B-parameter models
+  (LLaMA-13B/OPT-13B) and public benchmarks (Alpaca/LongBench) demonstrate
+  that BanaServe achieves $1.2\times$--$3.9\times$ higher throughput and
+  $3.9\%$--$78.4\%$ lower total processing time compared to the mainstream
+  open-source inference system vLLM, and $1.1\times$--$2.8\times$ higher
+  throughput with $1.4\%$--$70.1\%$ lower latency compared to the mainstream
+  PD disaggregation system DistServe, while exhibiting superior robustness
+  under bursty traffic scenarios.
 
-
-  The proposed methods have been extensively validated on real GPU clusters and public benchmarks. The technical architecture of ``Static Batching Optimization -- Dynamic Hierarchical Resource Scaling'' provides novel theoretical foundations and technical pathways for efficient deployment and resource management of LLM inference services, and holds significant importance for promoting the large-scale application of LLM technologies in latency-sensitive scenarios such as intelligent customer service, content creation, and knowledge retrieval.
-
+  The proposed methods have been extensively validated on real GPU clusters and
+  public benchmarks. The technical architecture of ``Static Batching
+  Optimization -- Dynamic Hierarchical Resource Scaling'' provides novel
+  theoretical foundations and technical pathways for efficient deployment and
+  resource management of LLM inference services, and holds significant
+  importance for promoting the large-scale application of LLM technologies in
+  latency-sensitive scenarios such as intelligent customer service, content
+  creation, and knowledge retrieval.
+  \vspace{-0.05cm}
   \thusetup{
-    keywords* = {Large Language Model Inference, Batch Scheduling, PD Disaggregated Architecture, Dynamic Batching, Heterogeneous Deployment Optimization},
+    keywords* = {Large Language Model Inference, Batch Scheduling, PD
+      Disaggregated Architecture, Dynamic Batching, Heterogeneous Deployment
+      Optimization},
   }
 \end{abstract*}
