@@ -1,6 +1,6 @@
 \contentsline {chapter}{摘\hskip 1em\relax 要}{I}{section*.9}%
 \contentsline {chapter}{\textbf {Abstract}}{III}{section*.11}%
-\contentsline {chapter}{符号和缩略语说明}{IX}{section*.15}%
+\contentsline {chapter}{符号和缩略语说明}{VIII}{section*.15}%
 \contentsline {chapter}{\numberline {第1章}绪论}{1}{chapter.1}%
 \contentsline {section}{\numberline {1.1}研究背景}{1}{section.1.1}%
 \contentsline {section}{\numberline {1.2}研究意义}{2}{section.1.2}%
@@ -46,53 +46,52 @@
 \contentsline {section}{\numberline {3.4}批处理调度器：SLO-ODBS算法}{29}{section.3.4}%
 \contentsline {subsection}{\numberline {3.4.1}问题建模}{29}{subsection.3.4.1}%
 \contentsline {subsection}{\numberline {3.4.2}SLO-ODBS算法设计}{30}{subsection.3.4.2}%
-\contentsline {subsection}{\numberline {3.4.3}算法变体：灵活适配不同调度目标}{31}{subsection.3.4.3}%
+\contentsline {subsection}{\numberline {3.4.3}SLO-ODBS的算法变体}{31}{subsection.3.4.3}%
 \contentsline {section}{\numberline {3.5}LLM部署器：HELR算法}{31}{section.3.5}%
-\contentsline {subsection}{\numberline {3.5.1}问题形式化建模}{31}{subsection.3.5.1}%
+\contentsline {subsection}{\numberline {3.5.1}问题建模}{31}{subsection.3.5.1}%
 \contentsline {subsection}{\numberline {3.5.2}HELR算法设计}{32}{subsection.3.5.2}%
 \contentsline {subsection}{\numberline {3.5.3}HELR的算法变体}{33}{subsection.3.5.3}%
 \contentsline {section}{\numberline {3.6}实验评估}{34}{section.3.6}%
 \contentsline {subsection}{\numberline {3.6.1}实验设置}{34}{subsection.3.6.1}%
 \contentsline {subsection}{\numberline {3.6.2}批处理算法与部署算法的消融分析}{34}{subsection.3.6.2}%
 \contentsline {subsection}{\numberline {3.6.3}与SOTA方法的综合对比}{35}{subsection.3.6.3}%
-\contentsline {subsection}{\numberline {3.6.4}实验结果综合分析}{36}{subsection.3.6.4}%
-\contentsline {section}{\numberline {3.7}本章小结}{37}{section.3.7}%
-\contentsline {chapter}{\numberline {第4章}面向PD分离架构的动态资源协同优化方法：BanaServe}{39}{chapter.4}%
-\contentsline {section}{\numberline {4.1}引言}{39}{section.4.1}%
-\contentsline {section}{\numberline {4.2}问题分析与设计动机}{40}{section.4.2}%
-\contentsline {subsection}{\numberline {4.2.1}静态配置导致的资源低效利用}{40}{subsection.4.2.1}%
-\contentsline {subsection}{\numberline {4.2.2}前缀缓存感知路由引发的负载倾斜}{41}{subsection.4.2.2}%
-\contentsline {subsection}{\numberline {4.2.3}PD分离架构的内生资源不均衡}{41}{subsection.4.2.3}%
-\contentsline {section}{\numberline {4.3}系统设计}{42}{section.4.3}%
-\contentsline {subsection}{\numberline {4.3.1}层级权重迁移}{42}{subsection.4.3.1}%
-\contentsline {subsection}{\numberline {4.3.2}注意力级KV Cache迁移}{43}{subsection.4.3.2}%
-\contentsline {subsection}{\numberline {4.3.3}全局KV Cache存储}{44}{subsection.4.3.3}%
-\contentsline {section}{\numberline {4.4}性能优化模型}{46}{section.4.4}%
-\contentsline {subsection}{\numberline {4.4.1}优化目标}{46}{subsection.4.4.1}%
-\contentsline {subsection}{\numberline {4.4.2}延迟模型}{46}{subsection.4.4.2}%
-\contentsline {subsection}{\numberline {4.4.3}资源利用率模型}{47}{subsection.4.4.3}%
-\contentsline {subsection}{\numberline {4.4.4}迁移开销模型}{47}{subsection.4.4.4}%
-\contentsline {subsection}{\numberline {4.4.5}系统吞吐量}{48}{subsection.4.4.5}%
-\contentsline {section}{\numberline {4.5}核心算法设计}{48}{section.4.5}%
-\contentsline {subsection}{\numberline {4.5.1}自适应模块迁移算法}{48}{subsection.4.5.1}%
-\contentsline {subsection}{\numberline {4.5.2}负载感知请求调度算法}{50}{subsection.4.5.2}%
-\contentsline {section}{\numberline {4.6}实验评估}{51}{section.4.6}%
-\contentsline {subsection}{\numberline {4.6.1}实验设置}{51}{subsection.4.6.1}%
-\contentsline {subsection}{\numberline {4.6.2}短文本场景性能评估}{52}{subsection.4.6.2}%
-\contentsline {subsection}{\numberline {4.6.3}长文本场景性能评估}{53}{subsection.4.6.3}%
-\contentsline {subsection}{\numberline {4.6.4}Azure生产负载追踪实验}{54}{subsection.4.6.4}%
-\contentsline {subsection}{\numberline {4.6.5}综合性能对比分析}{55}{subsection.4.6.5}%
-\contentsline {section}{\numberline {4.7}本章小结}{56}{section.4.7}%
-\contentsline {chapter}{\numberline {第5章}总结与展望}{58}{chapter.5}%
-\contentsline {section}{\numberline {5.1}研究总结}{58}{section.5.1}%
-\contentsline {section}{\numberline {5.2}未来研究方向}{59}{section.5.2}%
-\contentsline {subsection}{\numberline {5.2.1}异构硬件感知的自适应调度}{59}{subsection.5.2.1}%
-\contentsline {subsection}{\numberline {5.2.2}基于预测的主动式资源编排}{59}{subsection.5.2.2}%
-\contentsline {subsection}{\numberline {5.2.3}端到端延迟优化与SLO感知服务}{60}{subsection.5.2.3}%
-\contentsline {subsection}{\numberline {5.2.4}跨地域分布式推理}{60}{subsection.5.2.4}%
+\contentsline {section}{\numberline {3.7}本章小结}{36}{section.3.7}%
+\contentsline {chapter}{\numberline {第4章}面向PD分离架构的动态资源协同优化方法：BanaServe}{38}{chapter.4}%
+\contentsline {section}{\numberline {4.1}引言}{38}{section.4.1}%
+\contentsline {section}{\numberline {4.2}问题分析与设计动机}{39}{section.4.2}%
+\contentsline {subsection}{\numberline {4.2.1}静态配置导致的资源低效利用}{39}{subsection.4.2.1}%
+\contentsline {subsection}{\numberline {4.2.2}前缀缓存感知路由引发的负载倾斜}{40}{subsection.4.2.2}%
+\contentsline {subsection}{\numberline {4.2.3}PD分离架构的内生资源不均衡}{40}{subsection.4.2.3}%
+\contentsline {section}{\numberline {4.3}系统设计}{41}{section.4.3}%
+\contentsline {subsection}{\numberline {4.3.1}层级权重迁移}{41}{subsection.4.3.1}%
+\contentsline {subsection}{\numberline {4.3.2}注意力级KV Cache迁移}{42}{subsection.4.3.2}%
+\contentsline {subsection}{\numberline {4.3.3}全局KV Cache存储}{43}{subsection.4.3.3}%
+\contentsline {section}{\numberline {4.4}性能优化模型}{45}{section.4.4}%
+\contentsline {subsection}{\numberline {4.4.1}优化目标}{45}{subsection.4.4.1}%
+\contentsline {subsection}{\numberline {4.4.2}延迟模型}{45}{subsection.4.4.2}%
+\contentsline {subsection}{\numberline {4.4.3}资源利用率模型}{46}{subsection.4.4.3}%
+\contentsline {subsection}{\numberline {4.4.4}迁移开销模型}{46}{subsection.4.4.4}%
+\contentsline {subsection}{\numberline {4.4.5}系统吞吐量}{47}{subsection.4.4.5}%
+\contentsline {section}{\numberline {4.5}核心算法设计}{47}{section.4.5}%
+\contentsline {subsection}{\numberline {4.5.1}自适应模块迁移算法}{47}{subsection.4.5.1}%
+\contentsline {subsection}{\numberline {4.5.2}负载感知请求调度算法}{49}{subsection.4.5.2}%
+\contentsline {section}{\numberline {4.6}实验评估}{50}{section.4.6}%
+\contentsline {subsection}{\numberline {4.6.1}实验设置}{50}{subsection.4.6.1}%
+\contentsline {subsection}{\numberline {4.6.2}短文本场景性能评估}{51}{subsection.4.6.2}%
+\contentsline {subsection}{\numberline {4.6.3}长文本场景性能评估}{52}{subsection.4.6.3}%
+\contentsline {subsection}{\numberline {4.6.4}Azure生产负载追踪实验}{53}{subsection.4.6.4}%
+\contentsline {subsection}{\numberline {4.6.5}综合性能对比分析}{54}{subsection.4.6.5}%
+\contentsline {section}{\numberline {4.7}本章小结}{55}{section.4.7}%
+\contentsline {chapter}{\numberline {第5章}总结与展望}{57}{chapter.5}%
+\contentsline {section}{\numberline {5.1}研究总结}{57}{section.5.1}%
+\contentsline {section}{\numberline {5.2}未来研究方向}{58}{section.5.2}%
+\contentsline {subsection}{\numberline {5.2.1}异构硬件感知的自适应调度}{58}{subsection.5.2.1}%
+\contentsline {subsection}{\numberline {5.2.2}基于预测的主动式资源编排}{58}{subsection.5.2.2}%
+\contentsline {subsection}{\numberline {5.2.3}端到端延迟优化与SLO感知服务}{59}{subsection.5.2.3}%
+\contentsline {subsection}{\numberline {5.2.4}跨地域分布式推理}{59}{subsection.5.2.4}%
 \setcounter {tocdepth}{0}
-\contentsline {chapter}{结\hskip 1em\relax 论}{61}{section*.47}%
-\contentsline {chapter}{参考文献}{63}{section*.49}%
-\contentsline {chapter}{致\hskip 1em\relax 谢}{68}{section*.51}%
-\contentsline {chapter}{个人简历、在学期间完成的相关学术成果}{70}{section*.53}%
+\contentsline {chapter}{结\hskip 1em\relax 论}{60}{section*.46}%
+\contentsline {chapter}{参考文献}{62}{section*.48}%
+\contentsline {chapter}{致\hskip 1em\relax 谢}{67}{section*.50}%
+\contentsline {chapter}{个人简历、在学期间完成的相关学术成果}{69}{section*.52}%
 \contentsfinish 

@@ -191,7 +191,7 @@ UELLM在后台运行实时监控程序，持续追踪GPU利用率、显存占用
 
 将阶段二构建的所有批次整合至就绪列表，供后续LLM推理引擎处理。
 
-\subsection{算法变体：灵活适配不同调度目标}
+\subsection{SLO-ODBS的算法变体}
 
 SLO-ODBS通过调整权重系数$w_1$和$w_2$，可灵活适配不同的调度优化目标：
 \begin{enumerate}
@@ -205,7 +205,7 @@ SLO-ODBS通过调整权重系数$w_1$和$w_2$，可灵活适配不同的调度�
 
 LLM部署器（LLM Deployer）在模型部署阶段运行，根据当前集群的硬件网络拓扑和LLM的计算特性，自动求解最优的层到设备映射（Device Map），以最大化资源利用率并最小化推理延迟。
 
-\subsection{问题形式化建模}
+\subsection{问题建模}
 
 将集群硬件网络抽象为图$G = (D, E)$，其中$D = \{d_1, d_2, \ldots, d_n\}$为硬件设备节点集合，$E$为节点间的连接边集合。对于待部署的大模型$\text{llm}_i$，其显存需求为$M(\text{llm}_i)$，模型层数为$\text{Layer}(\text{llm}_i)$。每个节点$d_i$具有以下属性：
 \begin{enumerate}
@@ -408,40 +408,8 @@ UA在推理延迟和吞吐量两个指标上均取得最优结果：
     \item UB通过SLO-ODBS优化批次组合，减少迭代次数，降低推理延迟并提升吞吐量；
     \item UA综合HELR和SLO-ODBS的双重优化，在五次实验中均取得最优结果。
 \end{enumerate}
-总体而言，相比S$^3$和Morphling，UELLM将推理延迟降低\textbf{72.3\%至90.3\%}，吞吐量提升\textbf{1.92倍至4.98倍}\cite{he2024uellm}。
 
-\subsection{实验结果综合分析}
-
-综合上述实验结果，表~\ref{tab:uellm_results_summary}对UELLM各版本与基线方法的性能进行了系统性汇总。
-
-\begin{table}[htbp]
-  \centering
-  \caption{UELLM与基线方法性能综合对比}
-  \label{tab:uellm_results_summary}
-  \begin{tabularx}{\textwidth}{p{2.2cm}AAAAA}
-    \toprule
-    \textbf{方法} &
-    \textbf{GPU利用率} &
-    \textbf{SLO不违约率} &
-    \textbf{推理延迟} &
-    \textbf{吞吐量} &
-    \textbf{综合评价} \\
-    \midrule
-    S$^3$\cite{jin2023s3}
-        & 低    & 51.8\%          & 高   & 低   & 基线（批处理） \\
-    Morphling\cite{wang2021morphling}
-        & 高    & 70.4\%          & 中   & 中   & 基线（部署） \\
-    \midrule
-    UD  & 高    & 76.6\%          & 中低 & 中高 & 仅部署优化 \\
-    UB  & 低    & 87.4\%          & 低   & 高   & 仅批处理优化 \\
-    \textbf{UA}
-        & \textbf{高} & \textbf{100.0\%} & \textbf{最低} & \textbf{最高}
-        & \textbf{最优（联合优化）} \\
-    \bottomrule
-  \end{tabularx}
-\end{table}
-
-实验结果验证了UELLM设计的三个核心判断：
+总体而言，相比S$^3$和Morphling，UELLM将推理延迟降低\textbf{72.3\%至90.3\%}，吞吐量提升\textbf{1.92倍至4.98倍}\cite{he2024uellm}。实验结果验证了UELLM设计的三个核心判断：
 \begin{enumerate}
     \item \textbf{批处理优化与部署优化缺一不可}：单独的批处理优化（UB）或单独的部署优化（UD）均无法在所有指标上同时取得最优结果，只有联合优化（UA）才能实现零SLO违约、最低延迟和最高吞吐量的同时满足；
     \item \textbf{SLO感知是批处理调度的关键维度}：不具备SLO感知能力的S$^3$虽能优化延迟和显存，但SLO违约率高达48.2\%，难以保障实际生产场景的服务质量；

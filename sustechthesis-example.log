@@ -1,4 +1,4 @@
-This is XeTeX, Version 3.141592653-2.6-0.999997 (TeX Live 2025) (preloaded format=xelatex 2026.1.26)  26 FEB 2026 15:20
+This is XeTeX, Version 3.141592653-2.6-0.999997 (TeX Live 2025) (preloaded format=xelatex 2026.1.26)  26 FEB 2026 15:27
 entering extended mode
  \write18 enabled.
  file:line:error style messages enabled.
@@ -1418,36 +1418,31 @@ LaTeX Font Info:    Font shape `TU/CambriaMath.otf(3)/m/n' will be
 
 ]
 
-[6]
-
-[7])
+[6])
 \tf@toc=\write6
 \openout6 = `sustechthesis-example.toc'.
 
  (./data/denotation.tex
 
-[8]
+[7]
 
-[9
+[8
 
 
 ]
 
+[9]
+
 [10]
 
-[11]
+[11])
 
-[12])
-
-[13]
-
-[14
-
-] (./data/chap01.tex
+[12] (./data/chap01.tex
 第1章
 
 
 [1
+
 
 ]
 
@@ -1624,45 +1619,45 @@ File: figures/experiment7/throughput.pdf Graphic file (type pdf)
 [36]) (./data/chap04.tex
 
 [37]
-
-[38]
 第4章
 
 
-[39
+[38
 
 ]
 File: figures/bg1.pdf Graphic file (type pdf)
 <use figures/bg1.pdf>
 
 
-[40]
+[39]
 File: figures/prefix_cache_router.png Graphic file (type bmp)
 <figures/prefix_cache_router.png>
 File: figures/pd_imbalance.png Graphic file (type bmp)
 <figures/pd_imbalance.png>
 
 
-[41]
+[40]
 
-[42]
+[41]
 File: figures/offload.pdf Graphic file (type pdf)
 <use figures/offload.pdf>
 File: figures/attention_offload.png Graphic file (type bmp)
 <figures/attention_offload.png>
 
 
-[43]
+[42]
 File: figures/kv_store.png Graphic file (type bmp)
 <figures/kv_store.png>
 
 
-[44]
+[43]
 
-[45]
+[44]
 File: figures/kv_transfer.png Graphic file (type bmp)
 <figures/kv_transfer.png>
 
+
+[45]
 
 [46]
 
@@ -1673,8 +1668,6 @@ File: figures/kv_transfer.png Graphic file (type bmp)
 [49]
 
 [50]
-
-[51]
 File: figures/llama_short_throughput.pdf Graphic file (type pdf)
 <use figures/llama_short_throughput.pdf>
 File: figures/llama_short_total_time.pdf Graphic file (type pdf)
@@ -1689,7 +1682,7 @@ File: figures/opt_short_avg_latency.pdf Graphic file (type pdf)
 <use figures/opt_short_avg_latency.pdf>
 
 
-[52]
+[51]
 File: figures/llama_long_throughput.pdf Graphic file (type pdf)
 <use figures/llama_long_throughput.pdf>
 File: figures/llama_long_total_time.pdf Graphic file (type pdf)
@@ -1704,7 +1697,7 @@ File: figures/opt_long_avg_latency.pdf Graphic file (type pdf)
 <use figures/opt_long_avg_latency.pdf>
 
 
-[53]
+[52]
 File: figures/Azure_input.pdf Graphic file (type pdf)
 <use figures/Azure_input.pdf>
 File: figures/Azure_output.pdf Graphic file (type pdf)
@@ -1717,25 +1710,25 @@ File: figures/azure_latency.pdf Graphic file (type pdf)
 <use figures/azure_latency.pdf>
 
 
+[53]
+
 [54]
 
-[55]
+[55]) (./data/chap05.tex
 
-[56]) (./data/chap05.tex
-
-[57]
+[56]
 第5章
 
 
-[58
+[57
 
 ]
 
-[59])
+[58])
 
-[60] (./data/conclusion.tex
+[59] (./data/conclusion.tex
 
-[61
+[60
 
 
 
@@ -1744,14 +1737,14 @@ File: figures/azure_latency.pdf Graphic file (type pdf)
 
  (./sustechthesis-example.bbl
 
-[62]
+[61]
 LaTeX Font Info:    Font shape `TU/CambriaMath.otf(2)/m/n' will be
 (Font)              scaled to size 7.00075pt on input line 27.
 LaTeX Font Info:    Font shape `TU/CambriaMath.otf(3)/m/n' will be
 (Font)              scaled to size 6.99925pt on input line 27.
 
 
-[63
+[62
 
 
 ]
@@ -1761,22 +1754,22 @@ Underfull \hbox (badness 1418) in paragraph at lines 112--115
 
 
 
+[63]
+
 [64]
 
-[65]
+[65]) (./data/acknowledgements.tex
 
-[66]) (./data/acknowledgements.tex
+[66]
 
-[67]
-
-[68
+[67
 
 
 ]) (./data/resume.tex
 
-[69])
+[68])
 
-[70
+[69
 
 
 ] (./sustechthesis-example.aux (./bu.aux))
@@ -1785,15 +1778,15 @@ LaTeX2e <2024-11-01> patch level 2
 L3 programming layer <2022/08/05>
  ***********
 Package rerunfilecheck Info: File `sustechthesis-example.out' has not changed.
-(rerunfilecheck)             Checksum: 0A00A7BC34EFDAD257F370C859EB847C;16012.
+(rerunfilecheck)             Checksum: 5A2E061A541791795B77ECB904A9A925;15789.
  ) 
 Here is how much of TeX's memory you used:
- 45424 strings out of 473832
- 1004366 string characters out of 5729481
- 1522880 words of memory out of 5000000
- 67647 multiletter control sequences out of 15000+600000
+ 45423 strings out of 473832
+ 1004339 string characters out of 5729481
+ 1522596 words of memory out of 5000000
+ 67646 multiletter control sequences out of 15000+600000
  572095 words of font info for 222 fonts, out of 8000000 for 9000
  1350 hyphenation exceptions out of 8191
  106i,25n,128p,1423b,2960s stack positions out of 10000i,1000n,20000p,200000b,200000s
 
-Output written on sustechthesis-example.xdv (94 pages, 1774736 bytes).
+Output written on sustechthesis-example.xdv (91 pages, 1765376 bytes).
