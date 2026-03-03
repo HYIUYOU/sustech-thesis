@@ -1,6 +1,6 @@
 \contentsline {chapter}{摘\hskip 1em\relax 要}{I}{section*.9}%
 \contentsline {chapter}{\textbf {Abstract}}{III}{section*.11}%
-\contentsline {chapter}{符号和缩略语说明}{VIII}{section*.15}%
+\contentsline {chapter}{符号和缩略语说明}{IX}{section*.15}%
 \contentsline {chapter}{\numberline {第1章}绪论}{1}{chapter.1}%
 \contentsline {section}{\numberline {1.1}研究背景}{1}{section.1.1}%
 \contentsline {section}{\numberline {1.2}研究意义}{2}{section.1.2}%
@@ -45,17 +45,17 @@
 \contentsline {subsection}{\numberline {3.3.3}在线监控与自适应校正}{28}{subsection.3.3.3}%
 \contentsline {section}{\numberline {3.4}批处理调度器：SLO-ODBS算法}{29}{section.3.4}%
 \contentsline {subsection}{\numberline {3.4.1}问题建模}{29}{subsection.3.4.1}%
-\contentsline {subsection}{\numberline {3.4.2}SLO-ODBS算法设计}{30}{subsection.3.4.2}%
+\contentsline {subsection}{\numberline {3.4.2}SLO-ODBS算法设计}{29}{subsection.3.4.2}%
 \contentsline {subsection}{\numberline {3.4.3}SLO-ODBS的算法变体}{31}{subsection.3.4.3}%
 \contentsline {section}{\numberline {3.5}LLM部署器：HELR算法}{31}{section.3.5}%
 \contentsline {subsection}{\numberline {3.5.1}问题建模}{31}{subsection.3.5.1}%
 \contentsline {subsection}{\numberline {3.5.2}HELR算法设计}{32}{subsection.3.5.2}%
-\contentsline {subsection}{\numberline {3.5.3}HELR的算法变体}{33}{subsection.3.5.3}%
+\contentsline {subsection}{\numberline {3.5.3}HELR的算法变体}{32}{subsection.3.5.3}%
 \contentsline {section}{\numberline {3.6}实验评估}{34}{section.3.6}%
 \contentsline {subsection}{\numberline {3.6.1}实验设置}{34}{subsection.3.6.1}%
-\contentsline {subsection}{\numberline {3.6.2}批处理算法与部署算法的消融分析}{34}{subsection.3.6.2}%
+\contentsline {subsection}{\numberline {3.6.2}批处理算法与部署算法的消融分析}{35}{subsection.3.6.2}%
 \contentsline {subsection}{\numberline {3.6.3}与SOTA方法的综合对比}{35}{subsection.3.6.3}%
-\contentsline {section}{\numberline {3.7}本章小结}{36}{section.3.7}%
+\contentsline {section}{\numberline {3.7}本章小结}{37}{section.3.7}%
 \contentsline {chapter}{\numberline {第4章}面向PD分离架构的动态资源协同优化方法：BanaServe}{38}{chapter.4}%
 \contentsline {section}{\numberline {4.1}引言}{38}{section.4.1}%
 \contentsline {section}{\numberline {4.2}问题分析与设计动机}{39}{section.4.2}%

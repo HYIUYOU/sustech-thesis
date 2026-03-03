@@ -7,7 +7,7 @@
 \HyPL@Entry{10<</S/R>>}
 \@writefile{toc}{\contentsline {chapter}{摘\hskip 1em\relax 要}{I}{section*.9}\protected@file@percent }
 \@writefile{toc}{\contentsline {chapter}{\textbf  {Abstract}}{III}{section*.11}\protected@file@percent }
-\@writefile{toc}{\contentsline {chapter}{符号和缩略语说明}{VIII}{section*.15}\protected@file@percent }
+\@writefile{toc}{\contentsline {chapter}{符号和缩略语说明}{IX}{section*.15}\protected@file@percent }
 \citation{zhong2024distserve}
 \citation{longbench}
 \citation{jin2023s3}
@@ -23,8 +23,8 @@
 \citation{feng2025windserve,zhao2022gpu_sched}
 \citation{zhou2024survey}
 \citation{tensorrtllm}
-\HyPL@Entry{22<</S/D>>}
-\pp@pagectr{footnote}{1}{23}{1}
+\HyPL@Entry{24<</S/D>>}
+\pp@pagectr{footnote}{1}{25}{1}
 \@writefile{toc}{\contentsline {chapter}{\numberline {第1章}绪论}{1}{chapter.1}\protected@file@percent }
 \@writefile{loa}{\addvspace {10\p@ }}
 \@writefile{toc}{\contentsline {section}{\numberline {1.1}研究背景}{1}{section.1.1}\protected@file@percent }
@@ -99,7 +99,7 @@
 \citation{qin2024mooncake}
 \citation{hu2024memserve}
 \citation{he2024uellm,hong2024flashdecoding++}
-\pp@pagectr{footnote}{2}{34}{12}
+\pp@pagectr{footnote}{2}{36}{12}
 \@writefile{toc}{\contentsline {chapter}{\numberline {第2章}现有LLM推理任务的批式调度与KV缓存优化方法}{12}{chapter.2}\protected@file@percent }
 \@writefile{loa}{\addvspace {10\p@ }}
 \@writefile{toc}{\contentsline {section}{\numberline {2.1}概述}{12}{section.2.1}\protected@file@percent }
@@ -180,7 +180,7 @@
 \@writefile{toc}{\contentsline {section}{\numberline {2.6}本章小结}{24}{section.2.6}\protected@file@percent }
 \citation{he2024uellm}
 \citation{he2024uellm}
-\pp@pagectr{footnote}{3}{47}{25}
+\pp@pagectr{footnote}{3}{49}{25}
 \@writefile{toc}{\contentsline {chapter}{\numberline {第3章}面向LLM推理任务的高效批式调度和部署方法：UELLM}{25}{chapter.3}\protected@file@percent }
 \@writefile{loa}{\addvspace {10\p@ }}
 \@writefile{toc}{\contentsline {section}{\numberline {3.1}引言}{25}{section.3.1}\protected@file@percent }
@@ -191,11 +191,8 @@
 \newlabel{sec:uellm_motivation}{{3.2}{26}{问题分析与设计动机}{section.3.2}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {3.2.1}部署配置对推理性能的影响}{26}{subsection.3.2.1}\protected@file@percent }
 \newlabel{fig:image1}{{3-2(a)}{26}{归一化延迟}{figure.caption.24}{}}
-\newlabel{sub@fig:image1}{{(a)}{26}{归一化延迟}{figure.caption.24}{}}
 \newlabel{fig:image2}{{3-2(b)}{26}{归一化显存占用}{figure.caption.24}{}}
-\newlabel{sub@fig:image2}{{(b)}{26}{归一化显存占用}{figure.caption.24}{}}
 \newlabel{fig:image3}{{3-2(c)}{26}{归一化GPU利用率}{figure.caption.24}{}}
-\newlabel{sub@fig:image3}{{(c)}{26}{归一化GPU利用率}{figure.caption.24}{}}
 \@writefile{lof}{\contentsline {figure}{\numberline {3-2}{\ignorespaces 不同GPU数量和批大小配置下归一化延迟、显存占用和GPU利用率的变化（各指标均归一化至其最小值）。合理的部署配置可将GPU利用率提升4倍，延迟降低20倍。}}{26}{figure.caption.24}\protected@file@percent }
 \newlabel{fig:deployment_sensitivity}{{3-2}{26}{不同GPU数量和批大小配置下归一化延迟、显存占用和GPU利用率的变化（各指标均归一化至其最小值）。合理的部署配置可将GPU利用率提升4倍，延迟降低20倍。}{figure.caption.24}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {3.2.2}批处理策略对推理性能的影响}{26}{subsection.3.2.2}\protected@file@percent }
@@ -210,9 +207,9 @@
 \@writefile{toc}{\contentsline {section}{\numberline {3.3}资源画像器}{27}{section.3.3}\protected@file@percent }
 \newlabel{sec:uellm_profiler}{{3.3}{27}{资源画像器}{section.3.3}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {3.3.1}基于微调大模型的输出长度预测}{27}{subsection.3.3.1}\protected@file@percent }
+\newlabel{eq:bucket_definition}{{3-1}{27}{基于微调大模型的输出长度预测}{equation.3.1}{}}
 \citation{he2024uellm}
 \citation{jin2023s3}
-\newlabel{eq:bucket_definition}{{3-1}{28}{基于微调大模型的输出长度预测}{equation.3.1}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {3.3.2}SLO获取与资源画像}{28}{subsection.3.3.2}\protected@file@percent }
 \newlabel{eq:profile}{{3-2}{28}{SLO获取与资源画像}{equation.3.2}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {3.3.3}在线监控与自适应校正}{28}{subsection.3.3.3}\protected@file@percent }
@@ -222,20 +219,20 @@
 \newlabel{eq:total_latency}{{3-3}{29}{问题建模}{equation.3.3}{}}
 \newlabel{eq:total_output}{{3-4}{29}{问题建模}{equation.3.4}{}}
 \newlabel{eq:optimization_objective}{{3-5}{29}{问题建模}{equation.3.5}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {3.4.2}SLO-ODBS算法设计}{30}{subsection.3.4.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.4.2}SLO-ODBS算法设计}{29}{subsection.3.4.2}\protected@file@percent }
 \@writefile{loa}{\contentsline {algocf}{\numberline {3-1}{\ignorespaces SLO感知与输出长度驱动的动态批处理调度算法}}{30}{algocf.3-1}\protected@file@percent }
 \newlabel{algo:slo_odbs}{{3-1}{30}{SLO-ODBS算法设计}{algocf.3-1}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {3.4.3}SLO-ODBS的算法变体}{31}{subsection.3.4.3}\protected@file@percent }
 \@writefile{toc}{\contentsline {section}{\numberline {3.5}LLM部署器：HELR算法}{31}{section.3.5}\protected@file@percent }
 \newlabel{sec:uellm_deployer}{{3.5}{31}{LLM部署器：HELR算法}{section.3.5}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {3.5.1}问题建模}{31}{subsection.3.5.1}\protected@file@percent }
-\newlabel{eq:memory_constraint}{{3-6}{31}{问题建模}{equation.3.6}{}}
+\newlabel{eq:memory_constraint}{{3-6}{32}{问题建模}{equation.3.6}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {3.5.2}HELR算法设计}{32}{subsection.3.5.2}\protected@file@percent }
-\@writefile{loa}{\contentsline {algocf}{\numberline {3-2}{\ignorespaces 高效低延迟资源分配算法}}{32}{algocf.3-2}\protected@file@percent }
-\newlabel{algo:helr}{{3-2}{32}{HELR算法设计}{algocf.3-2}{}}
-\newlabel{eq:dp_recurrence}{{3-7}{33}{HELR算法设计}{equation.3.7}{}}
-\newlabel{eq:helr_objective}{{3-8}{33}{HELR算法设计}{equation.3.8}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {3.5.3}HELR的算法变体}{33}{subsection.3.5.3}\protected@file@percent }
+\newlabel{eq:dp_recurrence}{{3-7}{32}{HELR算法设计}{equation.3.7}{}}
+\newlabel{eq:helr_objective}{{3-8}{32}{HELR算法设计}{equation.3.8}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.5.3}HELR的算法变体}{32}{subsection.3.5.3}\protected@file@percent }
+\@writefile{loa}{\contentsline {algocf}{\numberline {3-2}{\ignorespaces 高效低延迟资源分配算法}}{33}{algocf.3-2}\protected@file@percent }
+\newlabel{algo:helr}{{3-2}{33}{HELR算法设计}{algocf.3-2}{}}
 \citation{du2022glm}
 \citation{wang2021morphling}
 \citation{jin2023s3}
@@ -244,34 +241,26 @@
 \@writefile{toc}{\contentsline {subsection}{\numberline {3.6.1}实验设置}{34}{subsection.3.6.1}\protected@file@percent }
 \@writefile{lot}{\contentsline {table}{\numberline {3-1}{\ignorespaces 实验集群网络拓扑及GPU最大功耗配置}}{34}{table.caption.28}\protected@file@percent }
 \newlabel{tab:cluster_topology}{{3-1}{34}{实验集群网络拓扑及GPU最大功耗配置}{table.caption.28}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {3.6.2}批处理算法与部署算法的消融分析}{34}{subsection.3.6.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.6.2}批处理算法与部署算法的消融分析}{35}{subsection.3.6.2}\protected@file@percent }
 \newlabel{fig:arlatency}{{3-4(a)}{35}{推理延迟}{figure.caption.29}{}}
-\newlabel{sub@fig:arlatency}{{(a)}{35}{推理延迟}{figure.caption.29}{}}
 \newlabel{fig:arslo}{{3-4(b)}{35}{SLO违约率}{figure.caption.29}{}}
-\newlabel{sub@fig:arslo}{{(b)}{35}{SLO违约率}{figure.caption.29}{}}
 \newlabel{fig:hethroughput}{{3-4(c)}{35}{吞吐量}{figure.caption.29}{}}
-\newlabel{sub@fig:hethroughput}{{(c)}{35}{吞吐量}{figure.caption.29}{}}
 \newlabel{fig:hegpu}{{3-4(d)}{35}{GPU利用率}{figure.caption.29}{}}
-\newlabel{sub@fig:hegpu}{{(d)}{35}{GPU利用率}{figure.caption.29}{}}
 \@writefile{lof}{\contentsline {figure}{\numberline {3-4}{\ignorespaces 不同批处理算法与部署算法的性能对比。在高负载下，SLO-ODBS通过合理组合请求，维持与ODBS相近的低延迟，同时实现接近SLO-DBS的低SLO违约率，兼顾了两个优化目标；HELR在维持较高GPU利用率的同时实现了较高吞吐量。}}{35}{figure.caption.29}\protected@file@percent }
 \newlabel{fig:ablation}{{3-4}{35}{不同批处理算法与部署算法的性能对比。在高负载下，SLO-ODBS通过合理组合请求，维持与ODBS相近的低延迟，同时实现接近SLO-DBS的低SLO违约率，兼顾了两个优化目标；HELR在维持较高GPU利用率的同时实现了较高吞吐量。}{figure.caption.29}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {3.6.3}与SOTA方法的综合对比}{35}{subsection.3.6.3}\protected@file@percent }
 \newlabel{fig:7GPU Utilization}{{3-5(a)}{35}{GPU利用率}{figure.caption.30}{}}
-\newlabel{sub@fig:7GPU Utilization}{{(a)}{35}{GPU利用率}{figure.caption.30}{}}
 \newlabel{fig:7slo}{{3-5(b)}{35}{SLO不违约率}{figure.caption.30}{}}
-\newlabel{sub@fig:7slo}{{(b)}{35}{SLO不违约率}{figure.caption.30}{}}
 \newlabel{fig:7latency}{{3-5(c)}{35}{推理延迟}{figure.caption.30}{}}
-\newlabel{sub@fig:7latency}{{(c)}{35}{推理延迟}{figure.caption.30}{}}
 \newlabel{fig:7throughput}{{3-5(d)}{35}{吞吐量}{figure.caption.30}{}}
-\newlabel{sub@fig:7throughput}{{(d)}{35}{吞吐量}{figure.caption.30}{}}
 \@writefile{lof}{\contentsline {figure}{\numberline {3-5}{\ignorespaces UELLM各版本与S$^3$、Morphling在四项核心指标上的综合对比。UA（UELLM-all）在所有指标上均取得最优性能：SLO不违约率达100\%，推理延迟最低，吞吐量最高。}}{35}{figure.caption.30}\protected@file@percent }
 \newlabel{fig:sota_comparison}{{3-5}{35}{UELLM各版本与S$^3$、Morphling在四项核心指标上的综合对比。UA（UELLM-all）在所有指标上均取得最优性能：SLO不违约率达100\%，推理延迟最低，吞吐量最高。}{figure.caption.30}{}}
 \citation{he2024uellm}
-\@writefile{toc}{\contentsline {section}{\numberline {3.7}本章小结}{36}{section.3.7}\protected@file@percent }
-\newlabel{sec:uellm_summary}{{3.7}{36}{本章小结}{section.3.7}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {3.7}本章小结}{37}{section.3.7}\protected@file@percent }
+\newlabel{sec:uellm_summary}{{3.7}{37}{本章小结}{section.3.7}{}}
 \citation{zheng2024sglang}
 \citation{kwon2023efficient}
-\pp@pagectr{footnote}{4}{60}{38}
+\pp@pagectr{footnote}{4}{62}{38}
 \@writefile{toc}{\contentsline {chapter}{\numberline {第4章}面向PD分离架构的动态资源协同优化方法：BanaServe}{38}{chapter.4}\protected@file@percent }
 \@writefile{loa}{\addvspace {10\p@ }}
 \@writefile{toc}{\contentsline {section}{\numberline {4.1}引言}{38}{section.4.1}\protected@file@percent }
@@ -283,11 +272,9 @@
 \newlabel{fig:bana_gpu_util}{{4-1}{39}{HFT和vLLM在不同请求速率下的GPU资源利用率对比（基于单台A100 GPU部署LLaMA-13B模型，每组实验重复5次）。在低负载（RPS $\leq $ 10）场景下，两个系统均存在约20\%--40\%的GPU资源空闲浪费。}{figure.caption.31}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {4.2.2}前缀缓存感知路由引发的负载倾斜}{40}{subsection.4.2.2}\protected@file@percent }
 \newlabel{fig:bana_cache_skew}{{4-2(a)}{40}{前缀缓存感知路由导致的负载倾斜}{figure.caption.32}{}}
-\newlabel{sub@fig:bana_cache_skew}{{(a)}{40}{前缀缓存感知路由导致的负载倾斜}{figure.caption.32}{}}
 \newlabel{fig:bana_pd_imbalance}{{4-2(b)}{40}{PD分离架构中的资源利用率不均衡}{figure.caption.32}{}}
-\newlabel{sub@fig:bana_pd_imbalance}{{(b)}{40}{PD分离架构中的资源利用率不均衡}{figure.caption.32}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {4-2}{\ignorespaces 现有LLM推理架构的两类实测局限（。(a) 前缀缓存感知路由导致命中率高的实例持续过载，形成负载倾斜、冗余存储和重复计算；(b) PD分离架构下Prefill实例计算密集（约95\%）但显存闲置（约35\%），Decode实例恰好相反，资源利用率高度互补但不均衡。}}{40}{figure.caption.32}\protected@file@percent }
-\newlabel{fig:bana_cache_imbalance}{{4-2}{40}{现有LLM推理架构的两类实测局限（。(a) 前缀缓存感知路由导致命中率高的实例持续过载，形成负载倾斜、冗余存储和重复计算；(b) PD分离架构下Prefill实例计算密集（约95\%）但显存闲置（约35\%），Decode实例恰好相反，资源利用率高度互补但不均衡。}{figure.caption.32}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {4-2}{\ignorespaces 现有LLM推理架构的两类实测局限(a) 前缀缓存感知路由导致命中率高的实例持续过载，形成负载倾斜、冗余存储和重复计算；(b) PD分离架构下Prefill实例计算密集（约95\%）但显存闲置（约35\%），Decode实例恰好相反，资源利用率高度互补但不均衡。}}{40}{figure.caption.32}\protected@file@percent }
+\newlabel{fig:bana_cache_imbalance}{{4-2}{40}{现有LLM推理架构的两类实测局限(a) 前缀缓存感知路由导致命中率高的实例持续过载，形成负载倾斜、冗余存储和重复计算；(b) PD分离架构下Prefill实例计算密集（约95\%）但显存闲置（约35\%），Decode实例恰好相反，资源利用率高度互补但不均衡。}{figure.caption.32}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {4.2.3}PD分离架构的内生资源不均衡}{40}{subsection.4.2.3}\protected@file@percent }
 \@writefile{toc}{\contentsline {section}{\numberline {4.3}系统设计}{41}{section.4.3}\protected@file@percent }
 \newlabel{sec:bana_design}{{4.3}{41}{系统设计}{section.4.3}{}}
@@ -296,9 +283,7 @@
 \newlabel{eq:layer_migration_latency}{{4-2}{41}{层级权重迁移}{equation.4.2}{}}
 \newlabel{eq:layer_correctness}{{4-3}{42}{层级权重迁移}{equation.4.3}{}}
 \newlabel{fig:bana_layer_migration}{{4-3(a)}{42}{层级权重迁移}{figure.caption.33}{}}
-\newlabel{sub@fig:bana_layer_migration}{{(a)}{42}{层级权重迁移}{figure.caption.33}{}}
 \newlabel{fig:bana_attn_migration}{{4-3(b)}{42}{注意力级KV Cache迁移}{figure.caption.33}{}}
-\newlabel{sub@fig:bana_attn_migration}{{(b)}{42}{注意力级KV Cache迁移}{figure.caption.33}{}}
 \@writefile{lof}{\contentsline {figure}{\numberline {4-3}{\ignorespaces BanaServe的两种迁移粒度。(a) 层级迁移将连续Transformer层（含权重$W_\ell $和KV Cache $\symcal {K}_\ell $）从高负载GPU迁移至低负载GPU，实现粗粒度负载均衡；(b) 注意力级迁移沿注意力头维度分割KV Cache，将$K^{(2)},V^{(2)}$卸载至冷GPU并行计算，仅交换极少量中间结果，实现细粒度负载均衡。}}{42}{figure.caption.33}\protected@file@percent }
 \newlabel{fig:bana_migration}{{4-3}{42}{BanaServe的两种迁移粒度。(a) 层级迁移将连续Transformer层（含权重$W_\ell $和KV Cache $\mathcal {K}_\ell $）从高负载GPU迁移至低负载GPU，实现粗粒度负载均衡；(b) 注意力级迁移沿注意力头维度分割KV Cache，将$K^{(2)},V^{(2)}$卸载至冷GPU并行计算，仅交换极少量中间结果，实现细粒度负载均衡。}{figure.caption.33}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {4.3.2}注意力级KV Cache迁移}{42}{subsection.4.3.2}\protected@file@percent }
@@ -364,58 +349,41 @@
 \newlabel{tab:bana_models}{{4-1}{51}{实验评估所用模型配置}{table.caption.38}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {4.6.2}短文本场景性能评估}{51}{subsection.4.6.2}\protected@file@percent }
 \newlabel{fig:bana_short_llama_thr}{{4-6(a)}{52}{吞吐量}{figure.caption.39}{}}
-\newlabel{sub@fig:bana_short_llama_thr}{{(a)}{52}{吞吐量}{figure.caption.39}{}}
 \newlabel{fig:bana_short_llama_time}{{4-6(b)}{52}{总处理时间}{figure.caption.39}{}}
-\newlabel{sub@fig:bana_short_llama_time}{{(b)}{52}{总处理时间}{figure.caption.39}{}}
 \newlabel{fig:bana_short_llama_lat}{{4-6(c)}{52}{平均延迟}{figure.caption.39}{}}
-\newlabel{sub@fig:bana_short_llama_lat}{{(c)}{52}{平均延迟}{figure.caption.39}{}}
 \@writefile{lof}{\contentsline {figure}{\numberline {4-6}{\ignorespaces LLaMA-13B短文本场景性能结果。在1到20 RPS的全请求速率范围内，BanaServe在吞吐量、总处理时间和平均延迟三项指标上均优于DistServe和vLLM，吞吐量提升1.1倍至1.2倍，总处理时间显著降低。}}{52}{figure.caption.39}\protected@file@percent }
 \newlabel{fig:bana_short_llama}{{4-6}{52}{LLaMA-13B短文本场景性能结果。在1到20 RPS的全请求速率范围内，BanaServe在吞吐量、总处理时间和平均延迟三项指标上均优于DistServe和vLLM，吞吐量提升1.1倍至1.2倍，总处理时间显著降低。}{figure.caption.39}{}}
 \newlabel{fig:bana_short_opt_thr}{{4-7(a)}{52}{吞吐量}{figure.caption.40}{}}
-\newlabel{sub@fig:bana_short_opt_thr}{{(a)}{52}{吞吐量}{figure.caption.40}{}}
 \newlabel{fig:bana_short_opt_time}{{4-7(b)}{52}{总处理时间}{figure.caption.40}{}}
-\newlabel{sub@fig:bana_short_opt_time}{{(b)}{52}{总处理时间}{figure.caption.40}{}}
 \newlabel{fig:bana_short_opt_lat}{{4-7(c)}{52}{平均延迟}{figure.caption.40}{}}
-\newlabel{sub@fig:bana_short_opt_lat}{{(c)}{52}{平均延迟}{figure.caption.40}{}}
 \@writefile{lof}{\contentsline {figure}{\numberline {4-7}{\ignorespaces OPT-13B短文本场景性能结果。BanaServe相比DistServe吞吐量提升2.8倍至3.9倍，相比vLLM最高提升3.9倍；平均延迟相比vLLM降低3.9\%至78.4\%，相比DistServe降低1.4\%至70.1\%。}}{52}{figure.caption.40}\protected@file@percent }
 \newlabel{fig:bana_short_opt}{{4-7}{52}{OPT-13B短文本场景性能结果。BanaServe相比DistServe吞吐量提升2.8倍至3.9倍，相比vLLM最高提升3.9倍；平均延迟相比vLLM降低3.9\%至78.4\%，相比DistServe降低1.4\%至70.1\%。}{figure.caption.40}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {4.6.3}长文本场景性能评估}{52}{subsection.4.6.3}\protected@file@percent }
 \newlabel{fig:bana_long_llama_thr}{{4-8(a)}{52}{吞吐量}{figure.caption.41}{}}
-\newlabel{sub@fig:bana_long_llama_thr}{{(a)}{52}{吞吐量}{figure.caption.41}{}}
 \newlabel{fig:bana_long_llama_time}{{4-8(b)}{52}{总处理时间}{figure.caption.41}{}}
-\newlabel{sub@fig:bana_long_llama_time}{{(b)}{52}{总处理时间}{figure.caption.41}{}}
 \newlabel{fig:bana_long_llama_lat}{{4-8(c)}{52}{平均延迟}{figure.caption.41}{}}
-\newlabel{sub@fig:bana_long_llama_lat}{{(c)}{52}{平均延迟}{figure.caption.41}{}}
 \@writefile{lof}{\contentsline {figure}{\numberline {4-8}{\ignorespaces LLaMA-13B长文本场景性能结果。BanaServe在1到10 RPS范围内吞吐量提升1.3倍至1.5倍（相比DistServe和vLLM），延迟降低1.4\%至65.3\%（相比vLLM）。在高负载（10 RPS以上）场景下优势更为明显。}}{52}{figure.caption.41}\protected@file@percent }
 \newlabel{fig:bana_long_llama}{{4-8}{52}{LLaMA-13B长文本场景性能结果。BanaServe在1到10 RPS范围内吞吐量提升1.3倍至1.5倍（相比DistServe和vLLM），延迟降低1.4\%至65.3\%（相比vLLM）。在高负载（10 RPS以上）场景下优势更为明显。}{figure.caption.41}{}}
 \citation{azure2024llm}
 \newlabel{fig:bana_long_opt_thr}{{4-9(a)}{53}{吞吐量}{figure.caption.42}{}}
-\newlabel{sub@fig:bana_long_opt_thr}{{(a)}{53}{吞吐量}{figure.caption.42}{}}
 \newlabel{fig:bana_long_opt_time}{{4-9(b)}{53}{总处理时间}{figure.caption.42}{}}
-\newlabel{sub@fig:bana_long_opt_time}{{(b)}{53}{总处理时间}{figure.caption.42}{}}
 \newlabel{fig:bana_long_opt_lat}{{4-9(c)}{53}{平均延迟}{figure.caption.42}{}}
-\newlabel{sub@fig:bana_long_opt_lat}{{(c)}{53}{平均延迟}{figure.caption.42}{}}
 \@writefile{lof}{\contentsline {figure}{\numberline {4-9}{\ignorespaces OPT-13B长文本场景性能结果。BanaServe相比DistServe和vLLM吞吐量提升1.1倍至1.3倍，延迟改善模式与LLaMA-13B一致，在不同负载水平下均保持稳定的性能优势。}}{53}{figure.caption.42}\protected@file@percent }
 \newlabel{fig:bana_long_opt}{{4-9}{53}{OPT-13B长文本场景性能结果。BanaServe相比DistServe和vLLM吞吐量提升1.1倍至1.3倍，延迟改善模式与LLaMA-13B一致，在不同负载水平下均保持稳定的性能优势。}{figure.caption.42}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {4.6.4}Azure生产负载追踪实验}{53}{subsection.4.6.4}\protected@file@percent }
 \newlabel{fig:bana_azure_input}{{4-10(a)}{54}{输入长度分布}{figure.caption.43}{}}
-\newlabel{sub@fig:bana_azure_input}{{(a)}{54}{输入长度分布}{figure.caption.43}{}}
 \newlabel{fig:bana_azure_output}{{4-10(b)}{54}{输出长度分布}{figure.caption.43}{}}
-\newlabel{sub@fig:bana_azure_output}{{(b)}{54}{输出长度分布}{figure.caption.43}{}}
 \newlabel{fig:bana_azure_rps}{{4-10(c)}{54}{请求到达速率}{figure.caption.43}{}}
-\newlabel{sub@fig:bana_azure_rps}{{(c)}{54}{请求到达速率}{figure.caption.43}{}}
 \@writefile{lof}{\contentsline {figure}{\numberline {4-10}{\ignorespaces Azure生产负载追踪数据前1小时的统计特性。输入和输出长度分布呈重尾特性，请求到达速率具有显著突发性，反映了真实生产环境中多样化LLM服务工作负载的特征。}}{54}{figure.caption.43}\protected@file@percent }
 \newlabel{fig:bana_azure_trace}{{4-10}{54}{Azure生产负载追踪数据前1小时的统计特性。输入和输出长度分布呈重尾特性，请求到达速率具有显著突发性，反映了真实生产环境中多样化LLM服务工作负载的特征。}{figure.caption.43}{}}
 \newlabel{fig:bana_azure_thr}{{4-11(a)}{54}{吞吐量对比}{figure.caption.44}{}}
-\newlabel{sub@fig:bana_azure_thr}{{(a)}{54}{吞吐量对比}{figure.caption.44}{}}
 \newlabel{fig:bana_azure_lat}{{4-11(b)}{54}{平均延迟对比}{figure.caption.44}{}}
-\newlabel{sub@fig:bana_azure_lat}{{(b)}{54}{平均延迟对比}{figure.caption.44}{}}
 \@writefile{lof}{\contentsline {figure}{\numberline {4-11}{\ignorespaces Azure生产负载追踪实验的吞吐量和延迟综合对比。BanaServe在LLaMA-13B上取得最高吞吐量（0.288 req/s）和最低延迟（3.828 s），在OPT-13B上分别为0.315 req/s和3.658 s，在重尾分布和突发流量下均显著优于vLLM和DistServe。}}{54}{figure.caption.44}\protected@file@percent }
 \newlabel{fig:bana_azure_results}{{4-11}{54}{Azure生产负载追踪实验的吞吐量和延迟综合对比。BanaServe在LLaMA-13B上取得最高吞吐量（0.288 req/s）和最低延迟（3.828 s），在OPT-13B上分别为0.315 req/s和3.658 s，在重尾分布和突发流量下均显著优于vLLM和DistServe。}{figure.caption.44}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {4.6.5}综合性能对比分析}{54}{subsection.4.6.5}\protected@file@percent }
 \@writefile{toc}{\contentsline {section}{\numberline {4.7}本章小结}{55}{section.4.7}\protected@file@percent }
 \newlabel{sec:bana_summary}{{4.7}{55}{本章小结}{section.4.7}{}}
-\pp@pagectr{footnote}{5}{79}{57}
+\pp@pagectr{footnote}{5}{81}{57}
 \@writefile{toc}{\contentsline {chapter}{\numberline {第5章}总结与展望}{57}{chapter.5}\protected@file@percent }
 \@writefile{loa}{\addvspace {10\p@ }}
 \@writefile{toc}{\contentsline {section}{\numberline {5.1}研究总结}{57}{section.5.1}\protected@file@percent }
@@ -434,4 +402,4 @@
 \@writefile{toc}{\contentsline {chapter}{致\hskip 1em\relax 谢}{67}{section*.50}\protected@file@percent }
 \@writefile{toc}{\contentsline {chapter}{个人简历、在学期间完成的相关学术成果}{69}{section*.52}\protected@file@percent }
 \ttl@finishall
-\gdef \@abspage@last{91}
+\gdef \@abspage@last{93}
