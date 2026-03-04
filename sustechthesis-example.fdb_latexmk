@@ -1,19 +1,19 @@
 # Fdb version 4
-["bibtex sustechthesis-example"] 1772546687.85242 "sustechthesis-example.aux" "sustechthesis-example.bbl" "sustechthesis-example" 1772546696.71007 0
+["bibtex sustechthesis-example"] 1772613816.64567 "sustechthesis-example.aux" "sustechthesis-example.bbl" "sustechthesis-example" 1772613825.25789 0
   "./ref/refs.bib" 1771999746.11082 31258 23ec35f0986cf5edf0412653a7a6a8e5 ""
   "./sustechthesis-numeric.bst" 1752929602 46094 26fe73ef569a32adfd63f812b95959ec ""
-  "bu.aux" 1772546691.44343 6720 9533c953c5612863328e3daa466bbafe "xelatex"
-  "sustechthesis-example.aux" 1772546691.48133 43087 96ff268ee631832f83b8ee52b22fe599 "xelatex"
+  "bu.aux" 1772613820.06994 6720 9533c953c5612863328e3daa466bbafe "xelatex"
+  "sustechthesis-example.aux" 1772613820.10946 43131 93bdbb31249c678918d48a6e387a586f "xelatex"
   (generated)
   "sustechthesis-example.bbl"
   "sustechthesis-example.blg"
   (rewritten before read)
-["xdvipdfmx"] 1772546691.78593 "sustechthesis-example.xdv" "sustechthesis-example.pdf" "sustechthesis-example" 1772546696.71172 0
-  "sustechthesis-example.xdv" 1772546691.48406 1958140 78ac5dc50e07f416d0fd8e45cad8c6dc "xelatex"
+["xdvipdfmx"] 1772613820.33162 "sustechthesis-example.xdv" "sustechthesis-example.pdf" "sustechthesis-example" 1772613825.25959 0
+  "sustechthesis-example.xdv" 1772613820.11211 1943472 ef2bc5e387de929600d7d4261bb4f82f "xelatex"
   (generated)
   "sustechthesis-example.pdf"
   (rewritten before read)
-["xelatex"] 1772546688.13087 "sustechthesis-example.tex" "sustechthesis-example.xdv" "sustechthesis-example" 1772546696.71013 0
+["xelatex"] 1772613816.73723 "sustechthesis-example.tex" "sustechthesis-example.xdv" "sustechthesis-example" 1772613825.25795 0
   "/System/Library/Fonts/Menlo.ttc" 1770268403 2156036 ec05dfca6821d85440da0899493002c3 ""
   "/usr/local/texlive/2025/texmf-dist/fonts/map/fontname/texfonts.map" 1577235249 3524 cb3e574dea2d1052e39280babc910dc8 ""
   "/usr/local/texlive/2025/texmf-dist/fonts/tfm/adobe/symbol/psyr.tfm" 1136768653 1408 5937f58aa508ea2cea4901c07d10f5fe ""
@@ -228,16 +228,16 @@
   "/usr/local/texlive/2025/texmf-dist/web2c/texmf.cnf" 1739380943 42148 61becc7c670cd061bb319c643c27fdd4 ""
   "/usr/local/texlive/2025/texmf-var/web2c/xetex/xelatex.fmt" 1769432591 5639810 99541f9b8f2e072b8c8d81818501266c ""
   "/usr/local/texlive/2025/texmf.cnf" 1741450484 577 418a7058ec8e006d8704f60ecd22c938 ""
-  "bu.aux" 1772546691.44343 6720 9533c953c5612863328e3daa466bbafe "xelatex"
-  "data/abstract.tex" 1772544360.25616 10568 ff3d5ff8102de4944e7a5cbbd680f3d3 ""
+  "bu.aux" 1772613820.06994 6720 9533c953c5612863328e3daa466bbafe "xelatex"
+  "data/abstract.tex" 1772611908.4325 7332 192bce9079af55c501bd0c9091551409 ""
   "data/acknowledgements.tex" 1771944259.99605 4116 541e3a23eda5c67f7a0e063864cfb4f0 ""
-  "data/chap01.tex" 1772546406.58285 35854 fbbcb290af357369bf39a68aa03c5e03 ""
+  "data/chap01.tex" 1772612235.98512 35858 a048980a94ac4bff008083eb1d7fb3b9 ""
   "data/chap02.tex" 1772543940.05406 39786 0ab9f3bed99469d8db6cbe572c2c9648 ""
-  "data/chap03.tex" 1772546123.71462 39785 a35949bf617ffe6772723c2df4c7218c ""
-  "data/chap04.tex" 1772546358.27416 58591 53b16a43aadcfd3eeba0452ce1e85c04 ""
-  "data/chap05.tex" 1772543991.54642 8109 fc1eea4cb6f93660790401b838af856e ""
+  "data/chap03.tex" 1772613501.23761 41023 c5e8fa5b91d0582beeff18bcd15c1caf ""
+  "data/chap04.tex" 1772613748.11881 58938 33919a9e67eb41525ee79b54e543a593 ""
+  "data/chap05.tex" 1772547941.22346 9324 92ae1c6215da3ebce9ab467879290b14 ""
   "data/committee.tex" 1752929602 1703 b175cbc15f18848bd3b84a81781c43fd ""
-  "data/conclusion.tex" 1772546500.2842 6282 23244606c6b36531b77336032bd3e234 ""
+  "data/conclusion.tex" 1772610877.18292 6867 b99fadf8e130b4603f4149cca59c3e87 ""
   "data/denotation.tex" 1771850349.68066 8829 959391921eac99fdb93484916567341b ""
   "data/resume.tex" 1771944718.87226 3395 0d7213d56c57c1be3946d86a0b2c292f ""
   "figures/Azure_input.pdf" 1772540760.68597 165666 4abf9c7cf120bd562b04ced7b38deaac ""
@@ -279,11 +279,11 @@
   "figures/throughput.pdf" 1772540760.7205 79711 0e3a4561d4cc4d013437e6f60ac04680 ""
   "figures/uellm_framework.pdf" 1772540760.72669 4207556 05048744920e54940de1bedf82d22d21 ""
   "sustech-setup.tex" 1772540760.74564 7817 ded4f71e3c6a8f6359a20e241912d84d ""
-  "sustechthesis-example.aux" 1772546691.48133 43087 96ff268ee631832f83b8ee52b22fe599 "xelatex"
-  "sustechthesis-example.bbl" 1772546688.12781 20439 5383755479df204b9a82324ddcebec81 "bibtex sustechthesis-example"
-  "sustechthesis-example.out" 1772546691.48372 15875 25901ec1dd26dd66c9a4972c0fa5c7a3 "xelatex"
+  "sustechthesis-example.aux" 1772613820.10946 43131 93bdbb31249c678918d48a6e387a586f "xelatex"
+  "sustechthesis-example.bbl" 1772613816.73403 20439 5383755479df204b9a82324ddcebec81 "bibtex sustechthesis-example"
+  "sustechthesis-example.out" 1772613820.11178 15875 25901ec1dd26dd66c9a4972c0fa5c7a3 "xelatex"
   "sustechthesis-example.tex" 1771850044.90086 3046 65d6123285483d37b6c22be188316c92 ""
-  "sustechthesis-example.toc" 1772546691.484 8789 396cbc55340506e2e174d16a20dbf469 "xelatex"
+  "sustechthesis-example.toc" 1772613820.11204 8791 b8b1d783eda25dc2938e0db84b6c8add "xelatex"
   "sustechthesis.cls" 1752929602 119068 96eb800231223be850e1d34ec8c0a3de ""
   (generated)
   "bu.aux"

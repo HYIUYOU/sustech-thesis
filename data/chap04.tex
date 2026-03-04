@@ -4,23 +4,14 @@
 
 \section{引言}
 
-随着大语言模型在生产环境中的大规模部署，推理服务系统正面临前所未有的资源管理挑战。以Prefill-Decode（PD）分离为代表的新型架构通过将提示预填充（Prefill）阶段与自回归解码（Decode）阶段分配至不同GPU实例，有效消除了两阶段间的资源竞争干扰。然而，现有PD分离系统在实际动态工作负载下暴露出三类根本性局限：
+PD分离架构将Prefill与Decode阶段分配至不同GPU实例，消除了两阶段间的直接资源竞争，却并未解决更深层的资源管理矛盾。第一章将这一矛盾归纳为相互关联的\textbf{挑战②}和\textbf{挑战③}：Prefill与Decode阶段在计算和显存上的需求天然互补，但现有系统无法在运行时动态利用这种互补性；与此同时，调度决策与KV Cache的物理位置紧耦合，使缓存感知路由持续向高命中率实例倾斜，在动态异构负载下难以维持全局均衡。两类问题的根源指向同一设计缺陷，即计算资源与KV Cache状态绑定于特定实例，负载均衡与缓存局部性之间由此产生了难以调和的结构性矛盾。
 
-\begin{enumerate}
-    \item \textbf{静态资源配置无法适应非平稳工作负载}：当请求速率较低（RPS $\leq$ 10）时，Prefill和Decode实例均存在20\%--40\%的GPU资源空闲浪费；而在突发高流量时，固定配置又成为吞吐量瓶颈；
-    \item \textbf{PD两阶段间存在内生的资源利用率不均衡}：Prefill阶段计算密集（计算利用率约95\%，显存利用率约35\%），而Decode阶段恰好相反（计算利用率约35\%，显存利用率约90\%），这种互补性资源失衡在现有系统中无法被动态利用；
-    \item \textbf{前缀缓存感知路由引发持续性负载倾斜}：以SGLang\cite{zheng2024sglang}和vLLM\cite{kwon2023efficient}为代表的系统在路由请求时优先考虑KV Cache命中率，导致命中率高的Prefill实例持续吸引更多请求，形成计算热点，而其他实例资源闲置。
-\end{enumerate}
+就挑战②而言，Prefill实例以处理长输入序列为主，计算利用率通常高达95\%，但显存利用率仅约35\%；Decode实例的情况恰好相反，计算利用率约35\%，显存利用率却接近90\%。这种天然的计算--显存互补性在现有系统中几乎无法被动态利用：当Prefill实例计算饱和时，其大量闲置显存无法转让给同时显存紧张的Decode实例，资源的互补性停留在存在而非可用的层面。
 
-上述三类局限共享同一根本原因：\textbf{资源分配与状态（缓存）放置的紧耦合}。现有系统中，计算资源与KV Cache等状态数据绑定于特定实例，难以在不引入巨大开销的前提下动态迁移，导致负载均衡与缓存局部性之间存在不可调和的矛盾。
+就挑战③而言，以SGLang\cite{zheng2024sglang}和vLLM\cite{kwon2023efficient}为代表的系统在路由请求时优先考虑KV Cache命中率，将请求倾向于发往缓存命中率高的Prefill实例。这一策略在静态负载下能够降低重复计算，但在动态异构负载下会形成持续性热点：命中率高的实例持续吸引更多请求并积累更多缓存内容，进一步提高命中率，而其他实例却因缓存内容少而长期处于轻载状态，形成正反馈循环，系统整体吞吐量因此受限。
 
-针对上述挑战，本章提出\textbf{BanaServe}，一个面向PD分离架构的动态编排框架，通过三项核心创新将资源分配与状态管理解耦：
-
-\begin{enumerate}
-    \item \textbf{层级权重迁移}（Layer-level Weight Migration）：在Transformer层粒度上动态迁移模型权重，实现Prefill与Decode实例之间粗粒度的计算和显存资源再平衡；
-    \item \textbf{注意力级KV Cache迁移}（Attention-level KV Cache Migration）：沿注意力头维度分割KV Cache，将部分KV状态迁移至空闲GPU进行并行计算，实现细粒度的负载均衡；
-    \item \textbf{全局KV Cache存储}（Global KV Cache Store）：构建跨所有Prefill实例的统一KV Cache存储层，结合层级流水线重叠传输技术，使路由器摆脱缓存位置约束，实现纯负载感知调度。
-\end{enumerate}
+针对上述两类挑战，本章提出\textbf{BanaServe}框架，以解耦资源分配与缓存状态管理为核心设计原则，通过三项互补的技术机制加以实现。针对\textbf{挑战②}，框架引入粗细两种粒度的自适应迁移机制：\textbf{层级权重迁移}（Layer-level Weight Migration）在Transformer层粒度上同步迁移权重与KVCache，承担跨实例的粗粒度计算--显存资源再平衡；\textbf{注意力级KV Cache迁移}（Attention-level KV Cache Migration）沿注意力头维度分割KV状态并迁移至辅助GPU，无需传输模型权重，可在毫秒级内完成细粒度负载调整，适合实时性要求高的动态场景。针对\textbf{挑战③}，框架构建\textbf{全局KV
+Cache存储}（Global KV Cache Store），将KV Cache从特定Prefill实例解放出来，使路由器无需考虑缓存位置即可实现纯负载感知调度；配合层间流水线重叠传输技术，将KV Cache预取操作（约0.082\,ms/层）隐藏于前向计算（约4.22\,ms/层）之中，消除全局存储引入的访问延迟瓶颈。
 
 BanaServe在vLLM和DistServe等主流推理栈上实现，并在Alpaca短文本和LongBench长文本等多种负载场景下进行评估。相比vLLM，BanaServe吞吐量提升1.2倍至3.9倍，总处理时间降低3.9\%至78.4\%；相比DistServe，吞吐量提升1.1倍至2.8倍，延迟降低1.4\%至70.1\%\cite{he2025banaserve}。
 

@@ -1,4 +1,4 @@
-This is XeTeX, Version 3.141592653-2.6-0.999997 (TeX Live 2025) (preloaded format=xelatex 2026.1.26)  3 MAR 2026 22:29
+This is XeTeX, Version 3.141592653-2.6-0.999997 (TeX Live 2025) (preloaded format=xelatex 2026.1.26)  4 MAR 2026 16:46
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -1409,45 +1409,40 @@ LaTeX Font Info:    Font shape `TU/CambriaMath.otf(3)/m/n' will be
 [3
 
 
-]
+])
 
-[4])
+[4] (./sustechthesis-example.toc
 
-[5] (./sustechthesis-example.toc
-
-[6
+[5
 
 
 ]
 
-[7])
+[6])
 \tf@toc=\write6
 \openout6 = `sustechthesis-example.toc'.
 
  (./data/denotation.tex
 
-[8]
+[7]
 
-[9
+[8
 
 
 ]
 
+[9]
+
 [10]
 
-[11]
+[11])
 
-[12])
-
-[13]
-
-[14
-
-] (./data/chap01.tex
+[12] (./data/chap01.tex
 第1章
 
 
 [1
+
 
 ]
 
@@ -1601,26 +1596,26 @@ File: figures/batch2.pdf Graphic file (type pdf)
 [29]
 
 [30]
-LaTeX Font Info:    Font shape `TU/cour(0)/m/n' will be
-(Font)              scaled to size 12.74046pt on input line 170.
-LaTeX Font Info:    Font shape `TU/cour(0)/m/n' will be
-(Font)              scaled to size 11.67876pt on input line 170.
-
 
 [31]
+LaTeX Font Info:    Font shape `TU/cour(0)/m/n' will be
+(Font)              scaled to size 12.74046pt on input line 194.
+LaTeX Font Info:    Font shape `TU/cour(0)/m/n' will be
+(Font)              scaled to size 11.67876pt on input line 194.
+
 
 [32]
 
 [33]
 
 [34]
-Underfull \hbox (badness 1199) in paragraph at lines 372--378
+
+[35]
+Underfull \hbox (badness 1199) in paragraph at lines 388--394
 []\TU/SimSun.ttc(0)/m/n/12.045 第 \TU/times(0)/m/n/12.045 13 \TU/SimSun.ttc(0)/m/n/12.045 行 计 算 节 点 $[][]$ 在 满 足 显 存 约 束 的 前 提 下 可 分 配 的 最 大 模 型 层 数
  []
 
 
-
-[35]
 
 [36]
 
@@ -1633,6 +1628,9 @@ File: figures/throughput.pdf Graphic file (type pdf)
 <use figures/throughput.pdf>
 File: figures/GPU_Utili.pdf Graphic file (type pdf)
 <use figures/GPU_Utili.pdf>
+
+
+[38]
 File: figures/experiment7/GPU_Utili.pdf Graphic file (type pdf)
 <use figures/experiment7/GPU_Utili.pdf>
 File: figures/experiment7/SLO1.pdf Graphic file (type pdf)
@@ -1642,8 +1640,6 @@ File: figures/experiment7/latency.pdf Graphic file (type pdf)
 File: figures/experiment7/throughput.pdf Graphic file (type pdf)
 <use figures/experiment7/throughput.pdf>
 
-
-[38]
 
 [39]
 
@@ -1694,13 +1690,13 @@ File: figures/kv_transfer.png Graphic file (type bmp)
 
 [51]
 
-LaTeX Warning: Reference `eq:benefit_cost' on page 52 undefined on input line 432.
+LaTeX Warning: Reference `eq:benefit_cost' on page 52 undefined on input line 423.
 
 
 
 [52]
 
-LaTeX Warning: Reference `eq:benefit_cost' on page 53 undefined on input line 445.
+LaTeX Warning: Reference `eq:benefit_cost' on page 53 undefined on input line 436.
 
 
 
@@ -1828,16 +1824,19 @@ L3 programming layer <2022/08/05>
 
 LaTeX Warning: There were undefined references.
 
+
+LaTeX Warning: Label(s) may have changed. Rerun to get cross-references right.
+
 Package rerunfilecheck Info: File `sustechthesis-example.out' has not changed.
 (rerunfilecheck)             Checksum: 25901EC1DD26DD66C9A4972C0FA5C7A3;15875.
  ) 
 Here is how much of TeX's memory you used:
- 45400 strings out of 473832
- 1003010 string characters out of 5729481
- 1522617 words of memory out of 5000000
- 67622 multiletter control sequences out of 15000+600000
+ 45409 strings out of 473832
+ 1003645 string characters out of 5729481
+ 1523617 words of memory out of 5000000
+ 67631 multiletter control sequences out of 15000+600000
  572095 words of font info for 222 fonts, out of 8000000 for 9000
  1350 hyphenation exceptions out of 8191
- 106i,25n,128p,1455b,2960s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 106i,25n,128p,1455b,2959s stack positions out of 10000i,1000n,20000p,200000b,200000s
 
-Output written on sustechthesis-example.pdf (101 pages).
+Output written on sustechthesis-example.pdf (99 pages).

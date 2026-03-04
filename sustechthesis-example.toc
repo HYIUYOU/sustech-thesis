@@ -1,6 +1,6 @@
 \contentsline {chapter}{摘\hskip 1em\relax 要}{I}{section*.9}%
 \contentsline {chapter}{\textbf {Abstract}}{III}{section*.11}%
-\contentsline {chapter}{符号和缩略语说明}{IX}{section*.15}%
+\contentsline {chapter}{符号和缩略语说明}{VIII}{section*.15}%
 \contentsline {chapter}{\numberline {第1章}绪论}{1}{chapter.1}%
 \contentsline {section}{\numberline {1.1}研究背景}{1}{section.1.1}%
 \contentsline {section}{\numberline {1.2}研究意义}{2}{section.1.2}%
@@ -38,21 +38,21 @@
 \contentsline {section}{\numberline {3.1}引言}{26}{section.3.1}%
 \contentsline {section}{\numberline {3.2}问题分析与设计动机}{27}{section.3.2}%
 \contentsline {subsection}{\numberline {3.2.1}部署配置对推理性能的影响}{27}{subsection.3.2.1}%
-\contentsline {subsection}{\numberline {3.2.2}批处理策略对推理性能的影响}{27}{subsection.3.2.2}%
-\contentsline {section}{\numberline {3.3}资源画像器}{28}{section.3.3}%
-\contentsline {subsection}{\numberline {3.3.1}基于微调大模型的输出长度预测}{28}{subsection.3.3.1}%
+\contentsline {subsection}{\numberline {3.2.2}批处理策略对推理性能的影响}{28}{subsection.3.2.2}%
+\contentsline {section}{\numberline {3.3}资源画像器}{29}{section.3.3}%
+\contentsline {subsection}{\numberline {3.3.1}基于微调大模型的输出长度预测}{29}{subsection.3.3.1}%
 \contentsline {subsection}{\numberline {3.3.2}SLO获取与资源画像}{29}{subsection.3.3.2}%
-\contentsline {subsection}{\numberline {3.3.3}在线监控与自适应校正}{29}{subsection.3.3.3}%
+\contentsline {subsection}{\numberline {3.3.3}在线监控与自适应校正}{30}{subsection.3.3.3}%
 \contentsline {section}{\numberline {3.4}批处理调度器：SLO-ODBS算法}{30}{section.3.4}%
 \contentsline {subsection}{\numberline {3.4.1}问题建模}{30}{subsection.3.4.1}%
-\contentsline {subsection}{\numberline {3.4.2}SLO-ODBS算法设计}{30}{subsection.3.4.2}%
+\contentsline {subsection}{\numberline {3.4.2}SLO-ODBS算法设计}{31}{subsection.3.4.2}%
 \contentsline {subsection}{\numberline {3.4.3}SLO-ODBS的算法变体}{33}{subsection.3.4.3}%
-\contentsline {section}{\numberline {3.5}LLM部署器：HELR算法}{33}{section.3.5}%
-\contentsline {subsection}{\numberline {3.5.1}问题建模}{33}{subsection.3.5.1}%
+\contentsline {section}{\numberline {3.5}LLM部署器：HELR算法}{34}{section.3.5}%
+\contentsline {subsection}{\numberline {3.5.1}问题建模}{34}{subsection.3.5.1}%
 \contentsline {subsection}{\numberline {3.5.2}HELR算法设计}{34}{subsection.3.5.2}%
 \contentsline {subsection}{\numberline {3.5.3}HELR的算法变体}{37}{subsection.3.5.3}%
-\contentsline {section}{\numberline {3.6}实验评估}{37}{section.3.6}%
-\contentsline {subsection}{\numberline {3.6.1}实验设置}{37}{subsection.3.6.1}%
+\contentsline {section}{\numberline {3.6}实验评估}{38}{section.3.6}%
+\contentsline {subsection}{\numberline {3.6.1}实验设置}{38}{subsection.3.6.1}%
 \contentsline {subsection}{\numberline {3.6.2}批处理算法与部署算法的消融分析}{38}{subsection.3.6.2}%
 \contentsline {subsection}{\numberline {3.6.3}与SOTA方法的综合对比}{39}{subsection.3.6.3}%
 \contentsline {section}{\numberline {3.7}本章小结}{40}{section.3.7}%
