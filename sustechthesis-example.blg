@@ -16,46 +16,44 @@ Reallocated global_strs (elt_size=200001) to 20 items from 10.
 Reallocated glb_str_end (elt_size=4) to 20 items from 10.
 Reallocated singl_function (elt_size=4) to 100 items from 50.
 Database file #1: ref/refs.bib
-Warning--I didn't find a database entry for "li2022cloud_resource"
-You've used 59 entries,
+You've used 60 entries,
             5374 wiz_defined-function locations,
-            1394 strings with 29572 characters,
-and the built_in function-call counts, 874647 in all, are:
-= -- 14665
-> -- 105928
-< -- 130679
-+ -- 36025
-- -- 8072
-* -- 4140
-:= -- 121583
-add.period$ -- 234
-call.type$ -- 59
-change.case$ -- 426
-chr.to.int$ -- 32423
-cite$ -- 59
-duplicate$ -- 1567
-empty$ -- 4619
-format.name$ -- 3069
-if$ -- 225704
+            1401 strings with 29748 characters,
+and the built_in function-call counts, 878319 in all, are:
+= -- 14865
+> -- 106224
+< -- 131067
++ -- 36202
+- -- 8191
+* -- 4178
+:= -- 122175
+add.period$ -- 237
+call.type$ -- 60
+change.case$ -- 428
+chr.to.int$ -- 32560
+cite$ -- 60
+duplicate$ -- 1594
+empty$ -- 4677
+format.name$ -- 3095
+if$ -- 226612
 int.to.chr$ -- 1
-int.to.str$ -- 60
+int.to.str$ -- 61
 missing$ -- 0
-newline$ -- 392
-num.names$ -- 178
-pop$ -- 44806
+newline$ -- 397
+num.names$ -- 181
+pop$ -- 44840
 preamble$ -- 1
-purify$ -- 59
+purify$ -- 60
 quote$ -- 0
-skip$ -- 93090
+skip$ -- 93403
 stack$ -- 0
-substring$ -- 41250
-swap$ -- 69
-text.length$ -- 1960
+substring$ -- 41516
+swap$ -- 70
+text.length$ -- 1987
 text.prefix$ -- 0
 top$ -- 0
-type$ -- 649
+type$ -- 660
 warning$ -- 0
-while$ -- 2016
+while$ -- 2039
 width$ -- 0
-write$ -- 864
-(There was 1 warning)
+write$ -- 878

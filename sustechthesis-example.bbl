@@ -1,4 +1,4 @@
-\begin{thebibliography}{59}
+\begin{thebibliography}{60}
 \providecommand{\natexlab}[1]{#1}
 \providecommand{\url}[1]{#1}
 \expandafter\ifx\csname urlstyle\endcsname\relax\else
@@ -11,47 +11,91 @@
   \let\eprint\href
 \fi
 
-\bibitem[Zhong et~al.(2024)Zhong, Liu, Chen, Hu, Zhu, Liu, Jin, and Zhang]{zhong2024distserve}
+\bibitem[Zhong et~al.(2024)Zhong, Liu, Chen, Hu, Zhu, Liu, Jin, and
+  Zhang]{zhong2024distserve}
 ZHONG Y, LIU S, CHEN J, et~al.
-\newblock DistServe: disaggregating prefill and decoding for goodput-optimized large language model serving\allowbreak[C]//\allowbreak
-OSDI'24: Proceedings of the 18th USENIX Conference on Operating Systems Design and Implementation.
+\newblock DistServe: disaggregating prefill and decoding for goodput-optimized
+  large language model serving\allowbreak[C]//\allowbreak
+OSDI'24: Proceedings of the 18th USENIX Conference on Operating Systems Design
+  and Implementation.
 \newblock USA: USENIX Association, 2024.
 
-\bibitem[Bai et~al.(2023)Bai, Lv, Zhang, Lyu, Tang, Huang, Du, Liu, Zeng, Hou, et~al.]{bai2023longbench}
+\bibitem[Bai et~al.(2023)Bai, Lv, Zhang, Lyu, Tang, Huang, Du, Liu, Zeng, Hou,
+  et~al.]{bai2023longbench}
 BAI Y, LV X, ZHANG J, et~al.
-\newblock {LongBench}: A Bilingual, Multitask Benchmark for Long Context Understanding\allowbreak[A/OL].
+\newblock {LongBench}: A Bilingual, Multitask Benchmark for Long Context
+  Understanding\allowbreak[A/OL].
 \newblock 2023.
 \newblock arXiv: \eprint{https://arxiv.org/abs/2308.14508}{2308.14508}.
 \newblock \url{https://arxiv.org/abs/2308.14508}.
 
 \bibitem[Jin et~al.(2023)Jin, Zhang, Jiang, Liu, Liu, Liu, and Jin]{jin2023s3}
 JIN C, ZHANG Z, JIANG X, et~al.
-\newblock {S$^3$}: Increasing {GPU} Utilization during Generative Inference for Higher Throughput\allowbreak[A/OL].
+\newblock {S$^3$}: Increasing {GPU} Utilization during Generative Inference for
+  Higher Throughput\allowbreak[A/OL].
 \newblock 2023.
 \newblock arXiv: \eprint{https://arxiv.org/abs/2309.11873}{2309.11873}.
 \newblock \url{https://arxiv.org/abs/2309.11873}.
 
-\bibitem[Zheng et~al.(2024)Zheng, Yin, Xie, Sun, Huang, Yu, Cao, Kozyrakis, Stoica, Gonzalez, et~al.]{zheng2024sglang}
+\bibitem[Zheng et~al.(2024)Zheng, Yin, Xie, Sun, Huang, Yu, Cao, Kozyrakis,
+  Stoica, Gonzalez, et~al.]{zheng2024sglang}
 ZHENG L, YIN L, XIE Z, et~al.
-\newblock Sglang: Efficient execution of structured language model programs\allowbreak[J].
-\newblock Advances in neural information processing systems, 2024, 37: 62557-62583.
+\newblock Sglang: Efficient execution of structured language model
+  programs\allowbreak[J].
+\newblock Advances in neural information processing systems, 2024, 37:
+  62557-62583.
 
-\bibitem[Kwon et~al.(2023)Kwon, Li, Zhuang, Sheng, Zheng, Yu, Gonzalez, Zhang, and Stoica]{kwon2023efficient}
+\bibitem[Kwon et~al.(2023)Kwon, Li, Zhuang, Sheng, Zheng, Yu, Gonzalez, Zhang,
+  and Stoica]{kwon2023efficient}
 KWON W, LI Z, ZHUANG S, et~al.
-\newblock Efficient memory management for large language model serving with pagedattention\allowbreak[C]//\allowbreak
+\newblock Efficient memory management for large language model serving with
+  pagedattention\allowbreak[C]//\allowbreak
 Proceedings of the 29th symposium on operating systems principles.
 \newblock 2023: 611-626.
 
-\bibitem[OpenAI et~al.(2024)OpenAI, Achiam, Adler, Agarwal, Ahmad, Akkaya, Aleman, Almeida, Altenschmidt, Altman, Anadkat, Avila, Babuschkin, Balaji, Balcom, Baltescu, Bao, Bavarian, Belgum, Bello, Berdine, Bernadett-Shapiro, Berner, Bogdonoff, Boiko, Boyd, Brakman, Brockman, Brooks, Brundage, Button, Cai, Campbell, Cann, Carey, Carlson, Carmichael, Chan, Chang, Chantzis, Chen, Chen, Chen, Chen, Chen, Chess, Cho, Chu, Chung, Cummings, Currier, Dai, Decareaux, Degry, Deutsch, Deville, Dhar, Dohan, Dowling, Dunning, Ecoffet, Eleti, Eloundou, Farhi, Fedus, Felix, Fishman, Forte, Fulford, Gao, Georges, Gibson, Goel, Gogineni, Goh, Gontijo-Lopes, Gordon, Grafstein, Gray, Greene, Gross, Gu, Guo, Hallacy, Han, Harris, He, Heaton, Heidecke, Hesse, Hickey, Hickey, Hoeschele, Houghton, Hsu, Hu, Hu, Huizinga, Jain, Jain, Jang, Jiang, Jiang, Jin, Jin, Jomoto, Jonn, Jun, Kaftan, Łukasz Kaiser, Kamali, Kanitscheider, Keskar, Khan, Kilpatrick, Kim, Kim, Kim, Kirchner, Kiros, Knight, Kokotajlo, Łukasz Kondraciuk, Kondrich, Konstantinidis, Kosic, Krueger, Kuo, Lampe, Lan, Lee, Leike, Leung, Levy, Li, Lim, Lin, Lin, Litwin, Lopez, Lowe, Lue, Makanju, Malfacini, Manning, Markov, Markovski, Martin, Mayer, Mayne, McGrew, McKinney, McLeavey, McMillan, McNeil, Medina, Mehta, Menick, Metz, Mishchenko, Mishkin, Monaco, Morikawa, Mossing, Mu, Murati, Murk, Mély, Nair, Nakano, Nayak, Neelakantan, Ngo, Noh, Ouyang, O'Keefe, Pachocki, Paino, Palermo, Pantuliano, Parascandolo, Parish, Parparita, Passos, Pavlov, Peng, Perelman, de~Avila Belbute~Peres, Petrov, de~Oliveira~Pinto, Michael, Pokorny, Pokrass, Pong, Powell, Power, Power, Proehl, Puri, Radford, Rae, Ramesh, Raymond, Real, Rimbach, Ross, Rotsted, Roussez, Ryder, Saltarelli, Sanders, Santurkar, Sastry, Schmidt, Schnurr, Schulman, Selsam, Sheppard, Sherbakov, Shieh, Shoker, Shyam, Sidor, Sigler, Simens, Sitkin, Slama, Sohl, Sokolowsky, Song, Staudacher, Such, Summers, Sutskever, Tang, Tezak, Thompson, Tillet, Tootoonchian, Tseng, Tuggle, Turley, Tworek, Uribe, Vallone, Vijayvergiya, Voss, Wainwright, Wang, Wang, Wang, Ward, Wei, Weinmann, Welihinda, Welinder, Weng, Weng, Wiethoff, Willner, Winter, Wolrich, Wong, Workman, Wu, Wu, Wu, Xiao, Xu, Yoo, Yu, Yuan, Zaremba, Zellers, Zhang, Zhang, Zhao, Zheng, Zhuang, Zhuk, and Zoph]{achiam2023gpt4}
+\bibitem[OpenAI et~al.(2024)OpenAI, Achiam, Adler, Agarwal, Ahmad, Akkaya,
+  Aleman, Almeida, Altenschmidt, Altman, Anadkat, Avila, Babuschkin, Balaji,
+  Balcom, Baltescu, Bao, Bavarian, Belgum, Bello, Berdine, Bernadett-Shapiro,
+  Berner, Bogdonoff, Boiko, Boyd, Brakman, Brockman, Brooks, Brundage, Button,
+  Cai, Campbell, Cann, Carey, Carlson, Carmichael, Chan, Chang, Chantzis, Chen,
+  Chen, Chen, Chen, Chen, Chess, Cho, Chu, Chung, Cummings, Currier, Dai,
+  Decareaux, Degry, Deutsch, Deville, Dhar, Dohan, Dowling, Dunning, Ecoffet,
+  Eleti, Eloundou, Farhi, Fedus, Felix, Fishman, Forte, Fulford, Gao, Georges,
+  Gibson, Goel, Gogineni, Goh, Gontijo-Lopes, Gordon, Grafstein, Gray, Greene,
+  Gross, Gu, Guo, Hallacy, Han, Harris, He, Heaton, Heidecke, Hesse, Hickey,
+  Hickey, Hoeschele, Houghton, Hsu, Hu, Hu, Huizinga, Jain, Jain, Jang, Jiang,
+  Jiang, Jin, Jin, Jomoto, Jonn, Jun, Kaftan, Łukasz Kaiser, Kamali,
+  Kanitscheider, Keskar, Khan, Kilpatrick, Kim, Kim, Kim, Kirchner, Kiros,
+  Knight, Kokotajlo, Łukasz Kondraciuk, Kondrich, Konstantinidis, Kosic,
+  Krueger, Kuo, Lampe, Lan, Lee, Leike, Leung, Levy, Li, Lim, Lin, Lin, Litwin,
+  Lopez, Lowe, Lue, Makanju, Malfacini, Manning, Markov, Markovski, Martin,
+  Mayer, Mayne, McGrew, McKinney, McLeavey, McMillan, McNeil, Medina, Mehta,
+  Menick, Metz, Mishchenko, Mishkin, Monaco, Morikawa, Mossing, Mu, Murati,
+  Murk, Mély, Nair, Nakano, Nayak, Neelakantan, Ngo, Noh, Ouyang, O'Keefe,
+  Pachocki, Paino, Palermo, Pantuliano, Parascandolo, Parish, Parparita,
+  Passos, Pavlov, Peng, Perelman, de~Avila Belbute~Peres, Petrov,
+  de~Oliveira~Pinto, Michael, Pokorny, Pokrass, Pong, Powell, Power, Power,
+  Proehl, Puri, Radford, Rae, Ramesh, Raymond, Real, Rimbach, Ross, Rotsted,
+  Roussez, Ryder, Saltarelli, Sanders, Santurkar, Sastry, Schmidt, Schnurr,
+  Schulman, Selsam, Sheppard, Sherbakov, Shieh, Shoker, Shyam, Sidor, Sigler,
+  Simens, Sitkin, Slama, Sohl, Sokolowsky, Song, Staudacher, Such, Summers,
+  Sutskever, Tang, Tezak, Thompson, Tillet, Tootoonchian, Tseng, Tuggle,
+  Turley, Tworek, Uribe, Vallone, Vijayvergiya, Voss, Wainwright, Wang, Wang,
+  Wang, Ward, Wei, Weinmann, Welihinda, Welinder, Weng, Weng, Wiethoff,
+  Willner, Winter, Wolrich, Wong, Workman, Wu, Wu, Wu, Xiao, Xu, Yoo, Yu, Yuan,
+  Zaremba, Zellers, Zhang, Zhang, Zhao, Zheng, Zhuang, Zhuk, and
+  Zoph]{achiam2023gpt4}
 OPENAI, ACHIAM J, ADLER S, et~al.
 \newblock GPT-4 Technical Report\allowbreak[A/OL].
 \newblock 2024.
 \newblock arXiv: \eprint{https://arxiv.org/abs/2303.08774}{2303.08774}.
 \newblock \url{https://arxiv.org/abs/2303.08774}.
 
-\bibitem[Touvron et~al.(2023)Touvron, Lavril, Izacard, et~al.]{touvron2023llama}
+\bibitem[Touvron et~al.(2023)Touvron, Lavril, Izacard,
+  et~al.]{touvron2023llama}
 TOUVRON H, LAVRIL T, IZACARD G, et~al.
-\newblock {LLaMA}: Open and Efficient Foundation Language Models\allowbreak[A/OL].
+\newblock {LLaMA}: Open and Efficient Foundation Language
+  Models\allowbreak[A/OL].
 \newblock 2023.
 \newblock arXiv: \eprint{https://arxiv.org/abs/2302.13971}{2302.13971}.
 \newblock \url{https://arxiv.org/abs/2302.13971}.
@@ -62,123 +106,169 @@ TOUVRON H, LAVRIL T, IZACARD G, et~al.
 \newblock 2025.
 \newblock \url{https://claude.ai}.
 
-\bibitem[张钦彤\ 等(2024)张钦彤, 王昱超, 王鹤羲, 王俊鑫, and 陈海]{zhang2023llm_survey}
+\bibitem[张钦彤\ 等(2024)张钦彤, 王昱超, 王鹤羲, 王俊鑫, and
+  陈海]{zhang2023llm_survey}
 张钦彤, 王昱超, 王鹤羲, 等.
 \newblock 大语言模型微调技术的研究综述.\allowbreak[J].
-\newblock Journal of Computer Engineering \& Applications, 2024, 60\allowbreak (17).
+\newblock Journal of Computer Engineering \& Applications, 2024, 60\allowbreak
+  (17).
 
-\bibitem[Wu et~al.(2022)Wu, Raghavendra, Gupta, Acun, Ardalani, Maeng, Chang, Behram, Huang, Bai, Gschwind, Gupta, Ott, Melnikov, Candido, Brooks, Chauhan, Lee, Lee, Akyildiz, Balandat, Spisak, Jain, Rabbat, and Hazelwood]{wu2022sustainable}
+\bibitem[田倬璟\ 等(2021)田倬璟, 黄震春, and
+  张益农]{li2022cloud_resource}
+田倬璟, 黄震春, 张益农.
+\newblock 云计算环境任务调度方法研究综述.\allowbreak[J].
+\newblock Journal of Computer Engineering \& Applications, 2021, 57\allowbreak
+  (2).
+
+\bibitem[Wu et~al.(2022)Wu, Raghavendra, Gupta, Acun, Ardalani, Maeng, Chang,
+  Behram, Huang, Bai, Gschwind, Gupta, Ott, Melnikov, Candido, Brooks, Chauhan,
+  Lee, Lee, Akyildiz, Balandat, Spisak, Jain, Rabbat, and
+  Hazelwood]{wu2022sustainable}
 WU C~J, RAGHAVENDRA R, GUPTA U, et~al.
-\newblock Sustainable AI: Environmental Implications, Challenges and Opportunities\allowbreak[A/OL].
+\newblock Sustainable AI: Environmental Implications, Challenges and
+  Opportunities\allowbreak[A/OL].
 \newblock 2022.
 \newblock arXiv: \eprint{https://arxiv.org/abs/2111.00364}{2111.00364}.
 \newblock \url{https://arxiv.org/abs/2111.00364}.
 
-\bibitem[袁牧\ 等(2024)袁牧, 张兰, 姚云昊, 张钧洋, 罗溥晗, and 李向阳]{wang2023kv_cache}
+\bibitem[袁牧\ 等(2024)袁牧, 张兰, 姚云昊, 张钧洋, 罗溥晗, and
+  李向阳]{wang2023kv_cache}
 袁牧, 张兰, 姚云昊, 等.
 \newblock 面向智能物联网的资源高效模型推理综述\allowbreak[J].
 \newblock 计算机学报, 2024, 47\allowbreak (10): 2247-2273.
 
 \bibitem[He et~al.(2024)He, Xu, Wu, Zheng, Ye, and Xu]{he2024uellm}
 HE Y, XU M, WU J, et~al.
-\newblock {UELLM}: A Unified and Efficient Approach for Large Language Model Inference Serving\allowbreak[C/OL]//\allowbreak
-Service-Oriented Computing: 22nd International Conference (ICSOC 2024), Tunis, Tunisia, December 3--6, 2024, Proceedings, Part I.
-\newblock Berlin, Heidelberg: Springer-Verlag, 2024: 218-235.
-\newblock DOI: \doi{10.1007/978-981-96-0805-8\_16}.
+\newblock UELLM: A Unified and Efficient Approach for Large Language Model
+  Inference Serving\allowbreak[C/OL]//\allowbreak
+Service-Oriented Computing: 22nd International Conference, ICSOC 2024, Tunis,
+  Tunisia, December 3–6, 2024, Proceedings, Part I.
+\newblock Berlin, Heidelberg: Springer-Verlag, 2024: 218–235.
+\newblock \url{https://doi.org/10.1007/978-981-96-0805-8_16}.
 
-\bibitem[Wolf et~al.(2020)Wolf, Debut, Sanh, Chaumond, Delangue, Moi, Cistac, Rault, Louf, Funtowicz, Davison, Shleifer, von Platen, Ma, Jernite, Plu, Xu, Le~Scao, Gugger, Drame, Lhoest, and Rush]{transformers}
+\bibitem[Wolf et~al.(2020)Wolf, Debut, Sanh, Chaumond, Delangue, Moi, Cistac,
+  Rault, Louf, Funtowicz, Davison, Shleifer, von Platen, Ma, Jernite, Plu, Xu,
+  Le~Scao, Gugger, Drame, Lhoest, and Rush]{transformers}
 WOLF T, DEBUT L, SANH V, et~al.
-\newblock Transformers: State-of-the-Art Natural Language Processing\allowbreak[C/OL]//\allowbreak
+\newblock Transformers: State-of-the-Art Natural Language
+  Processing\allowbreak[C/OL]//\allowbreak
 LIU Q, SCHLANGEN D.
-\newblock Proceedings of the 2020 Conference on Empirical Methods in Natural Language Processing: System Demonstrations.
+\newblock Proceedings of the 2020 Conference on Empirical Methods in Natural
+  Language Processing: System Demonstrations.
 \newblock Online: Association for Computational Linguistics, 2020: 38-45.
 \newblock \url{https://aclanthology.org/2020.emnlp-demos.6/}.
 \newblock DOI: \doi{10.18653/v1/2020.emnlp-demos.6}.
 
-\bibitem[Feng et~al.(2025)Feng, Huang, Zhang, Liang, Yan, and Wu]{feng2025windserve}
+\bibitem[Feng et~al.(2025)Feng, Huang, Zhang, Liang, Yan, and
+  Wu]{feng2025windserve}
 FENG J, HUANG Y, ZHANG R, et~al.
-\newblock {WindServe}: Efficient Phase-Disaggregated LLM Serving with Stream-based Dynamic Scheduling\allowbreak[C/OL]//\allowbreak
-Proceedings of the 52nd Annual International Symposium on Computer Architecture (ISCA '25).
-\newblock New York, NY, USA: Association for Computing Machinery, 2025: 1283-1295.
-\newblock DOI: \doi{10.1145/3695053.3730999}.
+\newblock WindServe: Efficient Phase-Disaggregated LLM Serving with
+  Stream-based Dynamic Scheduling\allowbreak[C/OL]//\allowbreak
+ISCA '25: Proceedings of the 52nd Annual International Symposium on Computer
+  Architecture.
+\newblock New York, NY, USA: Association for Computing Machinery, 2025:
+  1283–1295.
+\newblock \url{https://doi.org/10.1145/3695053.3730999}.
 
-\bibitem[任杰\ 等(2020)任杰, 高岭, 于佳龙, and 袁璐]{zhao2022gpu_sched}
+\bibitem[任杰\ 等(2020)任杰, 高岭, 于佳龙, and
+  袁璐]{zhao2022gpu_sched}
 任杰, 高岭, 于佳龙, 等.
-\newblock 面向边缘设备的高能效深度学习任务调度策略\allowbreak[J].
+\newblock
+  面向边缘设备的高能效深度学习任务调度策略\allowbreak[J].
 \newblock 计算机学报, 2020, 43\allowbreak (3): 440-452.
 
-\bibitem[Zhou et~al.(2024)Zhou, Ning, Hong, Fu, Xu, Li, Lou, Wang, Yuan, Li, et~al.]{zhou2024survey}
+\bibitem[Zhou et~al.(2024)Zhou, Ning, Hong, Fu, Xu, Li, Lou, Wang, Yuan, Li,
+  et~al.]{zhou2024survey}
 ZHOU Z, NING X, HONG K, et~al.
-\newblock A Survey on Efficient Inference for Large Language Models\allowbreak[A/OL].
+\newblock A Survey on Efficient Inference for Large Language
+  Models\allowbreak[A/OL].
 \newblock 2024.
 \newblock arXiv: \eprint{https://arxiv.org/abs/2404.14294}{2404.14294}.
 \newblock \url{https://arxiv.org/abs/2404.14294}.
 
 \bibitem[{NVIDIA Corporation}(2024)]{tensorrtllm}
 {NVIDIA Corporation}.
-\newblock {TensorRT-LLM}: High-performance LLM inference library from NVIDIA\allowbreak[EB/OL].
+\newblock {TensorRT-LLM}: High-performance LLM inference library from
+  NVIDIA\allowbreak[EB/OL].
 \newblock 2024.
 \newblock \url{https://developer.nvidia.com/tensorrt-llm}.
 
-\bibitem[孙梦宇\ 等(2026)孙梦宇, 谭宇剀, 陆钢, 黄志兰, 王亚森, 朱泽亚, 李伊青, and 陈映]{chen2022batch_schedule}
+\bibitem[孙梦宇\ 等(2026)孙梦宇, 谭宇剀, 陆钢, 黄志兰,
+  王亚森, 朱泽亚, 李伊青, and 陈映]{chen2022batch_schedule}
 孙梦宇, 谭宇剀, 陆钢, 等.
-\newblock 面向PD分离式混合专家模型部署优化的分布式推理系统\allowbreak[J/OL].
+\newblock
+  面向PD分离式混合专家模型部署优化的分布式推理系统\allowbreak[J/OL].
 \newblock 电信科学, 2026: 1-18.
 \newblock \url{https://link.cnki.net/urlid/11.2103.tn.20260119.1551.004}.
 
 \bibitem[王帅\ 等(2022)王帅 and 李丹]{liu2023distributed_infer}
 王帅, 李丹.
-\newblock 分布式机器学习系统网络性能优化研究进展\allowbreak[J].
+\newblock
+  分布式机器学习系统网络性能优化研究进展\allowbreak[J].
 \newblock 计算机学报, 2022, 45\allowbreak (7): 1384-1411.
 
-\bibitem[Leviathan et~al.(2023)Leviathan, Kalman, and Matias]{leviathan2023fast}
+\bibitem[Leviathan et~al.(2023)Leviathan, Kalman, and
+  Matias]{leviathan2023fast}
 LEVIATHAN Y, KALMAN M, MATIAS Y.
-\newblock Fast Inference from Transformers via Speculative Decoding\allowbreak[A/OL].
+\newblock Fast Inference from Transformers via Speculative
+  Decoding\allowbreak[A/OL].
 \newblock 2023.
 \newblock arXiv: \eprint{https://arxiv.org/abs/2211.17192}{2211.17192}.
 \newblock \url{https://arxiv.org/abs/2211.17192}.
 
-\bibitem[Chen et~al.(2023)Chen, Borgeaud, Irving, Lespiau, Sifre, and Jumper]{chen2023accelerating}
+\bibitem[Chen et~al.(2023)Chen, Borgeaud, Irving, Lespiau, Sifre, and
+  Jumper]{chen2023accelerating}
 CHEN C, BORGEAUD S, IRVING G, et~al.
-\newblock Accelerating Large Language Model Decoding with Speculative Sampling\allowbreak[A/OL].
+\newblock Accelerating Large Language Model Decoding with Speculative
+  Sampling\allowbreak[A/OL].
 \newblock 2023.
 \newblock arXiv: \eprint{https://arxiv.org/abs/2302.01318}{2302.01318}.
 \newblock \url{https://arxiv.org/abs/2302.01318}.
 
 \bibitem[Yu et~al.(2022)Yu, Jeong, Kim, Kim, and Chun]{Orca}
 YU G~I, JEONG J~S, KIM G~W, et~al.
-\newblock Orca: A distributed serving system for Transformer-Based generative models\allowbreak[C]//\allowbreak
+\newblock Orca: A distributed serving system for Transformer-Based generative
+  models\allowbreak[C]//\allowbreak
 16th USENIX symposium on operating systems design and implementation (OSDI 22).
 \newblock 2022: 521-538.
 
-\bibitem[Schuster et~al.(2022)Schuster, Fisch, Gupta, Dehghani, Bahri, Tran, Tay, and Metzler]{schuster2022confident}
+\bibitem[Schuster et~al.(2022)Schuster, Fisch, Gupta, Dehghani, Bahri, Tran,
+  Tay, and Metzler]{schuster2022confident}
 SCHUSTER T, FISCH A, GUPTA J, et~al.
 \newblock Confident Adaptive Language Modeling\allowbreak[C]//\allowbreak
 Advances in Neural Information Processing Systems (NeurIPS): Vol.~35.
 \newblock 2022: 17456-17472.
 
-\bibitem[Li et~al.(2021)Li, Lin, Chen, Ren, Li, Zhou, and Sun]{li2021cascadebert}
+\bibitem[Li et~al.(2021)Li, Lin, Chen, Ren, Li, Zhou, and
+  Sun]{li2021cascadebert}
 LI L, LIN Y, CHEN D, et~al.
-\newblock Cascadebert: Accelerating inference of pre-trained language models via calibrated complete models cascade\allowbreak[C]//\allowbreak
+\newblock Cascadebert: Accelerating inference of pre-trained language models
+  via calibrated complete models cascade\allowbreak[C]//\allowbreak
 Findings of the Association for Computational Linguistics: EMNLP 2021.
 \newblock 2021: 475-486.
 
-\bibitem[Dettmers et~al.(2022)Dettmers, Lewis, Belkada, and Zettlemoyer]{dettmers2022llm}
+\bibitem[Dettmers et~al.(2022)Dettmers, Lewis, Belkada, and
+  Zettlemoyer]{dettmers2022llm}
 DETTMERS T, LEWIS M, BELKADA Y, et~al.
-\newblock {LLM}.int8(): 8-bit Matrix Multiplication for Transformers at Scale\allowbreak[C]//\allowbreak
+\newblock {LLM}.int8(): 8-bit Matrix Multiplication for Transformers at
+  Scale\allowbreak[C]//\allowbreak
 Advances in Neural Information Processing Systems (NeurIPS): Vol.~35.
 \newblock 2022: 30318-30332.
 
-\bibitem[Frantar et~al.(2023)Frantar, Ashkboos, Hoefler, and Alistarh]{frantar2022gptq}
+\bibitem[Frantar et~al.(2023)Frantar, Ashkboos, Hoefler, and
+  Alistarh]{frantar2022gptq}
 FRANTAR E, ASHKBOOS S, HOEFLER T, et~al.
-\newblock GPTQ: Accurate Post-Training Quantization for Generative Pre-trained Transformers\allowbreak[A/OL].
+\newblock GPTQ: Accurate Post-Training Quantization for Generative Pre-trained
+  Transformers\allowbreak[A/OL].
 \newblock 2023.
 \newblock arXiv: \eprint{https://arxiv.org/abs/2210.17323}{2210.17323}.
 \newblock \url{https://arxiv.org/abs/2210.17323}.
 
-\bibitem[Wang et~al.(2023)Wang, Ma, Dong, Huang, Wang, Ma, Yang, Wang, Wu, and Wei]{wang2023bitnet}
+\bibitem[Wang et~al.(2023)Wang, Ma, Dong, Huang, Wang, Ma, Yang, Wang, Wu, and
+  Wei]{wang2023bitnet}
 WANG H, MA S, DONG L, et~al.
-\newblock {BitNet}: Scaling 1-bit Transformers for Large Language Models\allowbreak[A/OL].
+\newblock {BitNet}: Scaling 1-bit Transformers for Large Language
+  Models\allowbreak[A/OL].
 \newblock 2023.
 \newblock arXiv: \eprint{https://arxiv.org/abs/2310.11453}{2310.11453}.
 \newblock \url{https://arxiv.org/abs/2310.11453}.
@@ -192,201 +282,261 @@ GU Y, DONG L, WEI F, et~al.
 
 \bibitem[Wu et~al.(2023)Wu, Zhao, Li, Gao, Li, He, et~al.]{wu2023laminigpt}
 WU C, ZHAO W, LI B, et~al.
-\newblock {LaMini-LM}: A Diverse Herd of Distilled Models from Large-Scale Instructions\allowbreak[A/OL].
+\newblock {LaMini-LM}: A Diverse Herd of Distilled Models from Large-Scale
+  Instructions\allowbreak[A/OL].
 \newblock 2023.
 \newblock arXiv: \eprint{https://arxiv.org/abs/2304.14402}{2304.14402}.
 \newblock \url{https://arxiv.org/abs/2304.14402}.
 
-\bibitem[Dettmers et~al.(2023)Dettmers, Pagnoni, Holtzman, and Zettlemoyer]{dettmers2023qlora}
+\bibitem[Dettmers et~al.(2023)Dettmers, Pagnoni, Holtzman, and
+  Zettlemoyer]{dettmers2023qlora}
 DETTMERS T, PAGNONI A, HOLTZMAN A, et~al.
-\newblock QLORA: efficient finetuning of quantized LLMs\allowbreak[C]//\allowbreak
-NIPS '23: Proceedings of the 37th International Conference on Neural Information Processing Systems.
+\newblock QLORA: efficient finetuning of quantized
+  LLMs\allowbreak[C]//\allowbreak
+NIPS '23: Proceedings of the 37th International Conference on Neural
+  Information Processing Systems.
 \newblock Red Hook, NY, USA: Curran Associates Inc., 2023.
 
-\bibitem[Xiao et~al.(2023)Xiao, Tian, Chen, Han, and Lewis]{xiao2023streamingllm}
+\bibitem[Xiao et~al.(2023)Xiao, Tian, Chen, Han, and
+  Lewis]{xiao2023streamingllm}
 XIAO G, TIAN Y, CHEN B, et~al.
-\newblock {StreamingLLM}: Efficient Streaming Language Models with Attention Sinks\allowbreak[A/OL].
+\newblock {StreamingLLM}: Efficient Streaming Language Models with Attention
+  Sinks\allowbreak[A/OL].
 \newblock 2023.
 \newblock arXiv: \eprint{https://arxiv.org/abs/2309.17453}{2309.17453}.
 \newblock \url{https://arxiv.org/abs/2309.17453}.
 
-\bibitem[Dao et~al.(2022)Dao, Fu, Ermon, Rudra, and R{\'e}]{dao2022flashattention}
+\bibitem[Dao et~al.(2022)Dao, Fu, Ermon, Rudra, and
+  R{\'e}]{dao2022flashattention}
 DAO T, FU D~Y, ERMON S, et~al.
-\newblock {FlashAttention}: Fast and Memory-efficient Exact Attention with {IO}-awareness\allowbreak[C]//\allowbreak
+\newblock {FlashAttention}: Fast and Memory-efficient Exact Attention with
+  {IO}-awareness\allowbreak[C]//\allowbreak
 Advances in Neural Information Processing Systems (NeurIPS): Vol.~35.
 \newblock 2022: 16344-16359.
 
-\bibitem[Chen et~al.(2018)Chen, Moreau, Jiang, Zheng, Yan, Shen, Cowan, Wang, Hu, Ceze, Guestrin, and Krishnamurthy]{chen2018tvm}
+\bibitem[Chen et~al.(2018)Chen, Moreau, Jiang, Zheng, Yan, Shen, Cowan, Wang,
+  Hu, Ceze, Guestrin, and Krishnamurthy]{chen2018tvm}
 CHEN T, MOREAU T, JIANG Z, et~al.
-\newblock {TVM}: An Automated {End-to-End} Optimizing Compiler for Deep Learning\allowbreak[C/OL]//\allowbreak
+\newblock {TVM}: An Automated {End-to-End} Optimizing Compiler for Deep
+  Learning\allowbreak[C/OL]//\allowbreak
 13th USENIX Symposium on Operating Systems Design and Implementation (OSDI 18).
 \newblock Carlsbad, CA: USENIX Association, 2018: 578-594.
 \newblock \url{https://www.usenix.org/conference/osdi18/presentation/chen}.
 
-\bibitem[Gujarati et~al.(2020)Gujarati, Karimi, Alzayat, Hao, Kaufmann, Vigfusson, and Mace]{gujarati2020serving}
+\bibitem[Gujarati et~al.(2020)Gujarati, Karimi, Alzayat, Hao, Kaufmann,
+  Vigfusson, and Mace]{gujarati2020serving}
 GUJARATI A, KARIMI R, ALZAYAT S, et~al.
-\newblock Serving {DNNs} like Clockwork: Performance Predictability from the Bottom Up\allowbreak[C/OL]//\allowbreak
+\newblock Serving {DNNs} like Clockwork: Performance Predictability from the
+  Bottom Up\allowbreak[C/OL]//\allowbreak
 14th USENIX Symposium on Operating Systems Design and Implementation (OSDI 20).
 \newblock USENIX Association, 2020: 443-462.
 \newblock \url{https://www.usenix.org/conference/osdi20/presentation/gujarati}.
 
-\bibitem[Patel et~al.(2024)Patel, Choukse, Zhang, Shah, Goiri, Maleki, and Bianchini]{patel2024splitwise}
+\bibitem[Patel et~al.(2024)Patel, Choukse, Zhang, Shah, Goiri, Maleki, and
+  Bianchini]{patel2024splitwise}
 PATEL P, CHOUKSE E, ZHANG C, et~al.
-\newblock Splitwise: Efficient Generative LLM Inference Using Phase Splitting\allowbreak[C/OL]//\allowbreak
-2024 ACM/IEEE 51st Annual International Symposium on Computer Architecture (ISCA).
+\newblock Splitwise: Efficient Generative LLM Inference Using Phase
+  Splitting\allowbreak[C/OL]//\allowbreak
+2024 ACM/IEEE 51st Annual International Symposium on Computer Architecture
+  (ISCA).
 \newblock 2024: 118-132.
 \newblock DOI: \doi{10.1109/ISCA59077.2024.00019}.
 
-\bibitem[Hong et~al.(2025)Hong, Chen, Wang, Li, Mao, Ma, Xiong, Wu, Han, Dai, et~al.]{hong2025semi}
+\bibitem[Hong et~al.(2025)Hong, Chen, Wang, Li, Mao, Ma, Xiong, Wu, Han, Dai,
+  et~al.]{hong2025semi}
 HONG K, CHEN L, WANG Z, et~al.
-\newblock semi-{PD}: Towards Efficient LLM Serving via Phase-Wise Disaggregated Computation and Unified Storage\allowbreak[A/OL].
+\newblock semi-{PD}: Towards Efficient LLM Serving via Phase-Wise Disaggregated
+  Computation and Unified Storage\allowbreak[A/OL].
 \newblock 2025.
 \newblock arXiv: \eprint{https://arxiv.org/abs/2504.19867}{2504.19867}.
 \newblock \url{https://arxiv.org/abs/2504.19867}.
 
 \bibitem[Wu et~al.(2024)Wu, Liu, Zhong, Sun, Liu, and Jin]{wu2024loongserve}
 WU B, LIU S, ZHONG Y, et~al.
-\newblock {Loongserve}: Efficiently Serving Long-Context Large Language Models with Elastic Sequence Parallelism\allowbreak[C]//\allowbreak
+\newblock {Loongserve}: Efficiently Serving Long-Context Large Language Models
+  with Elastic Sequence Parallelism\allowbreak[C]//\allowbreak
 Proceedings of the ACM SIGOPS 30th Symposium on Operating Systems Principles.
 \newblock ACM, 2024: 640-654.
 
-\bibitem[Hu et~al.(2024)Hu, Huang, Xu, Chen, Xu, Chen, Feng, Wang, Wang, Bao, et~al.]{hu2024tetriInfer}
+\bibitem[Hu et~al.(2024)Hu, Huang, Xu, Chen, Xu, Chen, Feng, Wang, Wang, Bao,
+  et~al.]{hu2024tetriInfer}
 HU C, HUANG H, XU L, et~al.
-\newblock Inference without Interference: Disaggregate LLM Inference for Mixed Downstream Workloads\allowbreak[A/OL].
+\newblock Inference without Interference: Disaggregate LLM Inference for Mixed
+  Downstream Workloads\allowbreak[A/OL].
 \newblock 2024.
 \newblock arXiv: \eprint{https://arxiv.org/abs/2401.11181}{2401.11181}.
 \newblock \url{https://arxiv.org/abs/2401.11181}.
 
 \bibitem[{NVIDIA Corporation}(2025)]{nvidiadynamo}
 {NVIDIA Corporation}.
-\newblock {NVIDIA Dynamo}: Distributed orchestration for large-scale LLM serving\allowbreak[EB/OL].
+\newblock {NVIDIA Dynamo}: Distributed orchestration for large-scale LLM
+  serving\allowbreak[EB/OL].
 \newblock 2025.
 \newblock \url{https://developer.nvidia.com/nvidia-dynamo}.
 
-\bibitem[Qin et~al.(2024)Qin, Li, He, Zhang, Yu, Huang, He, Liu, Li, Xin, et~al.]{qin2024mooncake}
+\bibitem[Qin et~al.(2024)Qin, Li, He, Zhang, Yu, Huang, He, Liu, Li, Xin,
+  et~al.]{qin2024mooncake}
 QIN R, LI Z, HE W, et~al.
-\newblock Mooncake: A {KVCache}-centric Disaggregated Architecture for {LLM} Serving\allowbreak[A/OL].
+\newblock Mooncake: A {KVCache}-centric Disaggregated Architecture for {LLM}
+  Serving\allowbreak[A/OL].
 \newblock 2024.
 \newblock arXiv: \eprint{https://arxiv.org/abs/2407.00079}{2407.00079}.
 \newblock \url{https://arxiv.org/abs/2407.00079}.
 
-\bibitem[Hu et~al.(2024)Hu, Huang, Hu, Yu, Wang, Wang, Chen, Zhang, Hou, Li, et~al.]{hu2024memserve}
+\bibitem[Hu et~al.(2024)Hu, Huang, Hu, Yu, Wang, Wang, Chen, Zhang, Hou, Li,
+  et~al.]{hu2024memserve}
 HU C, HUANG H, HU J, et~al.
-\newblock {MemServe}: Context Caching for Disaggregated {LLM} Serving with Elastic Memory Pool\allowbreak[A/OL].
+\newblock {MemServe}: Context Caching for Disaggregated {LLM} Serving with
+  Elastic Memory Pool\allowbreak[A/OL].
 \newblock 2024.
 \newblock arXiv: \eprint{https://arxiv.org/abs/2406.17565}{2406.17565}.
 \newblock \url{https://arxiv.org/abs/2406.17565}.
 
-\bibitem[Wang et~al.(2021)Wang, Yang, Yu, Wang, Li, Sun, He, and Zhang]{wang2021morphling}
+\bibitem[Wang et~al.(2021)Wang, Yang, Yu, Wang, Li, Sun, He, and
+  Zhang]{wang2021morphling}
 WANG L, YANG L, YU Y, et~al.
-\newblock Morphling: Fast, near-optimal auto-configuration for cloud-native model serving\allowbreak[C]//\allowbreak
+\newblock Morphling: Fast, near-optimal auto-configuration for cloud-native
+  model serving\allowbreak[C]//\allowbreak
 Proceedings of the ACM Symposium on Cloud Computing.
 \newblock 2021: 639-653.
 
-\bibitem[Xiao et~al.(2020)Xiao, Ren, Li, Zhang, Hou, Li, Feng, Lin, and Jia]{xiao2022antman}
+\bibitem[Xiao et~al.(2020)Xiao, Ren, Li, Zhang, Hou, Li, Feng, Lin, and
+  Jia]{xiao2022antman}
 XIAO W, REN S, LI Y, et~al.
-\newblock {AntMan}: Dynamic Scaling on {GPU} Clusters for Deep Learning\allowbreak[C/OL]//\allowbreak
+\newblock {AntMan}: Dynamic Scaling on {GPU} Clusters for Deep
+  Learning\allowbreak[C/OL]//\allowbreak
 14th USENIX Symposium on Operating Systems Design and Implementation (OSDI 20).
 \newblock USENIX Association, 2020: 533-548.
 \newblock \url{https://www.usenix.org/conference/osdi20/presentation/xiao}.
 
-\bibitem[Qin et~al.(2023)Qin, Yang, Zheng, Li, Zhang, Zheng, Sun, Zhang, Zhang, An, et~al.]{qin2022allox}
+\bibitem[Qin et~al.(2023)Qin, Yang, Zheng, Li, Zhang, Zheng, Sun, Zhang, Zhang,
+  An, et~al.]{qin2022allox}
 QIN R, YANG Y, ZHENG Q, et~al.
-\newblock Allox: Compute Allocation in Hybrid Clusters\allowbreak[C]//\allowbreak
-Proceedings of the Eighteenth European Conference on Computer Systems (EuroSys).
+\newblock Allox: Compute Allocation in Hybrid
+  Clusters\allowbreak[C]//\allowbreak
+Proceedings of the Eighteenth European Conference on Computer Systems
+  (EuroSys).
 \newblock 2023: 587-603.
 
 \bibitem[Sheng et~al.(2023)Sheng, Zheng, Yuan, et~al.]{sheng2023flexgen}
 SHENG Y, ZHENG L, YUAN B, et~al.
-\newblock {FlexGen}: High-throughput Generative Inference of Large Language Models with a Single {GPU}\allowbreak[C]//\allowbreak
+\newblock {FlexGen}: High-throughput Generative Inference of Large Language
+  Models with a Single {GPU}\allowbreak[C]//\allowbreak
 Proceedings of the 40th International Conference on Machine Learning (ICML).
 \newblock PMLR, 2023: 31094-31116.
 
-\bibitem[Yang et~al.(2023)Yang, Luan, Li, Zhang, Qin, Liang, Li, Jin, He, Xu, et~al.]{yang2023skypilot}
+\bibitem[Yang et~al.(2023)Yang, Luan, Li, Zhang, Qin, Liang, Li, Jin, He, Xu,
+  et~al.]{yang2023skypilot}
 YANG Z, LUAN Z, LI B, et~al.
-\newblock {SkyPilot}: An Intercloud Broker for Sky Computing\allowbreak[C]//\allowbreak
-Proceedings of the 17th USENIX Symposium on Operating Systems Design and Implementation (OSDI).
+\newblock {SkyPilot}: An Intercloud Broker for Sky
+  Computing\allowbreak[C]//\allowbreak
+Proceedings of the 17th USENIX Symposium on Operating Systems Design and
+  Implementation (OSDI).
 \newblock 2023: 577-596.
 
-\bibitem[He et~al.(2026)He, Xu, Wu, Hu, Ma, Shen, Chen, Xu, Qu, and Ye]{he2025banaserve}
+\bibitem[He et~al.(2026)He, Xu, Wu, Hu, Ma, Shen, Chen, Xu, Qu, and
+  Ye]{he2025banaserve}
 HE Y, XU M, WU J, et~al.
-\newblock BanaServe: Unified KV Cache and Dynamic Module Migration for Balancing Disaggregated LLM Serving in AI Infrastructure\allowbreak[J/OL].
+\newblock BanaServe: Unified KV Cache and Dynamic Module Migration for
+  Balancing Disaggregated LLM Serving in AI Infrastructure\allowbreak[J/OL].
 \newblock Software: Practice and Experience, 2026, 56\allowbreak (4): 424-444.
 \newblock \url{https://onlinelibrary.wiley.com/doi/abs/10.1002/spe.70054}.
 \newblock DOI: \doi{https://doi.org/10.1002/spe.70054}.
 
-\bibitem[Taori et~al.(2023)Taori, Gulrajani, Zhang, Dubois, Li, Guestrin, Liang, and Hashimoto]{alpaca}
+\bibitem[Taori et~al.(2023)Taori, Gulrajani, Zhang, Dubois, Li, Guestrin,
+  Liang, and Hashimoto]{alpaca}
 TAORI R, GULRAJANI I, ZHANG T, et~al.
-\newblock Stanford Alpaca: An Instruction-following {LLaMA} Model\allowbreak[EB/OL].
+\newblock Stanford Alpaca: An Instruction-following {LLaMA}
+  Model\allowbreak[EB/OL].
 \newblock 2023.
 \newblock \url{https://github.com/tatsu-lab/stanford_alpaca}.
 
-\bibitem[Ruan et~al.(2025)Ruan, Chen, Tian, Shi, Wu, Li, and Li]{ruan2025dynaserve}
+\bibitem[Ruan et~al.(2025)Ruan, Chen, Tian, Shi, Wu, Li, and
+  Li]{ruan2025dynaserve}
 RUAN C, CHEN Y, TIAN D, et~al.
-\newblock {DynaServe}: Unified and Elastic Execution for Dynamic Disaggregated LLM Serving\allowbreak[A/OL].
+\newblock {DynaServe}: Unified and Elastic Execution for Dynamic Disaggregated
+  LLM Serving\allowbreak[A/OL].
 \newblock 2025.
 \newblock arXiv: \eprint{https://arxiv.org/abs/2504.09285}{2504.09285}.
 \newblock \url{https://arxiv.org/abs/2504.09285}.
 
-\bibitem[Zhang et~al.(2025)Zhang, Wang, Liu, Wei, Shan, Chen, and Chen]{blitzscale}
+\bibitem[Zhang et~al.(2025)Zhang, Wang, Liu, Wei, Shan, Chen, and
+  Chen]{blitzscale}
 ZHANG D, WANG H, LIU Y, et~al.
-\newblock {BlitzScale}: Fast and Live Large Model Autoscaling with O(1) Host Caching\allowbreak[C]//\allowbreak
+\newblock {BlitzScale}: Fast and Live Large Model Autoscaling with O(1) Host
+  Caching\allowbreak[C]//\allowbreak
 19th USENIX Symposium on Operating Systems Design and Implementation (OSDI 25).
 \newblock USENIX, 2025: 275-293.
 
-\bibitem[Zhang et~al.(2022)Zhang, Roller, Goyal, Artetxe, Chen, Chen, Dewan, Diab, Li, Lin, Mihaylov, Ott, Shleifer, Shuster, Simig, Koura, Sridhar, Wang, and Zettlemoyer]{zhang2022opt}
+\bibitem[Zhang et~al.(2022)Zhang, Roller, Goyal, Artetxe, Chen, Chen, Dewan,
+  Diab, Li, Lin, Mihaylov, Ott, Shleifer, Shuster, Simig, Koura, Sridhar, Wang,
+  and Zettlemoyer]{zhang2022opt}
 ZHANG S, ROLLER S, GOYAL N, et~al.
 \newblock OPT: Open Pre-trained Transformer Language Models\allowbreak[A/OL].
 \newblock 2022.
 \newblock arXiv: \eprint{https://arxiv.org/abs/2205.01068}{2205.01068}.
 \newblock \url{https://arxiv.org/abs/2205.01068}.
 
-\bibitem[Hong et~al.(2024)Hong, Dai, Xu, Mao, Li, Liu, Chen, Dong, and Wang]{hong2024flashdecoding++}
+\bibitem[Hong et~al.(2024)Hong, Dai, Xu, Mao, Li, Liu, Chen, Dong, and
+  Wang]{hong2024flashdecoding++}
 HONG K, DAI G, XU J, et~al.
-\newblock {FlashDecoding++}: Faster Large Language Model Inference with Asynchronization, Flat GEMM Optimization, and Heuristics\allowbreak[J].
+\newblock {FlashDecoding++}: Faster Large Language Model Inference with
+  Asynchronization, Flat GEMM Optimization, and Heuristics\allowbreak[J].
 \newblock Proceedings of Machine Learning and Systems, 2024, 6: 148-161.
 
 \bibitem[Zhu et~al.(2021)Zhu, Yang, Hu, Wo, Xue, Ouyang, and Xu]{zhu2021perph}
 ZHU J, YANG R, HU C, et~al.
-\newblock {Perph}: A Workload Co-location Agent with Online Performance Prediction and Resource Inference\allowbreak[C]//\allowbreak
-2021 IEEE/ACM 21st International Symposium on Cluster, Cloud and Internet Computing (CCGrid).
+\newblock {Perph}: A Workload Co-location Agent with Online Performance
+  Prediction and Resource Inference\allowbreak[C]//\allowbreak
+2021 IEEE/ACM 21st International Symposium on Cluster, Cloud and Internet
+  Computing (CCGrid).
 \newblock IEEE, 2021: 176-185.
 
-\bibitem[Chen et~al.(2025)Chen, Jiang, Yu, Xu, Chao, Meng, Jiang, Xu, and Liu]{chen2024kvdirect}
+\bibitem[Chen et~al.(2025)Chen, Jiang, Yu, Xu, Chao, Meng, Jiang, Xu, and
+  Liu]{chen2024kvdirect}
 CHEN S, JIANG R, YU D, et~al.
 \newblock {KVDirect}: Distributed Disaggregated LLM Inference\allowbreak[A/OL].
 \newblock 2025.
 \newblock arXiv: \eprint{https://arxiv.org/abs/2501.14743}{2501.14743}.
 \newblock \url{https://arxiv.org/abs/2501.14743}.
 
-\bibitem[Hooper et~al.(2024)Hooper, Kim, Mohammadzadeh, Mahoney, Shao, Keutzer, and Gholami]{hooper2024kvquant}
+\bibitem[Hooper et~al.(2024)Hooper, Kim, Mohammadzadeh, Mahoney, Shao, Keutzer,
+  and Gholami]{hooper2024kvquant}
 HOOPER C, KIM S, MOHAMMADZADEH H, et~al.
-\newblock {KVQuant}: Towards 10 Million Context Length {LLM} Inference with {KV} Cache Quantization\allowbreak[C]//\allowbreak
+\newblock {KVQuant}: Towards 10 Million Context Length {LLM} Inference with
+  {KV} Cache Quantization\allowbreak[C]//\allowbreak
 Advances in Neural Information Processing Systems (NeurIPS): Vol.~37.
 \newblock 2024.
 
-\bibitem[Zhang et~al.(2023)Zhang, Sheng, Zhou, Chen, Zheng, Cai, Song, Tian, R{\'e}, Barrett, Wang, and Chen]{zhang2023h2o}
+\bibitem[Zhang et~al.(2023)Zhang, Sheng, Zhou, Chen, Zheng, Cai, Song, Tian,
+  R{\'e}, Barrett, Wang, and Chen]{zhang2023h2o}
 ZHANG Z, SHENG Y, ZHOU T, et~al.
-\newblock {H$_2$O}: Heavy-Hitter Oracle for Efficient Generative Inference of Large Language Models\allowbreak[C]//\allowbreak
+\newblock {H$_2$O}: Heavy-Hitter Oracle for Efficient Generative Inference of
+  Large Language Models\allowbreak[C]//\allowbreak
 Advances in Neural Information Processing Systems (NeurIPS): Vol.~36.
 \newblock 2023.
 
-\bibitem[Agrawal et~al.(2024)Agrawal, Kedia, Panwar, Mohan, Kwatra, Gulavani, Tumanov, and Ramjee]{taming}
+\bibitem[Agrawal et~al.(2024)Agrawal, Kedia, Panwar, Mohan, Kwatra, Gulavani,
+  Tumanov, and Ramjee]{taming}
 AGRAWAL A, KEDIA N, PANWAR A, et~al.
-\newblock Taming Throughput-Latency Tradeoff in LLM Inference with Sarathi-Serve\allowbreak[C]//\allowbreak
+\newblock Taming Throughput-Latency Tradeoff in LLM Inference with
+  Sarathi-Serve\allowbreak[C]//\allowbreak
 18th USENIX Symposium on Operating Systems Design and Implementation (OSDI 24).
 \newblock USENIX, 2024: 117-134.
 
 \bibitem[Du et~al.(2022)Du, Qian, Liu, Ding, Qiu, Yang, and Tang]{du2022glm}
 DU Z, QIAN Y, LIU X, et~al.
-\newblock Glm: General language model pretraining with autoregressive blank infilling\allowbreak[C]//\allowbreak
-Proceedings of the 60th Annual Meeting of the Association for Computational Linguistics (Volume 1: Long Papers).
+\newblock Glm: General language model pretraining with autoregressive blank
+  infilling\allowbreak[C]//\allowbreak
+Proceedings of the 60th Annual Meeting of the Association for Computational
+  Linguistics (Volume 1: Long Papers).
 \newblock 2022: 320-335.
 
 \bibitem[{Microsoft Azure}(2025)]{AzureLMM2025}
 {Microsoft Azure}.
 \newblock Azure Multimodal Model Inference Dataset 2025\allowbreak[EB/OL].
 \newblock 2025.
-\newblock \url{https://github.com/Azure/AzurePublicDataset/blob/master/ AzureLMMInferenceDataset2025.md}.
+\newblock \url{https://github.com/Azure/AzurePublicDataset/blob/master/
+  AzureLMMInferenceDataset2025.md}.
 
 \end{thebibliography}
