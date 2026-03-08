@@ -22,7 +22,7 @@ Models, LLMs)在自然语言处理、代码生成、知识检索和内容创作�
 阶段对计算资源的巨额消耗及其带来的沉重经济负担。
 
 大模型推理过程具有独特的两阶段执行特性：预填充(Prefill)阶段与解码
-(Decode)阶段\cite{transformers,nguyen2025generative},这种内在的计算模式
+(Decode)阶段\cite{transformers},这种内在的计算模式
 差异构成了资源优化的核心挑战。Prefill阶段计算密集,需并行处理整个输入序
 列以计算注意力键值(KV Cache)并生成首个令牌(Time to First Token, TTFT),
 其延迟直接影响用户感知的响应速度\cite{feng2025windserve,zhao2022gpu_sched}。

@@ -24,7 +24,7 @@ BanaServe在vLLM和DistServe等主流推理栈上实现，并在Alpaca短文本�
 \begin{figure}[htbp]
     \centering
     \includegraphics[width=0.8\textwidth]{figures/bg1.pdf}
-    \caption{HFT和vLLM在不同请求速率下的GPU资源利用率对比（基于单台A100 GPU部署LLaMA-13B模型，每组实验重复5次）。在低负载（RPS $\leq$ 10）场景下，两个系统均存在约20\%--40\%的GPU资源空闲浪费}
+    \caption{HFT和vLLM在不同请求速率下的GPU资源利用率对比}
     \label{fig:bana_gpu_util}
 \end{figure}
 现有LLM推理系统在静态分配策略下频繁出现资源利用率不足的问题，其根源在于两个方面：（1）在低请求率（RPS $\leq$ 10）条件下，系统大量计算和显存资源处于闲置状态；（2）固定资源分配与LLM推理动态工作负载特性之间存在根本性的失配——满足存储需求往往制约可用的计算能力，反之亦然。
@@ -50,7 +50,7 @@ BanaServe在vLLM和DistServe等主流推理栈上实现，并在Alpaca短文本�
     \hfill
     \subcaptionbox{PD分离架构中的资源利用率不均衡\label{fig:bana_pd_imbalance}}
         {\includegraphics[width=0.48\textwidth]{figures/pd_imbalance.png}}
-    \caption{现有LLM推理架构的两类实测局限(a) 前缀缓存感知路由导致命中率高的实例持续过载，形成负载倾斜、冗余存储和重复计算；(b) PD分离架构下Prefill实例计算密集（约95\%）但显存闲置（约35\%），Decode实例恰好相反，资源利用率高度互补但不均衡}
+    \caption{现有LLM推理架构的两类实测局限}
     \label{fig:bana_cache_imbalance}
 \end{figure}
 
@@ -115,7 +115,7 @@ BanaServe的整体架构由三个核心模块协同构成：
     \hfill
     \subcaptionbox{注意力级KV Cache迁移\label{fig:bana_attn_migration}}
         {\includegraphics[width=0.48\textwidth]{figures/attention_offload.png}}
-    \caption{BanaServe的两种迁移粒度。(a) 层级迁移将连续Transformer层（含权重$W_\ell$和KV Cache $\mathcal{K}_\ell$）从高负载GPU迁移至低负载GPU，实现粗粒度负载均衡；(b) 注意力级迁移沿注意力头维度分割KV Cache，将$K^{(2)},V^{(2)}$卸载至冷GPU并行计算，仅交换极少量中间结果，实现细粒度负载均衡}
+    \caption{BanaServe的两种迁移粒度}
     \label{fig:bana_migration}
 \end{figure}
 
@@ -188,7 +188,7 @@ BanaServe的整体架构由三个核心模块协同构成：
 \begin{figure}[htbp]
     \centering
     \includegraphics[width=\textwidth]{figures/kv_store.png}
-    \caption{BanaServe全局KV Cache存储的管理与复用机制。Prefill实例对传入请求执行增量预填充，复用已缓存的前缀KV Cache；新生成的KV Cache存储于共享的CPU/SSD支持的KV存储中；Decode实例从共享存储中检索完整KV Cache用于token生成，避免重复计算}
+    \caption{BanaServe全局KV Cache存储的管理与复用机制}
     \label{fig:bana_kvcache_store}
 \end{figure}
 
@@ -230,7 +230,7 @@ BanaServe的整体架构由三个核心模块协同构成：
 \begin{figure}[htbp]
     \centering
     \includegraphics[width=0.9\textwidth]{figures/kv_transfer.png}
-    \caption{BanaServe三阶段层级KV Cache流水线验证。在50\%平均前缀缓存命中率下，每层前向计算时间（4.22 ms）远大于每层KV Cache传输时间（0.082 ms），确保有效重叠。时序图展示三层（$L_1$--$L_3$）的并发执行：GPU执行$L_i$的前向计算时，HtoD通道预取$L_{i+1}$的KV Cache，DtoH通道存储$L_{i-1}$的缓存}
+    \caption{BanaServe三阶段层级KV Cache流水线验证}
     \label{fig:bana_pipeline}
 \end{figure}
 
@@ -708,7 +708,7 @@ EstimateLoad根据$req$的输入长度（$\text{Input}_i$）和预测输出长�
     \hfill
     \subcaptionbox{平均延迟\label{fig:bana_short_llama_lat}}
         {\includegraphics[width=0.32\textwidth]{figures/llama_short_avg_latency.pdf}}
-    \caption{LLaMA-13B短文本场景性能结果。在1到20 RPS的全请求速率范围内，BanaServe在吞吐量、总处理时间和平均延迟三项指标上均优于DistServe和vLLM，吞吐量提升1.1倍至1.2倍，总处理时间显著降低}
+    \caption{LLaMA-13B短文本场景性能结果}
     \label{fig:bana_short_llama}
 \end{figure}
 
@@ -722,7 +722,7 @@ EstimateLoad根据$req$的输入长度（$\text{Input}_i$）和预测输出长�
     \hfill
     \subcaptionbox{平均延迟\label{fig:bana_short_opt_lat}}
         {\includegraphics[width=0.32\textwidth]{figures/opt_short_avg_latency.pdf}}
-    \caption{OPT-13B短文本场景性能结果。BanaServe相比DistServe吞吐量提升2.8倍至3.9倍，相比vLLM最高提升3.9倍；平均延迟相比vLLM降低3.9\%至78.4\%，相比DistServe降低1.4\%至70.1\%}
+    \caption{OPT-13B短文本场景性能结果}
     \label{fig:bana_short_opt}
 \end{figure}
 
@@ -744,7 +744,7 @@ EstimateLoad根据$req$的输入长度（$\text{Input}_i$）和预测输出长�
     \hfill
     \subcaptionbox{平均延迟\label{fig:bana_long_llama_lat}}
         {\includegraphics[width=0.32\textwidth]{figures/llama_long_avg_latency.pdf}}
-    \caption{LLaMA-13B长文本场景性能结果。BanaServe在1到10 RPS范围内吞吐量提升1.3倍至1.5倍（相比DistServe和vLLM），延迟降低1.4\%至65.3\%（相比vLLM）。在高负载（10 RPS以上）场景下优势更为明显}
+    \caption{LLaMA-13B长文本场景性能结果}
     \label{fig:bana_long_llama}
 \end{figure}
 
@@ -758,7 +758,7 @@ EstimateLoad根据$req$的输入长度（$\text{Input}_i$）和预测输出长�
     \hfill
     \subcaptionbox{平均延迟\label{fig:bana_long_opt_lat}}
         {\includegraphics[width=0.32\textwidth]{figures/opt_long_avg_latency.pdf}}
-    \caption{OPT-13B长文本场景性能结果。BanaServe相比DistServe和vLLM吞吐量提升1.1倍至1.3倍，延迟改善模式与LLaMA-13B一致，在不同负载水平下均保持稳定的性能优势}
+    \caption{OPT-13B长文本场景性能结果}
     \label{fig:bana_long_opt}
 \end{figure}
 
@@ -784,7 +784,7 @@ EstimateLoad根据$req$的输入长度（$\text{Input}_i$）和预测输出长�
     \hfill
     \subcaptionbox{请求到达速率\label{fig:bana_azure_rps}}
         {\includegraphics[width=0.32\textwidth]{figures/Azure_rps.pdf}}
-    \caption{Azure生产负载追踪数据前1小时的统计特性。输入和输出长度分布呈重尾特性，请求到达速率具有显著突发性，反映了真实生产环境中多样化LLM服务工作负载的特征}
+    \caption{Azure生产负载追踪数据前1小时的统计特性}
     \label{fig:bana_azure_trace}
 \end{figure}
 
@@ -797,7 +797,7 @@ EstimateLoad根据$req$的输入长度（$\text{Input}_i$）和预测输出长�
     \hfill
     \subcaptionbox{平均延迟对比\label{fig:bana_azure_lat}}
         {\includegraphics[width=0.48\textwidth]{figures/azure_latency.pdf}}
-    \caption{Azure生产负载追踪实验的吞吐量和延迟综合对比。BanaServe在LLaMA-13B上取得最高吞吐量（0.288 req/s）和最低延迟（3.828 s），在OPT-13B上分别为0.315 req/s和3.658 s，在重尾分布和突发流量下均显著优于vLLM和DistServe}
+    \caption{Azure生产负载追踪实验的吞吐量和延迟综合对比}
     \label{fig:bana_azure_results}
 \end{figure}
 

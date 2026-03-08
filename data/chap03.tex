@@ -15,9 +15,7 @@
 \begin{figure}[htbp]
   \centering
   \includegraphics[width=\textwidth]{figures/uellm_framework.pdf}
-  \caption{UELLM系统整体架构图。系统由资源画像器、批处理调度器和LLM部
-  署器三个核心组件构成，通过在线监控反馈机制实现端到端的推理服务优化
-  \cite{he2024uellm}}
+  \caption{UELLM系统整体架构图\cite{he2024uellm}}
   \label{fig:uellm_framework}
 \end{figure}
 
@@ -44,7 +42,7 @@ LLM的分布式部署涉及两个关键决策：GPU数量的选择和层到设�
   \hfill
   \subcaptionbox{归一化GPU利用率\label{fig:image3}}
     {\includegraphics[width=0.32\textwidth]{figures/GPU.pdf}}
-  \caption{不同GPU数量和批大小配置下归一化延迟、显存占用和GPU利用率的变化（各指标均归一化至其最小值）。合理的部署配置可将GPU利用率提升4倍，延迟降低20倍}
+  \caption{不同GPU数量和批大小配置下归一化延迟、显存占用和GPU利用率的变化}
   \label{fig:deployment_sensitivity}
 \end{figure}
 
@@ -69,7 +67,7 @@ LLM的分布式部署涉及两个关键决策：GPU数量的选择和层到设�
 \begin{figure}[htbp]
   \centering
   \includegraphics[width=\textwidth]{figures/batch2.pdf}
-  \caption{UELLM与默认批处理算法的对比示意图。该对比展示了三个查询请求在批处理阶段和推理阶段的KV缓存利用情况。UELLM专注于优化token使用效率，与默认方法相比，显著减少了推理过程中处理的token总数\cite{he2024uellm}}
+  \caption{UELLM与默认批处理算法的对比示意图\cite{he2024uellm}}
   \label{fig:batching_comparison}
 \end{figure}
 
@@ -154,38 +152,6 @@ UELLM在后台运行实时监控程序，持续追踪GPU利用率、显存占用
 
 基于上述问题建模，本文提出SLO感知与输出长度驱动的动态批处理调度算法（SLO and Output-Driven Dynamic Batch Scheduler, SLO-ODBS），如算法~\ref{algo:slo_odbs}所示。
 
-
-
-\textbf{算法执行分三个阶段：}
-
-\textbf{阶段一：初始化（第1--3行）}
-
-第1行将所有请求按SLO升序排列。这一排序设计具有双重意义：一方面确保
-SLO最紧迫的请求被优先处理，避免因长时间等待而产生违约；另一方面，SLO
-相近的请求在排序后自然相邻，使得后续贪心分组时能够将SLO异构性低的请求
-聚合为同一批次，从根本上减少批内SLO差距。
-
-第2行初始化最终输出的批次列表$\text{batches}$和当前正在构建的批次
-$\text{batch}_c$均为空集，为后续逐请求构建过程做准备。
-
-第3行初始化三个批次状态追踪变量：$L_{CM}$记录当前批次中所有请求的最大
-SLO值，用于在计算$T_l$时衡量新请求与批内现有请求的SLO差距；$O_{CM}$记
-录当前批次中所有请求的最大预测输出长度，用于在计算$T_o$时衡量新请求带
-来的填充浪费；$CM$记录当前批次的综合优化指标历史峰值，作为动态调整批大
-小的依据。
-
-
-\textbf{阶段二：基于综合指标的逐请求批次构建（第4--19行）}
-
-第4行开始遍历排好序的请求列表，对每个请求$q$依次判断能否加入当前批次。
-
-第5行计算若将$q$纳入当前批次后，批次在延迟维度上的综合开销估计$T_l$。
-其中$q.\text{SLO} + L_{CM}$衡量新请求的SLO与批内已有请求最大SLO之和，
-反映批内SLO异构性对端到端延迟的累积影响；$(\text{len}(\text{batch}_c)+1)$
-为加入$q$后的批次大小，随批次增大而线性放大延迟贡献；$L_1$为并行计算
-引入的额外延迟系数，由系统离线标定。$T_l$越大，说明将$q$加入当前批次
-后，批次内SLO差异导致的总延迟风险越高。
-
 \begin{algorithm}[htbp]
   \caption{SLO感知与输出长度驱动的动态批处理调度算法(SLO-ODBS)}
   \label{algo:slo_odbs}
@@ -220,6 +186,38 @@ SLO值，用于在计算$T_l$时衡量新请求与批内现有请求的SLO差距
   }
   \Return{batches}\;
 \end{algorithm}
+
+
+\textbf{算法执行分三个阶段：}
+
+\textbf{阶段一：初始化（第1--3行）}
+
+第1行将所有请求按SLO升序排列。这一排序设计具有双重意义：一方面确保
+SLO最紧迫的请求被优先处理，避免因长时间等待而产生违约；另一方面，SLO
+相近的请求在排序后自然相邻，使得后续贪心分组时能够将SLO异构性低的请求
+聚合为同一批次，从根本上减少批内SLO差距。
+
+第2行初始化最终输出的批次列表$\text{batches}$和当前正在构建的批次
+$\text{batch}_c$均为空集，为后续逐请求构建过程做准备。
+
+第3行初始化三个批次状态追踪变量：$L_{CM}$记录当前批次中所有请求的最大
+SLO值，用于在计算$T_l$时衡量新请求与批内现有请求的SLO差距；$O_{CM}$记
+录当前批次中所有请求的最大预测输出长度，用于在计算$T_o$时衡量新请求带
+来的填充浪费；$CM$记录当前批次的综合优化指标历史峰值，作为动态调整批大
+小的依据。
+
+
+\textbf{阶段二：基于综合指标的逐请求批次构建（第4--19行）}
+
+第4行开始遍历排好序的请求列表，对每个请求$q$依次判断能否加入当前批次。
+
+第5行计算若将$q$纳入当前批次后，批次在延迟维度上的综合开销估计$T_l$。
+其中$q.\text{SLO} + L_{CM}$衡量新请求的SLO与批内已有请求最大SLO之和，
+反映批内SLO异构性对端到端延迟的累积影响；$(\text{len}(\text{batch}_c)+1)$
+为加入$q$后的批次大小，随批次增大而线性放大延迟贡献；$L_1$为并行计算
+引入的额外延迟系数，由系统离线标定。$T_l$越大，说明将$q$加入当前批次
+后，批次内SLO差异导致的总延迟风险越高。
+
 
 第6行计算若将$q$纳入当前批次后，因输出长度差异引入的填充浪费估计$T_o$。
 其中$q.\text{length} - O_{CM}$衡量新请求的预测输出长度与当前批次最长输
@@ -324,6 +322,13 @@ $n=|D|$（全部GPU参与部署）。这一从小到大的枚举顺序具有实�
 量之和小于模型总显存需求$M$，则该子集无法容纳完整模型，直接跳过，避免
 对不可行方案进行无意义的动态规划计算，显著降低算法整体时间复杂度。
 
+
+第7行初始化动态规划表$dp[\text{mark}][i]$中所有条目为正无穷，其中
+$\text{mark}$为二进制位掩码，表示已访问的设备节点集合的状态（若第$k$位
+为1，则表示设备$d_k$已被访问）；$i$表示当前路径的终止设备节点。初始化
+为正无穷确保未被更新的状态不会被错误地选为最优路径。
+
+
 \begin{algorithm}[htbp]
   \caption{高效低延迟资源分配算法(HELR)}
   \label{algo:helr}
@@ -365,11 +370,6 @@ $n=|D|$（全部GPU参与部署）。这一从小到大的枚举顺序具有实�
   \Return{Device\_map}\;
 \end{algorithm}
 
-
-第7行初始化动态规划表$dp[\text{mark}][i]$中所有条目为正无穷，其中
-$\text{mark}$为二进制位掩码，表示已访问的设备节点集合的状态（若第$k$位
-为1，则表示设备$d_k$已被访问）；$i$表示当前路径的终止设备节点。初始化
-为正无穷确保未被更新的状态不会被错误地选为最优路径。
 
 第8行的中层循环枚举所有可能的状态掩码$\text{mark}$，从1（仅一个设备被
 访问）到$2^n-1$（所有$n$个设备均被访问）。状态压缩动态规划通过位掩码紧
@@ -495,6 +495,11 @@ $\sum_{d_i \in S_n} \text{Memory}(d_i) \geq M$，不存在OOM风险；（2）状
 
 图~\ref{fig:ablation}展示了不同批处理算法和部署算法的性能对比。
 
+
+\textbf{批处理算法对比分析：}实验结果（图~\ref{fig:ablation}(a)(b)）表明，在高负载场景下，SLO-ODBS通过合理组合请求减少迭代次数和显存开销，维持与ODBS相近的低延迟；同时按SLO调度请求，实现接近SLO-DBS的低违约率。SLO-ODBS成功地在低延迟和低SLO违约率两个目标之间取得了最佳平衡。
+
+\textbf{部署算法对比分析：}HELR由于选择了更合理的资源分配和部署方案，在维持与HE相近的GPU利用率的同时，实现了与LR相近的吞吐量，验证了均衡模式的有效性。
+
 \begin{figure}[htbp]
   \centering
   \subcaptionbox{推理延迟\label{fig:arlatency}}
@@ -508,13 +513,10 @@ $\sum_{d_i \in S_n} \text{Memory}(d_i) \geq M$，不存在OOM风险；（2）状
   \hfill
   \subcaptionbox{GPU利用率\label{fig:hegpu}}
     {\includegraphics[width=0.24\textwidth]{figures/GPU_Utili.pdf}}
-  \caption{不同批处理算法与部署算法的性能对比。在高负载下，SLO-ODBS通过合理组合请求，维持与ODBS相近的低延迟，同时实现接近SLO-DBS的低SLO违约率，兼顾了两个优化目标；HELR在维持较高GPU利用率的同时实现了较高吞吐量}
+  \caption{不同批处理算法与部署算法的性能对比}
   \label{fig:ablation}
 \end{figure}
 
-\textbf{批处理算法对比分析：}实验结果（图~\ref{fig:ablation}(a)(b)）表明，在高负载场景下，SLO-ODBS通过合理组合请求减少迭代次数和显存开销，维持与ODBS相近的低延迟；同时按SLO调度请求，实现接近SLO-DBS的低违约率。SLO-ODBS成功地在低延迟和低SLO违约率两个目标之间取得了最佳平衡。
-
-\textbf{部署算法对比分析：}HELR由于选择了更合理的资源分配和部署方案，在维持与HE相近的GPU利用率的同时，实现了与LR相近的吞吐量，验证了均衡模式的有效性。
 
 \subsection{与SOTA方法的综合对比}
 
@@ -533,7 +535,7 @@ $\sum_{d_i \in S_n} \text{Memory}(d_i) \geq M$，不存在OOM风险；（2）状
   \hfill
   \subcaptionbox{吞吐量\label{fig:7throughput}}
     {\includegraphics[width=0.24\textwidth]{figures/experiment7/throughput.pdf}}
-  \caption{UELLM各版本与S$^3$、Morphling在四项核心指标上的综合对比。UA（UELLM-all）在所有指标上均取得最优性能：SLO不违约率达100\%，推理延迟最低，吞吐量最高}
+  \caption{UELLM各版本与SOTA在四项核心指标上的综合对比}
   \label{fig:sota_comparison}
 \end{figure}
 

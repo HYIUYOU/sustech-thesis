@@ -64,7 +64,7 @@ SJF的理论优势在于其最优平均等待时间的数学性质：在非抢�
 
 \end{enumerate}
 
-\subsection{输出长度感知的S$^3$调度框架}
+\subsection{输出长度感知的调度框架}
 
 针对传统策略中输出长度未知导致的批处理低效问题，Jin等人\cite{jin2023s3}提出了S$^3$（Skipping Scheduling for GPU Sharing）框架，将输出长度预测与批处理调度联合优化，是该领域的重要里程碑工作。
 
@@ -223,7 +223,7 @@ KVQuant\cite{hooper2024kvquant}和H$_2$O\cite{zhang2023h2o}等工作观察到KV 
 
 \begin{table}[htbp]
   \centering
-  \caption{不同设备映射策略对ChatGLM2-6B推理吞吐量的影响（参考UELLM\cite{he2024uellm}）}
+  \caption{不同设备映射策略对ChatGLM2-6B推理吞吐量的影响}
   \label{tab:devicemap_impact}
   \begin{tabular}{cccc}
     \toprule
@@ -350,7 +350,7 @@ Prefill与Decode阶段的资源需求（计算密集 vs. 内存密集）在时�
   \node[right, font=\scriptsize] at (4.8, 5.4) {显存利用率};
 
   \end{tikzpicture}
-  \caption{PD分离架构下Prefill与Decode实例资源利用率的系统性失衡示意图。Prefill实例计算饱和而显存闲置，Decode实例显存紧张而计算利用率低，两阶段资源需求高度互补，具有通过细粒度迁移实现协同优化的理论潜力}
+  \caption{PD分离架构下Prefill与Decode实例资源利用率的系统性失衡示意图}
   \label{fig:pd_imbalance}
 \end{figure}
 
