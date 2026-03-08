@@ -60,7 +60,7 @@ SJF的理论优势在于其最优平均等待时间的数学性质：在非抢�
 
 \item \textbf{传统调度策略的共同局限}
 
-综合来看，上述传统策略均缺乏对LLM推理两阶段异构特性的感知：不区分Prefill与Decode阶段的资源需求差异；调度决策不考虑SLO约束；批次构建未能利用输出长度信息消除填充浪费；静态配置无法适应动态变化的请求负载。这些局限共同导致了实际部署中GPU利用率低下（通常仅20\%--40\%）和SLO违约率偏高的问题\cite{he2024uellm,Llumnix,SpotServe,holmes2024deepspeed}。
+综合来看，上述传统策略均缺乏对LLM推理两阶段异构特性的感知：不区分Prefill与Decode阶段的资源需求差异；调度决策不考虑SLO约束；批次构建未能利用输出长度信息消除填充浪费；静态配置无法适应动态变化的请求负载。这些局限共同导致了实际部署中GPU利用率低下（通常仅20\%--40\%）和SLO违约率偏高的问题\cite{he2024uellm}。
 
 \end{enumerate}
 
@@ -350,7 +350,7 @@ Prefill与Decode阶段的资源需求（计算密集 vs. 内存密集）在时�
   \node[right, font=\scriptsize] at (4.8, 5.4) {显存利用率};
 
   \end{tikzpicture}
-  \caption{PD分离架构下Prefill与Decode实例资源利用率的系统性失衡示意图（数据来源：BanaServe\cite{he2025banaserve}，基于LLaMA-13B模型和Alpaca数据集的实测结果）。Prefill实例计算饱和而显存闲置，Decode实例显存紧张而计算利用率低，两阶段资源需求高度互补，具有通过细粒度迁移实现协同优化的理论潜力。}
+  \caption{PD分离架构下Prefill与Decode实例资源利用率的系统性失衡示意图。Prefill实例计算饱和而显存闲置，Decode实例显存紧张而计算利用率低，两阶段资源需求高度互补，具有通过细粒度迁移实现协同优化的理论潜力}
   \label{fig:pd_imbalance}
 \end{figure}
 

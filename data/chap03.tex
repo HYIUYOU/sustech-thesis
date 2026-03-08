@@ -17,7 +17,7 @@
   \includegraphics[width=\textwidth]{figures/uellm_framework.pdf}
   \caption{UELLM系统整体架构图。系统由资源画像器、批处理调度器和LLM部
   署器三个核心组件构成，通过在线监控反馈机制实现端到端的推理服务优化
-  \cite{he2024uellm}。}
+  \cite{he2024uellm}}
   \label{fig:uellm_framework}
 \end{figure}
 
@@ -44,9 +44,11 @@ LLM的分布式部署涉及两个关键决策：GPU数量的选择和层到设�
   \hfill
   \subcaptionbox{归一化GPU利用率\label{fig:image3}}
     {\includegraphics[width=0.32\textwidth]{figures/GPU.pdf}}
-  \caption{不同GPU数量和批大小配置下归一化延迟、显存占用和GPU利用率的变化（各指标均归一化至其最小值）。合理的部署配置可将GPU利用率提升4倍，延迟降低20倍。}
+  \caption{不同GPU数量和批大小配置下归一化延迟、显存占用和GPU利用率的变化（各指标均归一化至其最小值）。合理的部署配置可将GPU利用率提升4倍，延迟降低20倍}
   \label{fig:deployment_sensitivity}
 \end{figure}
+
+
 图~\ref{fig:deployment_sensitivity}展示了在不同GPU数量和批大小配置下，归一化延迟、显存占用和GPU利用率的变化规律。实验结果表明，合理的GPU数量配置可将GPU利用率提升4倍，并将推理延迟降低20倍（最坏情况涉及显存卸载时）。这一结果揭示了以下规律：
 \begin{enumerate}
     \item \textbf{GPU数量并非越多越好}：随着GPU数量增加，节点间通信延迟和同步开销显著上升，过多的GPU反而会拖慢推理速度；
@@ -67,7 +69,7 @@ LLM的分布式部署涉及两个关键决策：GPU数量的选择和层到设�
 \begin{figure}[htbp]
   \centering
   \includegraphics[width=\textwidth]{figures/batch2.pdf}
-  \caption{UELLM与默认批处理算法的对比示意图。该对比展示了三个查询请求在批处理阶段和推理阶段的KV缓存利用情况。UELLM专注于优化token使用效率，与默认方法相比，显著减少了推理过程中处理的token总数\cite{he2024uellm}。}
+  \caption{UELLM与默认批处理算法的对比示意图。该对比展示了三个查询请求在批处理阶段和推理阶段的KV缓存利用情况。UELLM专注于优化token使用效率，与默认方法相比，显著减少了推理过程中处理的token总数\cite{he2024uellm}}
   \label{fig:batching_comparison}
 \end{figure}
 
@@ -506,7 +508,7 @@ $\sum_{d_i \in S_n} \text{Memory}(d_i) \geq M$，不存在OOM风险；（2）状
   \hfill
   \subcaptionbox{GPU利用率\label{fig:hegpu}}
     {\includegraphics[width=0.24\textwidth]{figures/GPU_Utili.pdf}}
-  \caption{不同批处理算法与部署算法的性能对比。在高负载下，SLO-ODBS通过合理组合请求，维持与ODBS相近的低延迟，同时实现接近SLO-DBS的低SLO违约率，兼顾了两个优化目标；HELR在维持较高GPU利用率的同时实现了较高吞吐量。}
+  \caption{不同批处理算法与部署算法的性能对比。在高负载下，SLO-ODBS通过合理组合请求，维持与ODBS相近的低延迟，同时实现接近SLO-DBS的低SLO违约率，兼顾了两个优化目标；HELR在维持较高GPU利用率的同时实现了较高吞吐量}
   \label{fig:ablation}
 \end{figure}
 
@@ -531,7 +533,7 @@ $\sum_{d_i \in S_n} \text{Memory}(d_i) \geq M$，不存在OOM风险；（2）状
   \hfill
   \subcaptionbox{吞吐量\label{fig:7throughput}}
     {\includegraphics[width=0.24\textwidth]{figures/experiment7/throughput.pdf}}
-  \caption{UELLM各版本与S$^3$、Morphling在四项核心指标上的综合对比。UA（UELLM-all）在所有指标上均取得最优性能：SLO不违约率达100\%，推理延迟最低，吞吐量最高。}
+  \caption{UELLM各版本与S$^3$、Morphling在四项核心指标上的综合对比。UA（UELLM-all）在所有指标上均取得最优性能：SLO不违约率达100\%，推理延迟最低，吞吐量最高}
   \label{fig:sota_comparison}
 \end{figure}
 

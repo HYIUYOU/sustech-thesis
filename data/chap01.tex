@@ -98,7 +98,7 @@ CPU等异构计算资源的协同调度技术发展，推动人工智能技术�
 为突破自回归生成的序列依赖瓶颈,学术界提出了多种非传统的解码范式。推测
 性解码(Speculative Decoding)通过小规模草稿模型(Draft Model)快速生成候选
 序列,再由目标模型并行验证并修正,在保持输出质量不变的前提下实现2-3倍的
-加速比\cite{leviathan2022fast,chen2023accelerating}。非自回归解码
+加速比\cite{leviathan2023fast,chen2023accelerating}。非自回归解码
 (Non-autoregressive Decoding)则彻底打破逐token生成的限制,通过迭代精化
 (Iterative Refinement)\cite{Orca}或掩码预测(Masked Prediction)机制并行输
 出生成序列,虽然牺牲部分质量,但在实时性要求极高的场景(如实时翻译)展现潜力。
@@ -106,7 +106,7 @@ CPU等异构计算资源的协同调度技术发展，推动人工智能技术�
 针对生成过程的不确定动态性,早退出机制(Early Exiting)和级联推理(Cascade
 Inference)根据中间层置信度自适应决定计算深度。例如,
 CALM\cite{schuster2022confident}通过动态层级退出减少简单查询的计算量。
-CascadeBERT\cite{li2020cascade}采用模型级联策略,对简单样本使用轻量级模
+CascadeBERT\cite{li2021cascadebert}采用模型级联策略,对简单样本使用轻量级模
 型,仅将困难样本路由至大模型。这类方法通过计算量与任务难度的自适应匹配,
 显著提升了平均推理效率。
 
@@ -508,7 +508,7 @@ BanaServe优化框架，通过\textbf{层级权重分配}、\textbf{全局KV Cac
 
 BanaServe在13B参数模型（LLaMA-13B\cite{touvron2023llama}、
 OPT-13B\cite{zhang2022opt}）和公开基准（Alpaca\cite{alpaca}、
-LongBench\cite{longbench}）上的评估表明，相比vLLM，系统吞吐量提升1.2倍
+LongBench\cite{bai2023longbench}）上的评估表明，相比vLLM，系统吞吐量提升1.2倍
 至3.9倍，总处理时间降低3.9\%至78.4\%；相比DistServe，吞吐量提升1.1倍至
 2.8倍，延迟降低1.4\%至70.1\%，有效解决了挑战②③。
 
