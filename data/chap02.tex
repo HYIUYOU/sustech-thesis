@@ -43,9 +43,10 @@ FIFO策略的主要问题在于批内长度异构性导致的计算浪费。当�
 
 定量分析表明，对于批大小为$b$、最大输入序列长度为$s$、最大输出序列长度为$n$、隐藏层维度为$h$、Transformer层数为$l$的推理任务，KV Cache峰值存储字节数为：
 \begin{equation}
-  \text{KV Cache}_{\text{peak}} = 4 \times b \cdot l \cdot h \cdot (s + n)
+  \text{KV Cache}_{\text{peak}} = 4 \times b \cdot l \cdot h \cdot (s + n).
   \label{eq:kvcache_peak}
 \end{equation}
+
 可见KV Cache随批大小和最大输出长度线性增长\cite{sheng2023flexgen}。当批次内各请求输出长度差异显著时，短请求的完成不能及时释放其KV Cache槽位，导致显存被无效占用，进一步限制系统可接纳的有效批大小。
 
 \item \textbf{短作业优先调度（SJF）}
@@ -75,7 +76,7 @@ SJF的理论优势在于其最优平均等待时间的数学性质：在非抢�
 S$^3$将批次构建建模为一个\textbf{多维装箱问题}（Multi-dimensional Bin Packing Problem）。给定一组待调度请求$\mathcal{Q} = \{q_1, q_2, \ldots, q_N\}$，每个请求$q_i$具有输入长度$\text{Input}_i$和预测输出长度$\widehat{\text{Output}}_i$，批次构建的目标是将请求分配至若干批次$\mathcal{B} = \{B_1, B_2, \ldots, B_K\}$，使得所有批次中因填充产生的冗余token总数最小化：
 \begin{equation}
   \min_{\mathcal{B}} \sum_{k=1}^{K} \left[ \max_{q_i \in B_k} \widehat{\text{Output}}_i \cdot |B_k|
-  - \sum_{q_i \in B_k} \widehat{\text{Output}}_i \right]
+  - \sum_{q_i \in B_k} \widehat{\text{Output}}_i \right] ,
   \label{eq:s3_objective}
 \end{equation}
 S$^3$通过将预测输出长度相近的请求聚合为同一批次，有效减少批内的最大输出长度差异，从而降低填充比例，提升有效计算密度。
@@ -97,7 +98,7 @@ S$^3$将输出长度预测与LLM批处理联合建模，验证了长度感知调
 
 设系统批次槽位数为$B$，第$i$个请求的生成长度为$L_i$。在静态批处理下，GPU有效利用率可近似表示为：
 \begin{equation}
-  \eta_{\text{static}} = \frac{\sum_{i=1}^{B} L_i}{B \cdot \max_{i} L_i}
+  \eta_{\text{static}} = \frac{\sum_{i=1}^{B} L_i}{B \cdot \max_{i} L_i} ,
   \label{eq:static_util}
 \end{equation}
 当请求长度分布呈现重尾特性时，$\eta_{\text{static}}$可低至20\%以下。而连续批处理通过实时替换已完成请求，理论上可将GPU利用率提升至接近100\%，显著改善系统吞吐量。
@@ -112,7 +113,7 @@ Orca\cite{Orca}是最早系统性地提出并实现In-flight Batching（也称�
     
 \item \textbf{迭代级调度}
 
-Orca\cite{Orca}将调度粒度从请求级细化为迭代级，即在每次前向传播（Forward Pass）后重新做出调度决策。具体而言，Orca维护一个全局请求队列，每次迭代开始时检测当前批次中已完成的请求将其移出，并从等待队列中选取新请求加入批次直到达到显存上限，随后对批次中处于Prefill阶段的新请求和处于Decode阶段的旧请求采用统一的前向传播流程处理。
+Orca将调度粒度从请求级细化为迭代级，即在每次前向传播（Forward Pass）后重新做出调度决策。具体而言，Orca维护一个全局请求队列，每次迭代开始时检测当前批次中已完成的请求将其移出，并从等待队列中选取新请求加入批次直到达到显存上限，随后对批次中处于Prefill阶段的新请求和处于Decode阶段的旧请求采用统一的前向传播流程处理。
 
 \item \textbf{选择性批处理（Selective Batching）}
 
@@ -454,6 +455,8 @@ Prefill与Decode阶段的资源需求（计算密集 vs. 内存密集）在时�
 \end{table}
 
 \end{enumerate}
+
+
 综合以上\textbf{三类核心挑战}的局限性分析（与第一章
 第~\ref{sec:limitations}节保持一致），本文提出两种互补的优化方案，
 分别从批处理调度与层级资源分配两个层面构建大模型推理服务的完整优化体系：

@@ -121,7 +121,6 @@
 \newlabel{eq:s3_objective}{{2-2}{15}{输出长度感知的调度框架}{equation.2.2}{}}
 \citation{kwon2023efficient}
 \citation{Orca}
-\citation{Orca}
 \@writefile{toc}{\contentsline {subsection}{\numberline {2.2.3}连续批处理机制（Continuous Batching）}{16}{subsection.2.2.3}\protected@file@percent }
 \newlabel{eq:static_util}{{2-3}{16}{连续批处理机制（Continuous Batching）}{equation.2.3}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {2.2.4}Orca中的In-flight Batching机制}{16}{subsection.2.2.4}\protected@file@percent }
@@ -193,11 +192,8 @@
 \newlabel{sec:uellm_motivation}{{3.2}{27}{问题分析与设计动机}{section.3.2}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {3.2.1}部署配置对推理性能的影响}{27}{subsection.3.2.1}\protected@file@percent }
 \newlabel{fig:image1}{{3-2(a)}{27}{归一化延迟}{figure.caption.25}{}}
-\newlabel{sub@fig:image1}{{(a)}{27}{归一化延迟}{figure.caption.25}{}}
 \newlabel{fig:image2}{{3-2(b)}{27}{归一化显存占用}{figure.caption.25}{}}
-\newlabel{sub@fig:image2}{{(b)}{27}{归一化显存占用}{figure.caption.25}{}}
 \newlabel{fig:image3}{{3-2(c)}{27}{归一化GPU利用率}{figure.caption.25}{}}
-\newlabel{sub@fig:image3}{{(c)}{27}{归一化GPU利用率}{figure.caption.25}{}}
 \@writefile{lof}{\contentsline {figure}{\numberline {3-2}{\ignorespaces 不同GPU数量和批大小配置下归一化延迟、显存占用和GPU利用率的变化}}{27}{figure.caption.25}\protected@file@percent }
 \newlabel{fig:deployment_sensitivity}{{3-2}{27}{不同GPU数量和批大小配置下归一化延迟、显存占用和GPU利用率的变化}{figure.caption.25}{}}
 \citation{he2024uellm}
@@ -247,24 +243,16 @@
 \@writefile{toc}{\contentsline {subsection}{\numberline {3.6.2}批处理算法与部署算法的消融分析}{38}{subsection.3.6.2}\protected@file@percent }
 \citation{he2024uellm}
 \newlabel{fig:arlatency}{{3-4(a)}{39}{推理延迟}{figure.caption.30}{}}
-\newlabel{sub@fig:arlatency}{{(a)}{39}{推理延迟}{figure.caption.30}{}}
 \newlabel{fig:arslo}{{3-4(b)}{39}{SLO违约率}{figure.caption.30}{}}
-\newlabel{sub@fig:arslo}{{(b)}{39}{SLO违约率}{figure.caption.30}{}}
 \newlabel{fig:hethroughput}{{3-4(c)}{39}{吞吐量}{figure.caption.30}{}}
-\newlabel{sub@fig:hethroughput}{{(c)}{39}{吞吐量}{figure.caption.30}{}}
 \newlabel{fig:hegpu}{{3-4(d)}{39}{GPU利用率}{figure.caption.30}{}}
-\newlabel{sub@fig:hegpu}{{(d)}{39}{GPU利用率}{figure.caption.30}{}}
 \@writefile{lof}{\contentsline {figure}{\numberline {3-4}{\ignorespaces 不同批处理算法与部署算法的性能对比}}{39}{figure.caption.30}\protected@file@percent }
 \newlabel{fig:ablation}{{3-4}{39}{不同批处理算法与部署算法的性能对比}{figure.caption.30}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {3.6.3}与SOTA方法的综合对比}{39}{subsection.3.6.3}\protected@file@percent }
 \newlabel{fig:7GPU Utilization}{{3-5(a)}{39}{GPU利用率}{figure.caption.31}{}}
-\newlabel{sub@fig:7GPU Utilization}{{(a)}{39}{GPU利用率}{figure.caption.31}{}}
 \newlabel{fig:7slo}{{3-5(b)}{39}{SLO不违约率}{figure.caption.31}{}}
-\newlabel{sub@fig:7slo}{{(b)}{39}{SLO不违约率}{figure.caption.31}{}}
 \newlabel{fig:7latency}{{3-5(c)}{39}{推理延迟}{figure.caption.31}{}}
-\newlabel{sub@fig:7latency}{{(c)}{39}{推理延迟}{figure.caption.31}{}}
 \newlabel{fig:7throughput}{{3-5(d)}{39}{吞吐量}{figure.caption.31}{}}
-\newlabel{sub@fig:7throughput}{{(d)}{39}{吞吐量}{figure.caption.31}{}}
 \@writefile{lof}{\contentsline {figure}{\numberline {3-5}{\ignorespaces UELLM各版本与SOTA在四项核心指标上的综合对比}}{39}{figure.caption.31}\protected@file@percent }
 \newlabel{fig:sota_comparison}{{3-5}{39}{UELLM各版本与SOTA在四项核心指标上的综合对比}{figure.caption.31}{}}
 \citation{he2024uellm}
@@ -284,9 +272,7 @@
 \newlabel{fig:bana_gpu_util}{{4-1}{43}{HFT和vLLM在不同请求速率下的GPU资源利用率对比}{figure.caption.32}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {4.2.2}前缀缓存感知路由引发的负载倾斜}{44}{subsection.4.2.2}\protected@file@percent }
 \newlabel{fig:bana_cache_skew}{{4-2(a)}{44}{前缀缓存感知路由导致的负载倾斜}{figure.caption.33}{}}
-\newlabel{sub@fig:bana_cache_skew}{{(a)}{44}{前缀缓存感知路由导致的负载倾斜}{figure.caption.33}{}}
 \newlabel{fig:bana_pd_imbalance}{{4-2(b)}{44}{PD分离架构中的资源利用率不均衡}{figure.caption.33}{}}
-\newlabel{sub@fig:bana_pd_imbalance}{{(b)}{44}{PD分离架构中的资源利用率不均衡}{figure.caption.33}{}}
 \@writefile{lof}{\contentsline {figure}{\numberline {4-2}{\ignorespaces 现有LLM推理架构的两类实测局限}}{44}{figure.caption.33}\protected@file@percent }
 \newlabel{fig:bana_cache_imbalance}{{4-2}{44}{现有LLM推理架构的两类实测局限}{figure.caption.33}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {4.2.3}PD分离架构的内生资源不均衡}{44}{subsection.4.2.3}\protected@file@percent }
@@ -297,9 +283,7 @@
 \newlabel{eq:layer_migration_latency}{{4-2}{45}{层级权重迁移}{equation.4.2}{}}
 \newlabel{eq:layer_correctness}{{4-3}{46}{层级权重迁移}{equation.4.3}{}}
 \newlabel{fig:bana_layer_migration}{{4-3(a)}{46}{层级权重迁移}{figure.caption.34}{}}
-\newlabel{sub@fig:bana_layer_migration}{{(a)}{46}{层级权重迁移}{figure.caption.34}{}}
 \newlabel{fig:bana_attn_migration}{{4-3(b)}{46}{注意力级KV Cache迁移}{figure.caption.34}{}}
-\newlabel{sub@fig:bana_attn_migration}{{(b)}{46}{注意力级KV Cache迁移}{figure.caption.34}{}}
 \@writefile{lof}{\contentsline {figure}{\numberline {4-3}{\ignorespaces BanaServe的两种迁移粒度}}{46}{figure.caption.34}\protected@file@percent }
 \newlabel{fig:bana_migration}{{4-3}{46}{BanaServe的两种迁移粒度}{figure.caption.34}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {4.3.2}注意力级KV Cache迁移}{46}{subsection.4.3.2}\protected@file@percent }
@@ -362,52 +346,35 @@
 \newlabel{tab:bana_models}{{4-1}{58}{实验评估所用模型配置}{table.caption.39}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {4.6.2}短文本场景性能评估}{58}{subsection.4.6.2}\protected@file@percent }
 \newlabel{fig:bana_short_llama_thr}{{4-6(a)}{59}{吞吐量}{figure.caption.40}{}}
-\newlabel{sub@fig:bana_short_llama_thr}{{(a)}{59}{吞吐量}{figure.caption.40}{}}
 \newlabel{fig:bana_short_llama_time}{{4-6(b)}{59}{总处理时间}{figure.caption.40}{}}
-\newlabel{sub@fig:bana_short_llama_time}{{(b)}{59}{总处理时间}{figure.caption.40}{}}
 \newlabel{fig:bana_short_llama_lat}{{4-6(c)}{59}{平均延迟}{figure.caption.40}{}}
-\newlabel{sub@fig:bana_short_llama_lat}{{(c)}{59}{平均延迟}{figure.caption.40}{}}
 \@writefile{lof}{\contentsline {figure}{\numberline {4-6}{\ignorespaces LLaMA-13B短文本场景性能结果}}{59}{figure.caption.40}\protected@file@percent }
 \newlabel{fig:bana_short_llama}{{4-6}{59}{LLaMA-13B短文本场景性能结果}{figure.caption.40}{}}
 \newlabel{fig:bana_short_opt_thr}{{4-7(a)}{59}{吞吐量}{figure.caption.41}{}}
-\newlabel{sub@fig:bana_short_opt_thr}{{(a)}{59}{吞吐量}{figure.caption.41}{}}
 \newlabel{fig:bana_short_opt_time}{{4-7(b)}{59}{总处理时间}{figure.caption.41}{}}
-\newlabel{sub@fig:bana_short_opt_time}{{(b)}{59}{总处理时间}{figure.caption.41}{}}
 \newlabel{fig:bana_short_opt_lat}{{4-7(c)}{59}{平均延迟}{figure.caption.41}{}}
-\newlabel{sub@fig:bana_short_opt_lat}{{(c)}{59}{平均延迟}{figure.caption.41}{}}
 \@writefile{lof}{\contentsline {figure}{\numberline {4-7}{\ignorespaces OPT-13B短文本场景性能结果}}{59}{figure.caption.41}\protected@file@percent }
 \newlabel{fig:bana_short_opt}{{4-7}{59}{OPT-13B短文本场景性能结果}{figure.caption.41}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {4.6.3}长文本场景性能评估}{59}{subsection.4.6.3}\protected@file@percent }
 \newlabel{fig:bana_long_llama_thr}{{4-8(a)}{59}{吞吐量}{figure.caption.42}{}}
-\newlabel{sub@fig:bana_long_llama_thr}{{(a)}{59}{吞吐量}{figure.caption.42}{}}
 \newlabel{fig:bana_long_llama_time}{{4-8(b)}{59}{总处理时间}{figure.caption.42}{}}
-\newlabel{sub@fig:bana_long_llama_time}{{(b)}{59}{总处理时间}{figure.caption.42}{}}
 \newlabel{fig:bana_long_llama_lat}{{4-8(c)}{59}{平均延迟}{figure.caption.42}{}}
-\newlabel{sub@fig:bana_long_llama_lat}{{(c)}{59}{平均延迟}{figure.caption.42}{}}
 \@writefile{lof}{\contentsline {figure}{\numberline {4-8}{\ignorespaces LLaMA-13B长文本场景性能结果}}{59}{figure.caption.42}\protected@file@percent }
 \newlabel{fig:bana_long_llama}{{4-8}{59}{LLaMA-13B长文本场景性能结果}{figure.caption.42}{}}
 \citation{AzureLMM2025}
 \newlabel{fig:bana_long_opt_thr}{{4-9(a)}{60}{吞吐量}{figure.caption.43}{}}
-\newlabel{sub@fig:bana_long_opt_thr}{{(a)}{60}{吞吐量}{figure.caption.43}{}}
 \newlabel{fig:bana_long_opt_time}{{4-9(b)}{60}{总处理时间}{figure.caption.43}{}}
-\newlabel{sub@fig:bana_long_opt_time}{{(b)}{60}{总处理时间}{figure.caption.43}{}}
 \newlabel{fig:bana_long_opt_lat}{{4-9(c)}{60}{平均延迟}{figure.caption.43}{}}
-\newlabel{sub@fig:bana_long_opt_lat}{{(c)}{60}{平均延迟}{figure.caption.43}{}}
 \@writefile{lof}{\contentsline {figure}{\numberline {4-9}{\ignorespaces OPT-13B长文本场景性能结果}}{60}{figure.caption.43}\protected@file@percent }
 \newlabel{fig:bana_long_opt}{{4-9}{60}{OPT-13B长文本场景性能结果}{figure.caption.43}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {4.6.4}Azure生产负载追踪实验}{60}{subsection.4.6.4}\protected@file@percent }
 \newlabel{fig:bana_azure_input}{{4-10(a)}{60}{输入长度分布}{figure.caption.44}{}}
-\newlabel{sub@fig:bana_azure_input}{{(a)}{60}{输入长度分布}{figure.caption.44}{}}
 \newlabel{fig:bana_azure_output}{{4-10(b)}{60}{输出长度分布}{figure.caption.44}{}}
-\newlabel{sub@fig:bana_azure_output}{{(b)}{60}{输出长度分布}{figure.caption.44}{}}
 \newlabel{fig:bana_azure_rps}{{4-10(c)}{60}{请求到达速率}{figure.caption.44}{}}
-\newlabel{sub@fig:bana_azure_rps}{{(c)}{60}{请求到达速率}{figure.caption.44}{}}
 \@writefile{lof}{\contentsline {figure}{\numberline {4-10}{\ignorespaces Azure生产负载追踪数据前1小时的统计特性}}{60}{figure.caption.44}\protected@file@percent }
 \newlabel{fig:bana_azure_trace}{{4-10}{60}{Azure生产负载追踪数据前1小时的统计特性}{figure.caption.44}{}}
 \newlabel{fig:bana_azure_thr}{{4-11(a)}{61}{吞吐量对比}{figure.caption.45}{}}
-\newlabel{sub@fig:bana_azure_thr}{{(a)}{61}{吞吐量对比}{figure.caption.45}{}}
 \newlabel{fig:bana_azure_lat}{{4-11(b)}{61}{平均延迟对比}{figure.caption.45}{}}
-\newlabel{sub@fig:bana_azure_lat}{{(b)}{61}{平均延迟对比}{figure.caption.45}{}}
 \@writefile{lof}{\contentsline {figure}{\numberline {4-11}{\ignorespaces Azure生产负载追踪实验的吞吐量和延迟综合对比}}{61}{figure.caption.45}\protected@file@percent }
 \newlabel{fig:bana_azure_results}{{4-11}{61}{Azure生产负载追踪实验的吞吐量和延迟综合对比}{figure.caption.45}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {4.6.5}综合性能对比分析}{61}{subsection.4.6.5}\protected@file@percent }

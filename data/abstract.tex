@@ -1,15 +1,16 @@
 % !TeX root = ../sustechthesis-example.tex
 
 \begin{abstract}
-  大语言模型的规模化部署使推理服务系统承受着持续增长的资源管理压力。云平台中约90\%的AI算力消耗于推理而非训练，但现有系统在批处理调度、部署配置和跨阶段资源协同三个层面均存在明显缺陷：（1）批处理策略粗放且部署配置忽视网络拓扑异构性，导致GPU利用率长期徘徊在20\%--40\%并频繁产生SLO违约。（2）预填充（Prefill）与解码（Decode）阶段的计算和显存资源天然互补，但现有PD分离系统的配置粒度过粗，这种互补性几乎无法被动态利用。（3）调度决策与KV Cache状态紧耦合，前缀缓存感知路由持续向命中率高的实例倾斜，形成热点正反馈，系统难以应对突发异构负载。本文围绕\textbf{面向大模型的推理任务批式调度和KV缓存优化}这一主题，提出UELLM和BanaServe两个系统框架，从批处理与部署联合优化、PD分离架构资源协同两个互补维度分别加以解决。
+  大语言模型的规模化部署使推理服务系统承受着持续增长的资源管理压力。云平台中约90\%的AI算力消耗于推理而非训练，但现有系统在批处理调度、部署配置和跨阶段资源协同三个层面均存在明显缺陷：（1）批处理策略粗放且部署配置忽视网络拓扑异构性，导致GPU利用率长期徘徊在20\%--40\%并频繁产生SLO（Service Level Objective）违约；（2）预填充（Prefill）与解码（Decode）阶段的计算和显存资源天然互补，但现有PD分离系统的配置粒度过粗，导致这种互补性几乎无法被动态利用；（3）调度决策与KV Cache状态紧耦合，导致前缀缓存感知路由持续向命中率高的实例倾斜，形成热点正反馈，系统难以应对突发异构负载。本文围绕面向大模型的推理任务批式调度和KV缓存优化这一主题，提出UELLM和BanaServe两个系统框架，从批处理与部署联合优化、PD分离架构资源协同两个互补维度分别加以解决。
 
   针对批处理策略粗放与部署配置忽视异构拓扑的问题，本文提出UELLM框架。UELLM的核心思路是将输出长度预测作为调度入口，以LoRA微调ChatGLM3-6B进行分桶预测，准确率达99.51\%，从而为批次构建提供可靠先验。在此基础上，SLO-ODBS算法以SLO约束与输出长度差异为双驱动，通过加权贪心策略将长度相近的请求归并成批，将冗余填充和KV Cache浪费压缩至最低。HELR算法则将部署建模为拓扑感知动态规划问题，综合NVLink/PCIe带宽差异和GPU计算能力，自动求解最优层到GPU映射，无需元学习配置搜索的压力测试环节。在4-GPU异构集群上，UELLM相比Morphling和S$^3$将推理延迟降低72.3\%至90.3\%，GPU利用率提升1.2倍至4.1倍，吞吐量提高1.92倍至4.98倍，并实现零SLO违约。
 
-  针对PD分离架构中互补性资源闲置和调度与缓存耦合两类问题，本文提出BanaServe框架。对于PD分离架构中互补性资源闲置问题，BanaServe引入层级权重迁移与注意力级KV Cache迁移两种机制：层级迁移在Transformer层粒度上同步搬运权重和KV Cache，适合处理严重的跨实例负载失衡。注意力级迁移仅沿注意力头维度搬运KV状态，无需传输模型权重，迁移延迟极低，适合实时细粒度调整。两种粒度协同，将Prefill实例闲置的显存和Decode实例闲置的算力重新投入使用。对于PD分离架构中调度与缓存耦合问题，Banaserve构建全局KV Cache存储层，将缓存状态与计算位置解耦，使路由器摆脱缓存命中率的约束，转为纯负载感知调度。配合层间流水线重叠传输技术（KV Cache传输时间约0.082\,ms，远低于单层前向计算时间约4.22\,ms），通信开销几乎完全隐藏于计算过程中。在LLaMA-13B和OPT-13B上，BanaServe相比vLLM吞吐量提升1.2倍至3.9倍、处理时间降低3.9\%至78.4\%，相比DistServe吞吐量提升1.1倍至2.8倍、延迟降低1.4\%至70.1\%。在Azure生产负载追踪数据上的验证进一步表明，两个框架在真实突发流量场景下具有良好的鲁棒性与跨架构泛化能力。
+  针对PD分离架构中互补性资源闲置和调度与缓存耦合两类问题，本文提出BanaServe框架。对于PD分离架构中互补性资源闲置问题，BanaServe引入层级权重迁移与注意力级KV Cache迁移两种机制：层级迁移在Transformer层粒度上同步搬运权重和KV Cache，适合处理严重的跨实例负载失衡。注意力级迁移仅沿注意力头维度搬运KV状态，无需传输模型权重，迁移延迟极低，适合实时细粒度调整。两种粒度协同，将Prefill实例闲置的显存和Decode实例闲置的算力重新投入使用。对于PD分离架构中调度与缓存耦合问题，BanaServe构建全局KV Cache存储层，将缓存状态与计算位置解耦，使路由器摆脱缓存命中率的约束，转为纯负载感知调度。配合层间流水线重叠传输技术（KV Cache传输时间约0.082\,ms，远低于单层前向计算时间约4.22\,ms），通信开销几乎完全隐藏于计算过程中。在LLaMA-13B和OPT-13B上进行测试，BanaServe相比vLLM吞吐量提升1.2倍至3.9倍、处理时间降低3.9\%至78.4\%，相比DistServe吞吐量提升1.1倍至2.8倍、延迟降低1.4\%至70.1\%。在Azure生产负载追踪数据上的验证进一步表明，两个框架在真实突发流量场景下具有良好的鲁棒性与跨架构泛化能力。
+
+  综上所述，本文针对大语言模型推理服务系统在批处理调度、部署配置与PD分离资源协同三方面的关键瓶颈，提出了UELLM与BanaServe两个互补框架。UELLM以输出长度预测为调度入口，通过SLO-ODBS与HELR算法实现了批处理与部署的联合优化，在4-GPU异构集群上将推理延迟降低72.3\%–90.3\%，GPU利用率提升1.2到4.1倍，并实现零SLO违约。BanaServe则通过层级化迁移机制与全局KV Cache存储层，解决了PD分离架构中的资源互补性利用与调度-缓存耦合难题，在LLaMA-13B与OPT-13B上分别实现最高3.9倍与2.8倍的吞吐量提升。两个框架在Azure生产负载追踪中的验证表明其具备良好的鲁棒性与跨架构泛化能力。
 
   \thusetup{
-    keywords = {大语言模型推理, 批式调度, PD分离架构, 动态批处理,
-      异构部署优化},
+    keywords = {大语言模型推理, 批式调度, PD分离架构, 动态批处理, 异构部署优化},
   }
 \end{abstract}
 
@@ -19,17 +20,16 @@
   platforms is spent on inference rather than training, yet existing systems
   fall short in three respects. Batching strategies remain coarse-grained and
   deployment configurations ignore network topology heterogeneity, keeping
-  GPU utilization in the 20\%--40\% range and causing frequent SLO
-  violations. The compute-intensive prefill phase and memory-intensive decode
+  GPU utilization in the 20\%--40\% range and causing frequent SLO (Service Level Objective) violations. The compute-intensive prefill phase and memory-intensive decode
   phase have naturally complementary resource profiles, but current
   PD-disaggregated systems lack the granularity to exploit this
   complementarity at runtime. Finally, scheduling decisions are tightly bound
   to KV Cache placement: prefix cache-aware routing continuously favors
   high-hit instances, creating a self-reinforcing hotspot that prevents
   balanced utilization under dynamic and heterogeneous workloads. This thesis
-  addresses all three issues under the theme of \textbf{Batch Scheduling and
-  KV Cache Optimization for Large Language Model Inference}, proposing two
-  complementary frameworks---UELLM for batching and deployment co-optimization,
+  addresses all three issues under the theme of Batch Scheduling and
+  KV Cache Optimization for Large Language Model Inference, proposing two
+  complementary frameworks: UELLM for batching and deployment co-optimization,
   and BanaServe for fine-grained resource coordination in PD-disaggregated
   settings.
 
@@ -40,8 +40,8 @@
   groups requests by output length under SLO constraints, minimizing padding
   waste through a weighted greedy strategy. Deployment is handled by HELR,
   which casts layer-to-GPU mapping as a topology-aware dynamic programming
-  problem and directly solves for the optimal assignment---accounting for
-  NVLink/PCIe bandwidth asymmetries and per-device compute capacity---without
+  problem and directly solves for the optimal assignment, accounting for
+  NVLink/PCIe bandwidth asymmetries and per-device compute capacity, without
   the meta-learning pressure-test overhead required by prior methods. On a
   4-GPU heterogeneous cluster, UELLM cuts inference latency by 72.3\%--90.3\%,
   raises GPU utilization by 1.2$\times$--4.1$\times$, and improves throughput
@@ -68,6 +68,13 @@
   confirm that both frameworks remain robust under heavy-tailed input/output
   distributions and bursty arrival patterns across different Transformer
   architectures.
+
+
+  TIn summary, this thesis addresses critical bottlenecks in batch scheduling, deployment configuration, and PD-disaggregated resource coordination for large language model inference serving.
+  We propose two complementary frameworks, UELLM and BanaServe, that tackle these challenges from distinct yet synergistic perspectives.
+  UELLM leverages output-length prediction as the scheduling entry point, achieving joint optimization of batching and deployment through the SLO-ODBS and HELR algorithms; on a 4-GPU heterogeneous cluster, it reduces inference latency by 72.3\%--90.3\%, improves GPU utilization by 1.2$\times$--4.1$\times$, and achieves zero SLO violations.
+  BanaServe, in turn, addresses resource complementarity exploitation and scheduling-cache coupling in PD-disaggregated architectures through hierarchical migration mechanisms and a global KV Cache store, delivering up to 3.9$\times$ and 2.8$\times$ throughput improvements on LLaMA-13B and OPT-13B, respectively.
+  Validation on Azure production traces demonstrates the robustness and cross-architecture generalizability of both frameworks.
 
   \thusetup{
     keywords* = {Large Language Model Inference, Batch Scheduling,
